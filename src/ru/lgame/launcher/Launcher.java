@@ -80,7 +80,7 @@ public class Launcher {
 					try {
 						loadingFrame = new LoadingFrm();
 						loadingFrame.setVisible(true);
-						loadingFrame.setText("�������������");
+						loadingFrame.setText("Инициализация");
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -96,16 +96,16 @@ public class Launcher {
 		getLauncherDir();
 		createDirsIfNecessary();
 		Config.init();
-		loadingFrame.setText("��������� ������ � �������");
+		loadingFrame.setText("Получение данных о сборках");
 		if(tryLoadModpacksFromServer()) {
-		} else if(loadCachedModpacks()) {
+		} else if(loadCachedLauncherJson()) {
 			offline = true;
 		} else {
-			JOptionPane.showMessageDialog(new JPanel(), "��� ������� ������� ����� ����������� � ���������!");
+			JOptionPane.showMessageDialog(new JPanel(), "Для первого запуска нужно подключение к интернету!");
 			System.exit(0);
 			return;
 		}
-		loadingFrame.setText("������������� ����������");
+		loadingFrame.setText("Инициализация интерфейса");
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -119,6 +119,9 @@ public class Launcher {
 		});
 	}
 	
+	/**
+	 * Создать недостающие директории
+	 */
 	private void createDirsIfNecessary() {
 		File f = new File(getLauncherDir());
 		if(!f.exists()) f.mkdirs();
@@ -126,7 +129,11 @@ public class Launcher {
 		if(!f.exists()) f.mkdirs();
 	}
 
-	private boolean loadCachedModpacks() {
+	/**
+	 * Загрузить кешированный launcher.json
+	 * @return Получилось ли
+	 */
+	private boolean loadCachedLauncherJson() {
 		File f = new File(getCacheDir() + "launcher.json");
 		if(!f.exists()) return false;
 		try {
@@ -138,6 +145,10 @@ public class Launcher {
 		}
 	}
 
+	/**
+	 * Попытаться загрузить launcher.json с сервера
+	 * @return Получилось ли
+	 */
 	private boolean tryLoadModpacksFromServer() {
 		try {
 			String s = WebUtils.get(LAUNCHER_JSON_URL);
@@ -150,6 +161,11 @@ public class Launcher {
 		}
 	}
 
+	/**
+	 * Поиск сборки по идентификатору
+	 * @param id
+	 * @return Сборка или null
+	 */
 	public Modpack getModpackById(String id) {
 		Iterator<Modpack> i = modpacks.iterator();
 		while(i.hasNext()) {
@@ -159,10 +175,18 @@ public class Launcher {
 		return null;
 	}
 	
+	/**
+	 * Возвращает список сборок
+	 * @return Итератор сборок
+	 */
 	public Iterator<Modpack> getModpacks() {
 		return modpacks.iterator();
 	}
 	
+	/**
+	 * Парс launcher.json
+	 * @param json Содержание файла
+	 */
 	public void parseLauncherJson(String json) {
 		launcherJson = new JSONObject(json);
 		JSONArray arr = launcherJson.getJSONArray("modpacks");
@@ -174,26 +198,42 @@ public class Launcher {
 		}
 	}
 	
+	/**
+	 * Проверка на оффлайн
+	 */
 	public boolean isOffline() {
 		return offline;
 	}
 
+	/**
+	 * Запустить сборку
+	 */
 	public void run(Auth auth) {
 		
 	}
-	
-	public void wakeEventThread() {
-		eventThread.interrupt();
-	}
 
+	/**
+	 * Запустить сборку с принудительным обновлением
+	 */
 	public void runForceUpdate(Auth auth) {
 		
 	}
+	
+	public void interruptEventThread() {
+		eventThread.interrupt();
+	}
 
+	/**
+	 * Запланировать действие
+	 */
 	public void queue(Runnable runnable) {
 		queuedTasks.add(runnable);
 	}
 
+	/**
+	 * Получить папку лаунчера
+	 * @return Путь к папке .lgame
+	 */
 	public static String getLauncherDir() {
 		if(launcherPath != null) return launcherPath;
 		String s = System.getenv("APPDATA");
@@ -205,14 +245,24 @@ public class Launcher {
 		return launcherPath = s;
 	}
 
+	/**
+	 * @return Путь к файлу с настройками
+	 */
 	public static String getConfigPath() {
 		return getLauncherDir() + "launcher.properties";
 	}
 
+	/**
+	 * @return Путь к файлу с кэшем
+	 */
 	public static String getCacheDir() {
 		return getLauncherDir() + "cache" + File.separator;
 	}
 
+	/**
+	 * Получить папку с временными файлами
+	 * @return Путь к временным файлам
+	 */
 	public static String getTempDir() {
 		String s = System.getProperty("java.io.tmpdir");
 		if(s.endsWith("/") || s.endsWith("\\"))
@@ -221,6 +271,11 @@ public class Launcher {
 		return s + "lgametemp" + File.separator;
 	}
 
+	/**
+	 * Сохранить картинку в кэш
+	 * @param url Адрес
+	 * @param img Изображение
+	 */
 	public void saveImageToCache(String url, BufferedImage img) {
 		File f = new File(getCacheDir() + getMD5String(url));
 		if(f.exists()) f.delete();
@@ -230,6 +285,11 @@ public class Launcher {
 		}
 	}
 
+	/**
+	 * Получить картинку из кэша
+	 * @param url Адрес
+	 * @return Кэшированное изображение
+	 */
 	public Image getCachedImage(String url) {
 		File f = new File(getCacheDir() + getMD5String(url));
 		if(!f.exists()) return null;
@@ -241,6 +301,9 @@ public class Launcher {
 		return null;
 	}
 
+	/**
+	 * MD5 хэш
+	 */
 	public static String getMD5String(String x) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");

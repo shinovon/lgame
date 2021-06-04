@@ -1,5 +1,9 @@
 package ru.lgame.launcher;
 
+/**
+ * Используется для авторизации
+ * @author Shinovon
+ */
 public final class Auth {
 
 	private boolean cracked;
@@ -13,6 +17,9 @@ public final class Auth {
 		this.cracked = true;
 	}
 
+	/**
+	 * Создает объект авторизации с никнеймом
+	 */
 	public static Auth fromUsername(String username) {
 		return new Auth(username);
 	}
@@ -26,7 +33,7 @@ public final class Auth {
 	}
 	
 	/**
-	 * @deprecated �� ������
+	 * @deprecated не готово
 	 */
 	public String getAuthToken() {
 		return null;

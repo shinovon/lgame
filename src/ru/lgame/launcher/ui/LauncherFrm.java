@@ -26,8 +26,11 @@ import ru.lgame.launcher.Auth;
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.Modpack;
-import ru.lgame.launcher.utils.Log;
 
+/**
+ * Окно лаунчера
+ * @author Shinovon
+ */
 public class LauncherFrm extends JFrame {
 
 	private static final long serialVersionUID = 5754803808367340968L;
@@ -42,7 +45,7 @@ public class LauncherFrm extends JFrame {
 	private JButton startButton;
 
 	/**
-	 * Create the frame.
+	 * Создает окно
 	 */
 	public LauncherFrm() {
 		setUI();
@@ -90,7 +93,7 @@ public class LauncherFrm extends JFrame {
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		panel_1.add(panel_3_1, BorderLayout.WEST);
 		
-		JButton refresh = new JButton("�������� ����������");
+		JButton refresh = new JButton("Обновить информацию");
 		panel_3_1.add(refresh);
 		
 		JPanel panel_3 = new JPanel();
@@ -98,16 +101,16 @@ public class LauncherFrm extends JFrame {
 		flowLayout_1.setAlignment(FlowLayout.TRAILING);
 		panel_1.add(panel_3);
 		
-		JCheckBox forceUpdateCheck = new JCheckBox("��������������");
+		JCheckBox forceUpdateCheck = new JCheckBox("Переустановить");
 		panel_3.add(forceUpdateCheck);
 		
 		usernameField = new JTextField();
 		panel_3.add(usernameField);
-		usernameField.setToolTipText("���");
+		usernameField.setToolTipText("Ник");
 		usernameField.setText(Config.get("username"));
 		usernameField.setColumns(15);
 		
-		startButton = new JButton("������");
+		startButton = new JButton("Играть");
 		panel_3.add(startButton);
 		startButton.setEnabled(false);
 		startButton.addActionListener(new ActionListener() {
@@ -125,11 +128,17 @@ public class LauncherFrm extends JFrame {
 		addModpacks();
 	}
 	
+	/**
+	 * Удалить все сборки из списка
+	 */
 	private void removeAllModpacks() {
 		bg.clearSelection();
 		list.removeAll();
 	}
 
+	/**
+	 * Добавить сборку в список
+	 */
 	private void addModpack(ModpackPanel sb) {
 		sb.setButtonGroup(bg);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -139,11 +148,17 @@ public class LauncherFrm extends JFrame {
         list.add(sb, gbc);
 	}
 	
+	/**
+	 * Обновить список сборок
+	 */
 	public void refreshModpackList() {
 		removeAllModpacks();
 		addModpacks();
 	}
 	
+	/**
+	 * Добавить сборки из списка
+	 */
 	private void addModpacks() {
 		Iterator<Modpack> i = Launcher.inst.getModpacks();
 		while(i.hasNext()) {
@@ -151,12 +166,9 @@ public class LauncherFrm extends JFrame {
 		}
 	}
 
-
-	public void selected(int i) {
-		Log.debug("selected: " + i);
-	}
-
-
+	/**
+	 * Установить LAF на системный
+	 */
 	private static void setUI() {
 		try {
 			String x = UIManager.getSystemLookAndFeelClassName();

@@ -12,6 +12,10 @@ import org.json.JSONObject;
 import ru.lgame.launcher.ui.ModpackPanel;
 import ru.lgame.launcher.utils.Log;
 
+/**
+ * Объект сборки
+ * @author Shinovon
+ */
 public class Modpack {
 	
 	private String id;
@@ -58,6 +62,9 @@ public class Modpack {
 		return lastVersion;
 	}
 
+	/**
+	 * Создает панель, грузит картинку
+	 */
 	public ModpackPanel createPanel() {
 		ModpackPanel mp = new ModpackPanel(id);
 		mp.setInformation(name, description);

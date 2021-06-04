@@ -89,6 +89,9 @@ public class ModpackPanel extends JPanel {
 		setInformation(id, id);
 	}
 	
+	/**
+	 * Задать группу кнопок
+	 */
 	public void setButtonGroup(ButtonGroup bg) {
 		bg.add(radioButton);
 	}
@@ -103,18 +106,33 @@ public class ModpackPanel extends JPanel {
 		setBorder(new MatteBorder(1, 1, 1, 1, Color.BLACK));
 	}
 
+	/**
+	 * Задать объект сборки
+	 */
 	public void setModpack(Modpack mp) {
 		this.modpack = mp;
 	}
 
+	/**
+	 * Получить объект сборки
+	 */
 	public Modpack getModpack() {
 		return modpack;
 	}
 
+	/**
+	 * Получить идентификатор сборки
+	 */
 	public String id() {
 		return id;
 	}
 	
+	/**
+	 * Добавить информацию
+	 * @param name Название
+	 * @param desc Описание
+	 * @return Самого себя
+	 */
 	public ModpackPanel setInformation(String name, String desc) {
 		this.modpackName = name;
 		this.desc = desc;
@@ -123,6 +141,11 @@ public class ModpackPanel extends JPanel {
 		return this;
 	}
 	
+	/**
+	 * Добавляет картинку
+	 * @param img Изображение
+	 * @return Самого себя
+	 */
 	public ModpackPanel setImage(Image img) {
 		this.image = img;
 		this.descArr = null;
@@ -175,6 +198,12 @@ public class ModpackPanel extends JPanel {
 	    return (height == 0) ? width : greatestCommonFactor(height, width % height);
 	}
 	
+	/**
+	 * Добавляет в текст переносы строки чтобы поместился в окне
+	 * @param text Текст
+	 * @param width Максимальная ирина
+	 * @param font Шрифт
+	 */
 	private static String[] getStringArray(String text, int width, FontMetrics font) {
 		if (text == null || text.length() == 0 || (text.length() == 1 && text.charAt(0) == ' ')) {
 			return new String[0];

@@ -10,6 +10,10 @@ import javax.swing.JProgressBar;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
+/**
+ * Окно загрузки
+ * @author Shinovon
+ */
 public class LoadingFrm extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -18,9 +22,6 @@ public class LoadingFrm extends JFrame {
 
 	private JLabel label;
 
-	/**
-	 * Create the frame.
-	 */
 	public LoadingFrm() {
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		contentPane = new JPanel();

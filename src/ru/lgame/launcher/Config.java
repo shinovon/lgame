@@ -8,8 +8,8 @@ import java.util.Properties;
 import ru.lgame.launcher.utils.Log;
 
 /**
+ * Конфиг
  * @author Shinovon
- *
  */
 public class Config {
 
