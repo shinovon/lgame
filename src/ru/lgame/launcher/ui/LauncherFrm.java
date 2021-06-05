@@ -119,8 +119,8 @@ public class LauncherFrm extends JFrame {
 
 			public void actionPerformed(ActionEvent e) {
 				if(forceUpdateCheck.isSelected()) 
-					Launcher.inst.runForceUpdate(Auth.fromUsername(usernameField.getText()));
-				else Launcher.inst.run(Auth.fromUsername(usernameField.getText()));
+					Launcher.inst.runForceUpdate(Auth.fromUsername(usernameField.getText()), selected.getModpack());
+				else Launcher.inst.run(Auth.fromUsername(usernameField.getText()), selected.getModpack());
 			}
 			
 		});
