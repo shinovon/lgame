@@ -20,6 +20,7 @@ import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.Modpack;
 import ru.lgame.launcher.utils.Log;
 
@@ -104,6 +105,7 @@ public class ModpackPanel extends JPanel {
 	protected void selected() {
 		Log.debug("selected: " + id);
 		setBorder(new MatteBorder(1, 1, 1, 1, Color.BLACK));
+		Launcher.inst.frame().setSelected(this);
 	}
 
 	/**

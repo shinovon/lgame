@@ -44,6 +44,8 @@ public class LauncherFrm extends JFrame {
 
 	private JButton startButton;
 
+	private ModpackPanel selected;
+
 	/**
 	 * Создает окно
 	 */
@@ -127,11 +129,31 @@ public class LauncherFrm extends JFrame {
 		setLocationRelativeTo(null);
 		addModpacks();
 	}
+
+	public void setSelected(ModpackPanel modpackPanel) {
+		selected = modpackPanel;
+		selected();
+	}
+	
+	private void selected() {
+		int i = Launcher.inst.getModpackState(selected.getModpack());
+		if(i == 0) startButton.setText("Установить");
+		else if(i == 1) startButton.setText("Играть");
+		else if(i == 2 || i == 3) startButton.setText("Обновить");
+		startButton.setEnabled(true);
+	}
+	
+	private void unselected() {
+		startButton.setEnabled(false);
+		startButton.setText("Играть");
+	}
 	
 	/**
 	 * Удалить все сборки из списка
 	 */
 	private void removeAllModpacks() {
+		selected = null;
+		unselected();
 		bg.clearSelection();
 		list.removeAll();
 	}

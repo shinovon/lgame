@@ -208,14 +208,14 @@ public class Launcher {
 	/**
 	 * Запустить сборку
 	 */
-	public void run(Auth auth) {
+	public void run(Auth auth, Modpack modpack) {
 		
 	}
 
 	/**
 	 * Запустить сборку с принудительным обновлением
 	 */
-	public void runForceUpdate(Auth auth) {
+	public void runForceUpdate(Auth auth, Modpack modpack) {
 		
 	}
 	
@@ -228,6 +228,10 @@ public class Launcher {
 	 */
 	public void queue(Runnable runnable) {
 		queuedTasks.add(runnable);
+	}
+	
+	public LauncherFrm frame() {
+		return frame;
 	}
 
 	/**
@@ -313,6 +317,15 @@ public class Launcher {
 		} catch (NoSuchAlgorithmException e) {
 		}
 		return null;
+	}
+
+	/**
+	 * 
+	 * @param modpack Объект сборки
+	 * @return 0 - не установлена, 1 - можно играть, 2 - есть обновление, 3 - требуется обновление, отрицательное значение - ошибка
+	 */
+	public int getModpackState(Modpack modpack) {
+		return 0;
 	}
 
 }

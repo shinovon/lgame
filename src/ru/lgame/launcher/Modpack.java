@@ -24,6 +24,7 @@ public class Modpack {
 	private String description;
 	private String lastVersion;
 	private String image;
+	private ModpackPanel ui;
 	
 	public Modpack(String id) {
 		this.id = id;
@@ -66,6 +67,7 @@ public class Modpack {
 	 * Создает панель, грузит картинку
 	 */
 	public ModpackPanel createPanel() {
+		if(ui != null) return ui;
 		ModpackPanel mp = new ModpackPanel(id);
 		mp.setInformation(name, description);
 		mp.setModpack(this);
@@ -112,7 +114,7 @@ public class Modpack {
 		}
 		//	}
 		//});
-		return mp;
+		return ui = mp;
 	}
 
 }
