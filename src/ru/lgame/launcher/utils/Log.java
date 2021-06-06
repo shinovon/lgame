@@ -4,6 +4,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Calendar;
 
+import ru.lgame.launcher.Launcher;
+
 public class Log {
 
 	public static void info(String x) {
@@ -19,7 +21,7 @@ public class Log {
 	}
 
 	public static void debug(String x) {
-		log("DEBUG", x);
+		if(Launcher.DEBUG) log("DEBUG", x);
 	}
 
 	public static void error(String s, Throwable e) {

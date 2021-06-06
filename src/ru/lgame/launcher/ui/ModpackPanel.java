@@ -2,6 +2,7 @@ package ru.lgame.launcher.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -29,6 +30,8 @@ public class ModpackPanel extends JPanel {
 	private static final long serialVersionUID = 5622859608833406220L;
 
 	private static final int ITEM_HEIGHT = 240;
+
+	private Modpack modpack;
 	
 	private String id;
 	private String modpackName;
@@ -46,7 +49,9 @@ public class ModpackPanel extends JPanel {
 
 	private int lastW;
 
-	private Modpack modpack;
+	private String updateText1;
+	private String updateText2;
+	private int updatePercent;
 
 	public ModpackPanel(String id) {
 		this(id, null);
@@ -85,8 +90,8 @@ public class ModpackPanel extends JPanel {
 
 			public void mouseExited(MouseEvent e) {
 			}
-        	
-        });
+			
+		});
 		setInformation(id, id);
 	}
 	
@@ -157,10 +162,21 @@ public class ModpackPanel extends JPanel {
 		double r = (double) iw / (double) ih;
 		int w = (int) (r * (double)ITEM_HEIGHT);
 		int factor = greatestCommonFactor(iw, ih);
-		Log.debug(id + " image scaled to: " + w + "x" + ITEM_HEIGHT + " (" + iw / factor + ":" + ih / factor + ")");
+		//Log.debug(id + " image scaled to: " + w + "x" + ITEM_HEIGHT + " (" + iw / factor + ":" + ih / factor + ")");
 		image = image.getScaledInstance(w, ITEM_HEIGHT, Image.SCALE_SMOOTH);
 		updateContents();
 		return this;
+	}
+	
+	public boolean isUpdating() {
+		if(modpack == null) return false;
+		return modpack.isUpdating();
+	}
+	
+	public void setUpdateInfo(String s1, String s2, int percent) {
+		if(s1 != null) this.updateText1 = s1;
+		if(s2 != null) this.updateText2 = s2;
+		if(percent >= 0) this.updatePercent = percent;
 	}
 	
 	public void updateContents() {
@@ -176,12 +192,16 @@ public class ModpackPanel extends JPanel {
 		super.paintComponent(g);
 		if(g instanceof Graphics2D) {
 			Graphics2D g2d = (Graphics2D) g;
-            g2d.setRenderingHint(
-                    RenderingHints.KEY_ANTIALIASING,
-                    RenderingHints.VALUE_ANTIALIAS_ON);
+			g2d.setRenderingHint(
+					RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON);
 		}
+		g.setColor(Color.BLACK);
+		Font f = g.getFont();
 		int w = getWidth();
+		int h = getHeight();
 		int th = g.getFontMetrics().getHeight();
+		int th2 = th / 2;
 		int x = 5;
 		if(image != null) {
 			g.drawImage(image, 0, 0, null);
@@ -193,11 +213,34 @@ public class ModpackPanel extends JPanel {
 		if(descArr != null) {
 			for(int i = 0; i < descArr.length; i++) g.drawString(descArr[i], x, 16 + th + (i * (th + 1)));
 		}
+		if(isUpdating()) {
+			int percent = 10;
+			String s = "Обновление";
+			String p = "Скачивание: mods (6.3/100.0Mb) (0.5Mb/s) (6%)";
+			
+			String s1 = s + " " + percent + "%";
+			String s2 = p;
+			
+			int px = x - 5;
+			int ptx = x;
+			int pww = w - px;
+			g.setColor(new Color(57, 57, 57));
+			g.fillRect(px, h - 4, pww, 4);
+			g.setColor(new Color(65, 119, 179));
+			int pw = (int) ((double)pww*((double)percent/100D));
+			g.fillRect(px, h - 4, pw, 4);
+			Font f2 = g.getFont().deriveFont(12.0F);
+			g.setFont(f2);
+			g.drawString(s1, ptx, h - th - th2 - 3);
+			g.setFont(f);
+			g.setColor(Color.BLACK);
+			g.drawString(s2, ptx, h - th2 - 1);
+		}
 		lastW = w;
 	}
 	
 	private static int greatestCommonFactor(int width, int height) {
-	    return (height == 0) ? width : greatestCommonFactor(height, width % height);
+		return (height == 0) ? width : greatestCommonFactor(height, width % height);
 	}
 	
 	/**

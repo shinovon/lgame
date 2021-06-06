@@ -22,8 +22,10 @@ public class Modpack {
 	private String name;
 	private String category;
 	private String description;
-	private String lastVersion;
+	private String last_version;
 	private String image;
+	private String client_id;
+	private String update_data;
 	private ModpackPanel ui;
 	
 	public Modpack(String id) {
@@ -36,6 +38,9 @@ public class Modpack {
 		description = o.optString("category");
 		image = o.optString("img", null);
 		description = o.optString("description");
+		last_version = o.optString("last_version");
+		client_id = o.optString("client", null);
+		update_data = o.optString("update_data", null);
 		return this;
 	}
 
@@ -60,14 +65,18 @@ public class Modpack {
 	}
 
 	public String getLastVersion() {
-		return lastVersion;
+		return last_version;
 	}
 
 	/**
 	 * Создает панель, грузит картинку
 	 */
 	public ModpackPanel createPanel() {
-		if(ui != null) return ui;
+		if(ui != null) {
+			ui.setInformation(name, description);
+			ui.setModpack(this);
+			return ui;
+		}
 		ModpackPanel mp = new ModpackPanel(id);
 		mp.setInformation(name, description);
 		mp.setModpack(this);
@@ -115,6 +124,14 @@ public class Modpack {
 		//	}
 		//});
 		return ui = mp;
+	}
+	
+	public boolean isUpdating() {
+		return false;
+	}
+
+	public int getState() {
+		return Updater.getModpackState(this);
 	}
 
 }

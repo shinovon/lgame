@@ -22,6 +22,7 @@ public class Config {
 	}
 
 	public static void loadDefaults() {
+		set("path", Launcher.getModpacksDefaultDir());
 		set("username", "");
 	}
 

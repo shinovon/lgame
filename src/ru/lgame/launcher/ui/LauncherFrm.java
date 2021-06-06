@@ -15,6 +15,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -50,6 +51,7 @@ public class LauncherFrm extends JFrame {
 	 * Создает окно
 	 */
 	public LauncherFrm() {
+		setTitle("Демонстрационный билд. Не готов к распространению");
 		setUI();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		contentPane = new JPanel();
@@ -96,6 +98,11 @@ public class LauncherFrm extends JFrame {
 		panel_1.add(panel_3_1, BorderLayout.WEST);
 		
 		JButton refresh = new JButton("Обновить информацию");
+		refresh.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				refreshModpackList();
+			}
+		});
 		panel_3_1.add(refresh);
 		
 		JPanel panel_3 = new JPanel();
@@ -118,6 +125,10 @@ public class LauncherFrm extends JFrame {
 		startButton.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
+				if(usernameField.getText() == null || usernameField.getText().length() <= 4) {
+					JOptionPane.showMessageDialog(LauncherFrm.this, "Введите никнейм", "", JOptionPane.WARNING_MESSAGE);
+					return;
+				}
 				if(forceUpdateCheck.isSelected()) 
 					Launcher.inst.runForceUpdate(Auth.fromUsername(usernameField.getText()), selected.getModpack());
 				else Launcher.inst.run(Auth.fromUsername(usernameField.getText()), selected.getModpack());
@@ -136,7 +147,7 @@ public class LauncherFrm extends JFrame {
 	}
 	
 	private void selected() {
-		int i = Launcher.inst.getModpackState(selected.getModpack());
+		int i = selected.getModpack().getState();
 		if(i == 0) startButton.setText("Установить");
 		else if(i == 1) startButton.setText("Играть");
 		else if(i == 2 || i == 3) startButton.setText("Обновить");
@@ -174,8 +185,13 @@ public class LauncherFrm extends JFrame {
 	 * Обновить список сборок
 	 */
 	public void refreshModpackList() {
-		removeAllModpacks();
-		addModpacks();
+		Launcher.inst.queue(new Runnable() {
+			public void run() {
+				removeAllModpacks();
+				Launcher.inst.refreshLauncherJson();
+				addModpacks();
+			}
+		});
 	}
 	
 	/**

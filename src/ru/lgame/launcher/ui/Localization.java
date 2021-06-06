@@ -1,4 +1,4 @@
-package ru.lgame.launcher;
+package ru.lgame.launcher.ui;
 
 /**
  * Локализация (будет)

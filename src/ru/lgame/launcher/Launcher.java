@@ -5,7 +5,6 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -26,6 +25,10 @@ import ru.lgame.launcher.utils.Log;
 import ru.lgame.launcher.utils.WebUtils;
 
 public class Launcher {
+	
+	public static final String version = "concept demo";
+	
+	public static final boolean DEBUG = true;
 	
 	private static final String LAUNCHER_JSON_URL = "http://dl.nnproject.cc/lgame/launcher.json";
 
@@ -86,9 +89,7 @@ public class Launcher {
 					}
 				}
 			});
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		eventThread.setPriority(2);
@@ -193,9 +194,31 @@ public class Launcher {
 		Iterator<Object> i = arr.iterator();
 		while(i.hasNext()) {
 			String id = (String) i.next();
-			modpackIds.add(id);
-			modpacks.add(new Modpack(id).parse(launcherJson.getJSONObject(id)));
+			if(!modpackIds.contains(id)) {
+				modpackIds.add(id);
+				modpacks.add(new Modpack(id).parse(launcherJson.getJSONObject(id)));
+			} else getModpackById(id).parse(launcherJson.getJSONObject(id));
 		}
+	}
+
+	public void refreshLauncherJson() {
+		launcherJson = null;
+		try {
+			EventQueue.invokeAndWait(new Runnable() {
+				public void run() {
+					try {
+						loadingFrame.setText("Получение данных о сборках");
+						loadingFrame.setVisible(true);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(!tryLoadModpacksFromServer()) loadCachedLauncherJson();
+		loadingFrame.setVisible(false);
 	}
 	
 	/**
@@ -263,6 +286,14 @@ public class Launcher {
 		return getLauncherDir() + "cache" + File.separator;
 	}
 
+	public static String getModpacksDefaultDir() {
+		String s = System.getProperty("user.home");
+		if(s.endsWith("/") || s.endsWith("\\"))
+			s = s.substring(0, s.length()-1);
+		s += File.separator + ".lgame" + File.separator;
+		return s;
+	}
+
 	/**
 	 * Получить папку с временными файлами
 	 * @return Путь к временным файлам
@@ -317,15 +348,6 @@ public class Launcher {
 		} catch (NoSuchAlgorithmException e) {
 		}
 		return null;
-	}
-
-	/**
-	 * 
-	 * @param modpack Объект сборки
-	 * @return 0 - не установлена, 1 - можно играть, 2 - есть обновление, 3 - требуется обновление, отрицательное значение - ошибка
-	 */
-	public int getModpackState(Modpack modpack) {
-		return 0;
 	}
 
 }
