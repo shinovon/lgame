@@ -2,7 +2,7 @@
 	"id": "1.12.2forge",
 	"date": "19.06.2021",
 	"format": 1,
-	"update_build": 1
+	"update_build": 1,
 	"integrity_check": {
 		"dirs": [
 			{"type": "exists", "path", "assets/"}
