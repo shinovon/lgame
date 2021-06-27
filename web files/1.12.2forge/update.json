@@ -5,7 +5,7 @@
 	"update_build": 1,
 	"integrity_check": {
 		"dirs": [
-			{"type": "exists", "path", "assets/"}
+			{"type": "exists", "path": "assets/"}
 		],
 		"natives": {
 			"checksum_algorithm": "SHA-1",
