@@ -1,0 +1,248 @@
+{
+	"id": "oil",
+	"date": "19.06.2021",
+	"human_readable_version": "2.2.42",
+	"update_build": 2,
+	"client": "http://dl.nnproject.cc/tdlauncher/1.12.2forge/update.json",
+	"has_mods": true,
+	"integrity_check": {
+		"dirs": [
+			{"type": "mods"},
+			{
+				"type": "exists", "path": "scripts/"
+			},
+			{
+				"type": "exists", "path": "resources/"
+			},
+			{
+				"type": "exists", "path": "config/"
+			}
+		],
+		"mods": {
+			"ignore_excess_mods": true,
+			"delete_blacklist_mods": true,
+			"words_blacklist": [
+				"minimap", "xaero", "worldmap", "cheat"
+			],
+			"remove_all_if_check_failed": true,
+			"checksum_algorithm": "SHA-1",
+			"checksums": {
+				"FTBBackups-1.1.0.1.jar": "20ddf96ff380f1f3219305f2efc6742ab5999449",
+				"JustEnoughResources-1.12.2-0.9.2.60.jar": "3d4c9b8bb4ad948c7e26b7becd1c836f8cb34d07",
+				"SereneSeasons-1.12.2-1.2.18-universal.jar": "05acc4faf6f5ca31215599c0ebf778ba18a9121b",
+				"phosphor-forge-mc1.12.2-0.2.7-universal.jar": "1c75738ecd4bc5f7021b2b23ea04602aac3d16ec",
+				"jei_1.12.2-4.16.1.302.jar": "3e88d2896ca868c3cedb65e117ad3a1b82488fa8",
+				"ForgeCraft-1.6.51.jar": "13876e5a23212768b380fcf804c6a544b94135ab",
+				"Puddles-1.1.jar": "6409abf3a462d867bb6e60b2ff9a5a2924bfb854",
+				"MPUtils-1.12.2-1.5.7.jar": "5c034b16d420af6d8b935f3416608f1cd1378ea9",
+				"ItemFilters-1.0.4.2.jar": "6b6560aea35c6e0e8a550ea7044501412b0fb335",
+				"FpsReducer-mc1.12.2-1.18.jar": "9fe2074d6251aa6dc8047c45e63be57f01b1a0b3",
+				"Hwyla-1.8.26-B41_1.12.2.jar": "7280d5c0dab42436549bcefc63ff64a1049e5501",
+				"FTBQuests-1202.9.0.15.jar": "03413411b820e0fb91f36013aa5954dde3bc85e9",
+				"PrimalTech-0.3.5.jar": "5a94c311a29b41b694b6d996649c65caec0a49ab",
+				"OptiFine_1.12.2_HD_U_G5.jar": "ca3aea3a09ce215906c346fe190907fe0347b0c4",
+				"titlechanger-1.1.4.jar": "2def940726743bef161adc2c729c4ea009ad294f",
+				"WaterStrainer-1.12-3.3.0.jar": "a408fe27b271be54397b65eff0dfaf62744a5eaa",
+				"ImmersivePosts-0.2.1.jar": "7f8b97e25ed8072715f558cc6efe7f7997f492b7",
+				"SimpleStorageNetwork-1.12.2-1.8.0.jar": "24970908d20a8a43f209ca97b75623876d94ea74",
+				"Aquaculture-1.12.2-1.6.8.jar": "9db4558bc156fbcd201625c6ccb0df52fec52c0f",
+				"ironchest-1.12.2-7.0.72.847.jar": "adc4c785a484c5d5a4ab9a29e1937faeed4312dd",
+				"animania-1.12.2-1.7.3.jar": "2e77203ed27ec1c08c1e23e55ae1d56f10e42526",
+				"Pam's+HarvestCraft+1.12.2zg.jar": "a064b434253305424755943dd66f389855ade953",
+				"Wawla-1.12.2-2.6.275.jar": "783157c607149875de1e045d72382d370256257c",
+				"rustic-1.1.7.jar": "567832a6b073e59fa29f2f694e224008707db2f8",
+				"mpbasic-1.12.2-1.4.11.jar": "d033d21e0806203e5daa173259691f0f1c8e6255",
+				"Chameleon-1.12-4.1.3.jar": "5ed3dd5fd1ebded57bfe525b4ece11232bd14e5e",
+				"twilightforest-1.12.2-3.11.1021-universal.jar": "a4c2d01f98350fe41374666db8e1419f770a1609",
+				"immersivepetroleum-1.12.2-1.1.9.jar": "cb9365f335ee7f50262eca1dfb703dab64ab9d10",
+				"Geolosys-1.12.2-3.0.10.jar": "7b521fc9c9af3ef65e2ca465e3d3aed9e8114e2e",
+				"ResourceLoader-MC1.12.1-1.5.3.jar": "d8c10e6e29df5f9bc51e468642d9b3cae5f2f8e4",
+				"CraftStudioAPI-universal-1.0.1.95-mc1.12-alpha.jar": "868d96028427e39495f441e43e60a9b77225b5ad",
+				"SmoothFont-mc1.12.2-2.1.2.jar": "f904ba15339103acb898b6a618b87f6498b3d8bc",
+				"[1.12]TreeCapitator-client-1.43.0.jar": "d58eb72603d7d58ad5a5982da8684fe2b9703bfb",
+				"LoadingScreens-1.12.2-0.3.1.jar": "53129de47388d323b76f5d50e0ba01ade7e0e9b5",
+				"CraftTweaker2-1.12-4.1.20.618.jar": "e1ae49d207d7817221aa070c9f5f8425feb4cf3e",
+				"StorageDrawers-1.12.2-5.4.2.jar": "c3f370ed6c158726061211334cbb72fd53f30364",
+				"BetterWithMods-1.12-2.3.23.jar": "431d61f2d571bdd6cc5414288e02249d9d66fd7b",
+				"auginter-1.1.0-1.12.x.jar": "1f23df31367633f932ae2d9b730881646d421984",
+				"Huds-1.12.2-1.0.6.jar": "8e4d64732a3a6041fd47c45f58908031c9b7251a",
+				"PrimalCore-1.12.2-0.6.105.jar": "d1cd14519d3a09abfa5d8ccc48c970933e57b93b",
+				"obfuscate-0.4.2-1.12.2.jar": "0bc9cb77f1e71d4edf98a40135e0762e6c9f9c35",
+				"[1.12]bspkrsCore-universal-7.6.0.1.jar": "9ae9811f387a960381e5c82fae2a7f79d0480a27",
+				"ImmersiveEngineering-0.12-98.jar": "633070d9c447fdaf6a9ead59425017815c890c63",
+				"NaturesCompass-1.12.2-1.8.5.jar": "60bcf179cab708f67bbce98d201e82f3e7be9266",
+				"gentleharvest-1.12--b1.jar": "db66586bb33ed2ce958912516ab46cac4d78ad4f",
+				"VanillaFix-1.0.10-150.jar": "646fc28aa81773662e33a3b447e830b816528fc9",
+				"ElecCore-1.12.2-1.9.453.jar": "112cda98b049902b8c073ec37b96495ff5e0bdf6",
+				"ImprovedBackpacks-1.12.2-1.5.0.0.jar": "021f50ce1abe2d504f8111df75cf845e03efd3fa",
+				"memory_repo/blusunrize/ImmersiveEngineering-core/0.12-98/ImmersiveEngineering-core-0.12-98.jar": "c38e4693e209fa8edc16a7558f0e332e9d448fd5",
+				"CustomMainMenu-MC1.12.2-2.0.9.1.jar": "9aad10a13bed75b6061a33219ab4f2f39e0ccc12",
+				"FTBLib-5.4.7.2.jar": "7c20cd223bc2334edf153e074f35acdbcab3c976",
+				"vehicle-mod-0.44.1-1.12.2.jar": "67d58525bf858bbce303343c22bec62af38d4a84",
+				"antiqueatlas-1.12.2-4.6.3.jar": "9531e665ad5d5aa7a84890147dddb6eaf86a5752",
+				"BetterWithLib-1.12-1.5.jar": "5bdf3c80660753158f4a92ab063a9799341813d5",
+				"InventoryTweaks-1.63.jar": "6e00827d1a009da39fa6db5afd2a3d6b024abfe9",
+				"BNBGamingLib-1.12.2-2.17.6.jar": "06f0da5cf79645437ee5e666be23176eea1dfb94",
+				"gravestone-1.10.3.jar": "b2cc9a25054fd6878ba242a6080a2866140bbeb0"
+			}
+		}
+	},
+	"update": {
+		"updates_check": {"type": "update_build"},
+		"update_scripts": {
+			"install_script": {
+				"download": [
+					{
+						"condition": "always",
+						"url": "http://dl.nnproject.cc/lgame/oil/mods.zip",
+						"dir": "temp",
+						"name": "mods.zip",
+						"type": "mods"
+
+					},
+					{
+						"condition": "always",
+						"url": "http://dl.nnproject.cc/lgame/oil/scripts.zip",
+						"dir": "temp",
+						"name": "scripts.zip",
+						"type": "resources"
+					},
+					{
+						"condition": "always",
+						"url": "http://dl.nnproject.cc/lgame/oil/resources.zip",
+						"dir": "temp",
+						"name": "resources.zip",
+						"type": "resources"
+					},
+					{
+						"condition": "always",
+						"url": "http://dl.nnproject.cc/lgame/oil/config.zip",
+						"dir": "temp",
+						"name": "config.zip",
+						"type": "config"
+					},
+					{
+						"condition": "always",
+						"url": "http://dl.nnproject.cc/lgame/oil/options.zip",
+						"dir": "temp",
+						"name": "options.zip",
+						"type": "options"
+					},
+					{
+						"condition": "always",
+						"url": "http://dl.nnproject.cc/lgame/oil/resourcepacks.zip",
+						"dir": "temp",
+						"name": "resourcepacks.zip",
+						"type": "extra"
+					}
+				],
+				"unzip": [
+					{
+						"condition": "always",
+						"from": "temp",
+						"name": "mods.zip",
+						"path": "/mods/"
+					},
+					{
+						"condition": "always",
+						"from": "temp",
+						"name": "resources.zip",
+						"path": "/resources/"
+					},
+					{
+						"condition": "always",
+						"from": "temp",
+						"name": "scripts.zip",
+						"path": "/scripts/"
+					},
+					{
+						"condition": "always",
+						"from": "temp",
+						"name": "config.zip",
+						"path": "/config/"
+					},
+					{
+						"condition": "always",
+						"from": "temp",
+						"name": "options.zip",
+						"path": "/"
+					},
+					{
+						"condition": "exists",
+						"from": "temp",
+						"name": "resourcepacks.zip",
+						"path": "/resourcepacks/"
+					}
+				],
+				"post_install": [
+					{"remove":"temp"}
+				]
+			},
+			"update_script": {
+				"remove_dirs": [
+					"scripts",
+					"config"
+				],
+				"download": [
+					{
+						"condition": "checkmods",
+						"url": "http://dl.nnproject.cc/lgame/oil/mods.zip",
+						"dir": "temp",
+						"name": "mods.zip",
+						"type": "mods"
+					},
+					{
+						"condition": "always",
+						"url": "http://dl.nnproject.cc/lgame/oil/scripts.zip",
+						"dir": "temp",
+						"name": "scripts.zip",
+						"type": "resources"
+					},
+					{
+						"condition": "always",
+						"url": "http://dl.nnproject.cc/lgame/oil/resources.zip",
+						"dir": "temp",
+						"name": "resources.zip",
+						"type": "resources"
+					},
+					{
+						"condition": "always",
+						"url": "http://dl.nnproject.cc/lgame/oil/config.zip",
+						"dir": "temp",
+						"name": "config.zip",
+						"type": "config"
+					}
+				],
+				"unzip": [
+					{
+						"condition": "exists",
+						"from": "temp",
+						"name": "mods.zip",
+						"path": "/mods/"
+					},
+					{
+						"condition": "always",
+						"from": "temp",
+						"name": "resources.zip",
+						"path": "/resources/"
+					},
+					{
+						"condition": "always",
+						"from": "temp",
+						"name": "scripts.zip",
+						"path": "/scripts/"
+					},
+					{
+						"condition": "always",
+						"from": "temp",
+						"name": "config.zip",
+						"path": "/config/"
+					}
+				],
+				"post_update": [
+					{"remove":"temp"}
+				]
+			},
+		}
+	}
+}

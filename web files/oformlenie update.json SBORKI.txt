@@ -1,0 +1,54 @@
+Инструкция для оформления update.json сборки
+Версия 2 от 07.06.2021
+{
+	id: (string) иденификатор сборки
+	date: (string) дата последнего изменения, формат: ДД.ММ.ГГГГ (пример: 07.06.2021)
+	format: (int) 2 (версия формата данных)
+	human_readable_version: (string) текстовая версия
+	update_build: (int) номер обновления понимаемая лаунчером
+	client: (string) ссылка на update.json клиента
+	has_mods: (boolean) имеет моды?
+	integrity_check: (object) конфигурация для проверки целостности
+	{
+		dirs: (array) обязательные папки сборки, формат записей: {"type": "тип проверки", "path": "название папки/файла"}
+		[
+			{ (описание параметров записи)
+				type: (string) тип проверки ("mods" - моды, "exists" - существует ли папка/файл)
+				path: (string) название папки/файла (не обязательно для модов)
+			}
+		],
+		mods: (object) раздел для проверки целостности модов
+		{
+			ignore_excess_mods: (boolean) игнорировать лишние моды (которых нет в списке хешей)
+			delete_blacklist_mods: (boolean) удалять моды которые находятся в черном списке ниже
+			words_blacklist: (array) массив из строк, с запрещенными словами в названиях модов
+			checksum_algorithm: (string) алгорити хешей (рекомендованно - SHA-1)
+			checksums: (object) хеши модов, формат записей: "файл": "хеш"
+			{ (пример записей)
+				"1.jar": "hash",
+				"2.jar": "hash"
+			}
+		}
+	},
+	update: (object) конфигурация для обновления
+	{
+		updates_check: (object) проверка наличия обновлений
+		{
+			type: (string) тип проверки наличия обновлений, на данный момент только один: update_build
+		},
+		update_scripts: (object) сценарии
+		{
+			install_script: (object) сценарий первого скачивания
+			{
+				download: (array)
+				unzip: (array)
+			},
+			update_script: (object) сценарий обновления
+			{
+				remove: (array)
+				download: (array)
+				unzip: (array)
+			}
+		}
+	}
+}
