@@ -27,6 +27,8 @@ import ru.lgame.launcher.Auth;
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.Modpack;
+import ru.lgame.launcher.utils.StackLayout;
+import javax.swing.JLabel;
 
 /**
  * Окно лаунчера
@@ -43,9 +45,15 @@ public class LauncherFrm extends JFrame {
 
 	private JPanel list;
 
-	private JButton startButton;
+	private JButton startBtn;
 
 	private ModpackPanel selected;
+
+	private StackLayout layout;
+
+	protected boolean settingsShowing;
+
+	private JScrollPane scrollPane;
 
 	/**
 	 * Создает окно
@@ -56,14 +64,51 @@ public class LauncherFrm extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
+		contentPane.setLayout(layout = new StackLayout());
 		setContentPane(contentPane);
 		
-		JPanel panel = new JPanel();
-		contentPane.add(panel, BorderLayout.CENTER);
-		panel.setLayout(new BorderLayout(0, 0));
+		JPanel settingsPanel = new JPanel();
+		settingsPanel.setLayout(new BorderLayout(0, 0));
+		contentPane.add(settingsPanel, BorderLayout.CENTER);
+
+		JPanel mainPanel = new JPanel();
+		mainPanel.setLayout(new BorderLayout(0, 0));
+		contentPane.add(mainPanel, BorderLayout.CENTER);
+
+		ActionListener settsActionListener = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				settingsShowing = !settingsShowing;
+				layout.showComponent(settingsShowing ? settingsPanel : mainPanel, LauncherFrm.this);
+			}
+		};
 		
-		JScrollPane scrollPane = new JScrollPane();
+		JPanel panel = new JPanel();
+		FlowLayout flowLayout_2 = (FlowLayout) panel.getLayout();
+		flowLayout_2.setAlignment(FlowLayout.LEFT);
+		settingsPanel.add(panel, BorderLayout.SOUTH);
+		
+		JButton settsBackBtn = new JButton("Назад");
+		settsBackBtn.addActionListener(settsActionListener);
+		panel.add(settsBackBtn);
+		
+		JPanel panel_1 = new JPanel();
+		settingsPanel.add(panel_1, BorderLayout.CENTER);
+		
+		JPanel panel_4 = new JPanel();
+		FlowLayout flowLayout_3 = (FlowLayout) panel_4.getLayout();
+		flowLayout_3.setAlignment(FlowLayout.LEADING);
+		settingsPanel.add(panel_4, BorderLayout.NORTH);
+		
+		JLabel label = new JLabel("Настройки");
+		panel_4.add(label);
+		
+		layout.showComponent(mainPanel, this);
+		
+		JPanel modpacksPanel = new JPanel();
+		mainPanel.add(modpacksPanel, BorderLayout.CENTER);
+		modpacksPanel.setLayout(new BorderLayout(0, 0));
+		
+		scrollPane = new JScrollPane();
 		scrollPane.addMouseWheelListener(new MouseWheelListener() {
 
 			@Override
@@ -74,7 +119,7 @@ public class LauncherFrm extends JFrame {
 			}
 			
 		});
-		panel.add(scrollPane);
+		modpacksPanel.add(scrollPane);
 		
 		list = new JPanel();
 		scrollPane.setViewportView(list);
@@ -86,29 +131,33 @@ public class LauncherFrm extends JFrame {
         bg = new ButtonGroup();
 		
 		JPanel panel_2 = new JPanel();
-		panel.add(panel_2, BorderLayout.NORTH);
+		modpacksPanel.add(panel_2, BorderLayout.NORTH);
 		
-		JPanel panel_1 = new JPanel();
-		contentPane.add(panel_1, BorderLayout.SOUTH);
-		panel_1.setLayout(new BorderLayout(0, 0));
+		JPanel bottomPanel = new JPanel();
+		mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+		bottomPanel.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel_3_1 = new JPanel();
 		FlowLayout flowLayout = (FlowLayout) panel_3_1.getLayout();
 		flowLayout.setAlignment(FlowLayout.LEFT);
-		panel_1.add(panel_3_1, BorderLayout.WEST);
+		bottomPanel.add(panel_3_1, BorderLayout.WEST);
 		
-		JButton refresh = new JButton("Обновить информацию");
-		refresh.addActionListener(new ActionListener() {
+		JButton refreshBtn = new JButton("Обновить информацию");
+		refreshBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				refreshModpackList();
 			}
 		});
-		panel_3_1.add(refresh);
+		panel_3_1.add(refreshBtn);
+		
+		JButton settingsBtn = new JButton("Настройки");
+		settingsBtn.addActionListener(settsActionListener);
+		panel_3_1.add(settingsBtn);
 		
 		JPanel panel_3 = new JPanel();
 		FlowLayout flowLayout_1 = (FlowLayout) panel_3.getLayout();
 		flowLayout_1.setAlignment(FlowLayout.TRAILING);
-		panel_1.add(panel_3);
+		bottomPanel.add(panel_3);
 		
 		JCheckBox forceUpdateCheck = new JCheckBox("Переустановить");
 		panel_3.add(forceUpdateCheck);
@@ -119,10 +168,10 @@ public class LauncherFrm extends JFrame {
 		usernameField.setText(Config.get("username"));
 		usernameField.setColumns(15);
 		
-		startButton = new JButton("Играть");
-		panel_3.add(startButton);
-		startButton.setEnabled(false);
-		startButton.addActionListener(new ActionListener() {
+		startBtn = new JButton("Играть");
+		panel_3.add(startBtn);
+		startBtn.setEnabled(false);
+		startBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Config.set("username", usernameField.getText());
 				Config.saveConfig();
@@ -136,6 +185,7 @@ public class LauncherFrm extends JFrame {
 			}
 		});
 		contentPane.setPreferredSize(new Dimension(1000, 600));
+		
 		pack();
 		setLocationRelativeTo(null);
 		addModpacks();
@@ -148,15 +198,15 @@ public class LauncherFrm extends JFrame {
 	
 	private void selected() {
 		int i = selected.getModpack().getState();
-		if(i == 0) startButton.setText("Установить");
-		else if(i == 1) startButton.setText("Играть");
-		else if(i == 2 || i == 3) startButton.setText("Обновить");
-		startButton.setEnabled(true);
+		if(i == 0) startBtn.setText("Установить");
+		else if(i == 1) startBtn.setText("Играть");
+		else if(i == 2 || i == 3) startBtn.setText("Обновить");
+		startBtn.setEnabled(true);
 	}
 	
 	private void unselected() {
-		startButton.setEnabled(false);
-		startButton.setText("Играть");
+		startBtn.setEnabled(false);
+		startBtn.setText("Играть");
 	}
 	
 	/**
@@ -167,6 +217,8 @@ public class LauncherFrm extends JFrame {
 		unselected();
 		bg.clearSelection();
 		list.removeAll();
+		scrollPane.revalidate();
+		repaint();
 	}
 
 	/**
@@ -190,6 +242,8 @@ public class LauncherFrm extends JFrame {
 				removeAllModpacks();
 				Launcher.inst.refreshLauncherJson();
 				addModpacks();
+				scrollPane.revalidate();
+				repaint();
 			}
 		});
 	}
@@ -201,6 +255,13 @@ public class LauncherFrm extends JFrame {
 		Iterator<Modpack> i = Launcher.inst.getModpacks();
 		while(i.hasNext()) {
 			addModpack(i.next().createPanel());
+			scrollPane.revalidate();
+			repaint();
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

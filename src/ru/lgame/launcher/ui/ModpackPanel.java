@@ -255,7 +255,7 @@ public class ModpackPanel extends JPanel {
 	 * @param font Шрифт
 	 */
 	private static String[] getStringArray(String text, int width, FontMetrics font) {
-		if(text == null || text.length() == 0 || (text.length() == 1 && text.charAt(0) == ' ')) {
+		if(text == null || text.length() == 0 || (text.length() == 1 && text.charAt(0) == ' ') || width <= 1 || font == null || (width <= font.charWidth('A') + 2)) {
 			return new String[0];
 		}
 		text = text.replace('\r', '\0');

@@ -355,7 +355,7 @@ public final class Updater implements Runnable {
 		}
 		}
 		if(ret && !failed) {
-			Log.info("repeat");
+			Log.info("Updater repeat");
 		}
 	}
 
