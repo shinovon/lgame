@@ -51,35 +51,23 @@ public class Config {
 	}
 
 	public static boolean getBoolean(String key) {
-		if (properties.containsKey(key)) {
-			return new Boolean((String) properties.get(key)).booleanValue();
-		} else {
-			return false;
-		}
+		if(properties.containsKey(key)) return Boolean.parseBoolean((String) properties.get(key));
+		else return false;
 	}
 
 	public static int getInt(String key) {
-		if (properties.containsKey(key)) {
-			return new Integer((String) properties.get(key)).intValue();
-		} else {
-			return -1;
-		}
+		if(properties.containsKey(key)) return Integer.parseInt((String) properties.get(key));
+		else return -1;
 	}
 
 	public static long getLong(String key) {
-		if (properties.containsKey(key)) {
-			return new Long((String) properties.get(key)).longValue();
-		} else {
-			return 0;
-		}
+		if(properties.containsKey(key)) return Long.parseLong((String) properties.get(key));
+		else return 0;
 	}
 
 	public static String get(String key) {
-		if (properties.containsKey(key)) {
-			return (String) properties.get(key);
-		} else {
-			return null;
-		}
+		if(properties.containsKey(key)) return (String) properties.get(key);
+		else return null;
 	}
 
 	public static boolean contains(String key) {

@@ -41,7 +41,7 @@ public final class ZipUtils {
 	}
 
 	public static void unzip(String zipFile, String outputFolder) throws IOException, InterruptedException {
-		if (Thread.interrupted()) throw new InterruptedException("Thread.interrupted()");
+		if(Thread.interrupted()) throw new InterruptedException("Thread.interrupted()");
 		Log.info("Unzipping " + zipFile + " to " + outputFolder);
 		if(listener != null) listener.startUnzip(zipFile);
 		currentFile = "";
@@ -49,7 +49,7 @@ public final class ZipUtils {
 		byte[] buf = new byte[4096];
 
 		File folder = new File(outputFolder);
-		if (!folder.exists()) {
+		if(!folder.exists()) {
 			folder.mkdir();
 		}
 		int totalEntries = 0;
@@ -62,7 +62,7 @@ public final class ZipUtils {
 		int p = 0;
 		while (ze != null) {
 			p = (int)(((float) processedEntries / (float)totalEntries) * 100F);
-			if (Thread.interrupted()) {
+			if(Thread.interrupted()) {
 				zis.closeEntry();
 				zis.close();
 				throw new InterruptedException("Thread.interrupted()");
@@ -71,14 +71,14 @@ public final class ZipUtils {
 			boolean isDir = ze.isDirectory();
 			File newFile = new File(outputFolder + File.separator + fileName);
 			new File(newFile.getParent()).mkdirs();
-			if (!isDir) {
+			if(!isDir) {
 				done = false;
 				FileOutputStream fos = new FileOutputStream(newFile);
 				currentFile = newFile.getName();
 				if(listener != null) listener.unzipProgress(currentFile, p, 0);
 				int len;
 				while ((len = zis.read(buf)) > 0) {
-					if (Thread.interrupted()) {
+					if(Thread.interrupted()) {
 						fos.close();
 						zis.closeEntry();
 						zis.close();
@@ -105,7 +105,6 @@ public final class ZipUtils {
 	}
 	
 	public interface ProgressListener {
-		
 		public void startZip(String zipFile);
 
 		public void doneZip(String zipFile);
@@ -115,7 +114,6 @@ public final class ZipUtils {
 		public void unzipProgress(String currentFile, int totalPercent, int currentFilePercent);
 
 		public void doneUnzip(String zipFile);
-
 	}
 
 }

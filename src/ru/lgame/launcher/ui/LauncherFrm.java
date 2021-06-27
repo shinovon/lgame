@@ -123,8 +123,9 @@ public class LauncherFrm extends JFrame {
 		panel_3.add(startButton);
 		startButton.setEnabled(false);
 		startButton.addActionListener(new ActionListener() {
-
 			public void actionPerformed(ActionEvent e) {
+				Config.set("username", usernameField.getText());
+				Config.saveConfig();
 				if(usernameField.getText() == null || usernameField.getText().length() <= 4) {
 					JOptionPane.showMessageDialog(LauncherFrm.this, "Введите никнейм", "", JOptionPane.WARNING_MESSAGE);
 					return;
@@ -133,7 +134,6 @@ public class LauncherFrm extends JFrame {
 					Launcher.inst.runForceUpdate(Auth.fromUsername(usernameField.getText()), selected.getModpack());
 				else Launcher.inst.run(Auth.fromUsername(usernameField.getText()), selected.getModpack());
 			}
-			
 		});
 		contentPane.setPreferredSize(new Dimension(1000, 600));
 		pack();
@@ -210,15 +210,7 @@ public class LauncherFrm extends JFrame {
 	private static void setUI() {
 		try {
 			String x = UIManager.getSystemLookAndFeelClassName();
-			//String x2 = UIManager.getCrossPlatformLookAndFeelClassName();
-			//if (Settings.getBoolean("systemLookAndFeel")) {
-				UIManager.setLookAndFeel(x);
-			//} else {
-			//	UIManager.setLookAndFeel(x2);
-			//}
-			//if (Settings.getBoolean("customUI")) {
-			//UIManager.put("ButtonUI", MyButtonUI.class.getName());
-			//}
+			UIManager.setLookAndFeel(x);
 		} catch (ClassNotFoundException e1) {
 			e1.printStackTrace();
 		} catch (InstantiationException e1) {

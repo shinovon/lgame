@@ -1,7 +1,15 @@
 package ru.lgame.launcher;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Image;
+import java.awt.SystemColor;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -11,8 +19,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
 import javax.xml.bind.DatatypeConverter;
 
 import org.json.JSONArray;
@@ -124,10 +138,14 @@ public class Launcher {
 	 * Создать недостающие директории
 	 */
 	private void createDirsIfNecessary() {
-		File f = new File(getLauncherDir());
-		if(!f.exists()) f.mkdirs();
-		f = new File(getCacheDir());
-		if(!f.exists()) f.mkdirs();
+		try {
+			File f = new File(getLauncherDir());
+			if(!f.exists()) f.mkdirs();
+			f = new File(getCacheDir());
+			if(!f.exists()) f.mkdirs();
+		} catch (Exception e) {
+			showError("Ошибка", "Ошибка создания директорий", Log.exceptionToString(e));
+		}
 	}
 
 	/**
@@ -231,15 +249,15 @@ public class Launcher {
 	/**
 	 * Запустить сборку
 	 */
-	public void run(Auth auth, Modpack modpack) {
-		
+	public void run(Auth a, Modpack m) {
+		Updater.start(m, a);
 	}
 
 	/**
 	 * Запустить сборку с принудительным обновлением
 	 */
-	public void runForceUpdate(Auth auth, Modpack modpack) {
-		
+	public void runForceUpdate(Auth a, Modpack m) {
+		Updater.startForceUpdate(m, a);
 	}
 	
 	public void interruptEventThread() {
@@ -348,6 +366,52 @@ public class Launcher {
 		} catch (NoSuchAlgorithmException e) {
 		}
 		return null;
+	}
+
+	@SuppressWarnings("deprecation")
+	public void showError(String title, String text, String trace) {
+		JDialog dialog = new JDialog(frame, title, true);
+        Container contentPane = dialog.getContentPane();
+        contentPane.setLayout(new BorderLayout());
+        JPanel pane = new JPanel();
+        contentPane.add(pane, BorderLayout.CENTER);
+		pane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		pane.setLayout(new BorderLayout());
+		if(text != null && text.length() > 0) {
+			JTextPane infopane = new JTextPane();
+			infopane.setBackground(SystemColor.menu);
+			infopane.setEditable(false);
+			infopane.setText(text);
+			pane.add(infopane, BorderLayout.NORTH);
+		}
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setPreferredSize(new Dimension(600, 200));
+		pane.add(scrollPane, BorderLayout.CENTER);
+		JTextArea textArea = new JTextArea();
+		textArea.setFont(new Font("Consolas", Font.PLAIN, 12));
+		textArea.setEditable(false);
+		textArea.setText(trace);
+		scrollPane.setViewportView(textArea);
+
+		JPanel buttonPane = new JPanel();
+		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		contentPane.add(buttonPane, BorderLayout.SOUTH);
+		{
+			JButton okButton = new JButton("OK");
+			okButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					dialog.dispose();
+				}
+			});
+			okButton.setActionCommand("OK");
+			buttonPane.add(okButton);
+			dialog.getRootPane().setDefaultButton(okButton);
+		}
+		dialog.pack();
+        dialog.setResizable(false);
+        dialog.setLocationRelativeTo(frame);
+        dialog.show();
+        dialog.dispose();
 	}
 
 }

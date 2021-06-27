@@ -3,6 +3,8 @@ package ru.lgame.launcher.utils;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,26 +17,23 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Map;
 
-import javax.net.ssl.HttpsURLConnection;
+import ru.lgame.launcher.Launcher;
 
 public class WebUtils {
+	public static ProgressListener listener;
 	
 	public static int downloaded;
-	public static int downloadedk;
 	public static int need;
-	public static int needk;
-	public static int needm;
-	public static double downloadedm;
 	public static double percent;
 	private static String useragent = "Mozilla/5.0";
+	
+	public static void setListener(ProgressListener p) {
+		listener = p;
+	}
 
-	public final static void downloadExperimental(final String uri, final String fileName) throws IOException {
+	public static void downloadExperimental(final String uri, final String fileName) throws IOException {
 		downloaded = 0;
 		need = 0;
-		downloadedk = 0;
-		downloadedm = 0;
-		needk = 0;
-		needm = 0;
 
 		final URL url = new URL(uri);
 		ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
@@ -50,57 +49,64 @@ public class WebUtils {
 		downloadNormal(a, b);
 	}
 
-	public final static void downloadNormal(final String uri, final String fileName)
+	public final static void downloadNormal(String uri, String path)
 			throws IOException, InterruptedException {
-		if (Thread.interrupted()) {
-			throw new InterruptedException();
-		}
+		if(Thread.interrupted()) throw new InterruptedException("Thread.interrupted()");
+		if(listener != null)
 		downloaded = 0;
 		need = 0;
-		downloadedk = 0;
-		downloadedm = 0;
-		needk = 0;
-		needm = 0;
-		final URL url = new URL(uri);
-		final Object connection = uri.startsWith("https://") ? ((HttpsURLConnection) url.openConnection())
-				: ((HttpURLConnection) url.openConnection());
-		((URLConnection) connection).setRequestProperty("User-Agent", useragent);
-		((HttpURLConnection) connection).setRequestMethod("GET");
-		final FileOutputStream out = new FileOutputStream(fileName);
-		final InputStream in = ((URLConnection) connection).getInputStream();
-		byte buffer[] = new byte[4096];
-		int read;
-		((HttpURLConnection) connection).setConnectTimeout(10000);
-		((HttpURLConnection) connection).setReadTimeout(10000);
-		need = ((HttpURLConnection) connection).getContentLength();
-		needk = need / 1024;
-		needm = needk / 1024;
-		Log.info("Downloading: " + uri + " to " + fileName + " size: " + need + "k");
-		while ((read = in.read(buffer)) != -1) {
-			out.write(buffer, 0, read);
-			downloaded += read;
-			downloadedk = downloaded / 1024;
-			downloadedm = (double) downloadedk / (double) 1024;
-			percent = (double) ((double) ((double) downloaded / (double) need) * 100f);
-			if (Thread.interrupted()) {
-				out.close();
-				in.close();
-				((HttpURLConnection) connection).disconnect();
-				Log.warn("Download interrupt!");
-				throw new InterruptedException();
+		try {
+			URL url = new URL(uri);
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+			con.setRequestProperty("User-Agent", useragent);
+			con.setRequestMethod("GET");
+			FileOutputStream out = new FileOutputStream(path);
+			InputStream in = ((URLConnection) con).getInputStream();
+			byte buffer[] = new byte[4096];
+			int read;
+			con.setConnectTimeout(10000);
+			con.setReadTimeout(10000);
+			need = con.getContentLength();
+			Log.info("Downloading: " + uri + " to " + path + " size: " + need + "k");
+			while ((read = in.read(buffer)) != -1) {
+				out.write(buffer, 0, read);
+				downloaded += read;
+				percent = (double) ((double) ((double) downloaded / (double) need) * 100f);
+				if(Thread.interrupted()) {
+					Log.warn("Download interrupt!");
+					out.close();
+					in.close();
+					((HttpURLConnection) con).disconnect();
+					Launcher.inst.queue(new Runnable() {
+						public void run() {
+							try {
+								new File(path).delete();
+							} catch (Exception e) {
+							}
+						}
+					});
+					throw new InterruptedException("Thread.interrupted()");
+				}
 			}
+			Log.debug("Size of " + path + " " + downloaded);
+			if(downloaded != need) Log.warn("Content-Size and actual file size does not match!!");
+			in.close();
+			out.close();
+			((HttpURLConnection) con).disconnect();
+		} catch (IOException e) {
+			throw new IOException(uri, e);
+		} finally {
+			Launcher.inst.queue(new Runnable() {
+				public void run() {
+					try {
+						new File(path).delete();
+					} catch (Exception e) {
+					}
+				}
+			});
 		}
-		Log.debug("Size of " + fileName + " " + downloaded);
-		if(downloaded != need) Log.warn("Content-Size and actual file size does not match!!");
-		in.close();
-		out.close();
-		((HttpURLConnection) connection).disconnect();
 		downloaded = 0;
 		need = 0;
-		downloadedk = 0;
-		downloadedm = 0;
-		needk = 0;
-		needm = 0;
 	}
 
 	public final static String get(final String url) throws IOException {
@@ -112,10 +118,14 @@ public class WebUtils {
 			//con.setRequestProperty("User-Agent", useragent);
 			con.connect();
 			Log.debug("Connected, getting text");
+			if(con.getResponseCode() == 404) {
+				con.disconnect();
+				throw new FileNotFoundException();
+			}
 			//Log.debug("response code: " + con.getResponseCode());
 			is = con.getInputStream();
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			final byte[] buf = new byte[8192];
+			byte[] buf = new byte[8192];
 			int read;
 			while ((read = is.read(buf)) != -1) {
 				baos.write(buf, 0, read);
@@ -128,24 +138,24 @@ public class WebUtils {
 		} catch (IOException e) {
 			throw new IOException(url, e);
 		} finally {
-			if (is != null) is.close();
+			if(is != null) is.close();
 		}
 	}
 
-	public final static String post(final String url, final Map<String, String> requestMap, final String body)
+	public static String post(final String url, final Map<String, String> requestMap, final String body)
 			throws IOException {
-		final HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+		HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
 		con.setRequestMethod("POST");
-		con.setRequestProperty("User-Agent", useragent);
-		if (requestMap != null) requestMap.forEach(con::setRequestProperty);
+		//con.setRequestProperty("User-Agent", useragent);
+		if(requestMap != null) requestMap.forEach(con::setRequestProperty);
 		con.setDoOutput(true);
 		con.setDoInput(true);
-		final DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 		wr.writeBytes(body);
 		wr.flush();
 		wr.close();
-		final BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		final StringBuilder response = new StringBuilder();
+		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		StringBuilder response = new StringBuilder();
 		String inputLine;
 		while ((inputLine = in.readLine()) != null) {
 			response.append(inputLine).append("\n");
@@ -157,5 +167,13 @@ public class WebUtils {
 
 	public static String getс(String url) throws IOException {
 		return get(url).replace(" ", "").replace("\r", "").replace("\n", "");
+	}
+	
+	public interface ProgressListener {
+		public void startDownload(String filename);
+		
+		public void downloadProgress(String filename, int percent);
+
+		public void doneDownload(String zipFile);
 	}
 }

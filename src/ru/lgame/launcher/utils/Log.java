@@ -48,7 +48,7 @@ public class Log {
 		return "" + i;
 	}
 	
-	private static String exceptionToString(Throwable e) {
+	public static String exceptionToString(Throwable e) {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
 		e.printStackTrace(pw);

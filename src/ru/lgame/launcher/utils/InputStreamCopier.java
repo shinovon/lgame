@@ -20,7 +20,7 @@ public class InputStreamCopier extends Thread {
 			int read;
 			while ((read = this.input.read(buffer)) != -1) {
 				this.output.write(buffer, 0, read);
-				if (Thread.interrupted()) return;
+				if(Thread.interrupted()) return;
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);

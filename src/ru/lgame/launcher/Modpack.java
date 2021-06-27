@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import ru.lgame.launcher.ui.ModpackPanel;
 import ru.lgame.launcher.utils.Log;
+import ru.lgame.launcher.utils.WebUtils;
 
 /**
  * Объект сборки
@@ -26,13 +27,19 @@ public class Modpack {
 	private String image;
 	private String client_id;
 	private String update_data;
+	private String client_update_data;
 	private ModpackPanel ui;
+	
+	private JSONObject updateJson;
+	private JSONObject clientUpdateJson;
 	
 	public Modpack(String id) {
 		this.id = id;
 	}
 	
 	public Modpack parse(JSONObject o) {
+		updateJson = null;
+		clientUpdateJson = null;
 		name = o.optString("name", id);
 		category = o.optString("category");
 		description = o.optString("category");
@@ -41,6 +48,7 @@ public class Modpack {
 		last_version = o.optString("last_version");
 		client_id = o.optString("client", null);
 		update_data = o.optString("update_data", null);
+		client_update_data = o.optString("client_update_data", null);
 		return this;
 	}
 
@@ -66,6 +74,10 @@ public class Modpack {
 
 	public String getLastVersion() {
 		return last_version;
+	}
+
+	public String client() {
+		return client_id;
 	}
 
 	/**
@@ -127,11 +139,31 @@ public class Modpack {
 	}
 	
 	public boolean isUpdating() {
-		return false;
+		return this.equals(Updater.getNowUpdatingModpack());
 	}
 
 	public int getState() {
 		return Updater.getModpackState(this);
+	}
+	
+	public JSONObject getUpdateJson() throws IOException {
+		if(updateJson == null) updateJson = new JSONObject(WebUtils.get(update_data));
+		return updateJson;
+	}
+	
+	public JSONObject getClientUpdateJson() throws IOException {
+		if(clientUpdateJson == null) clientUpdateJson = new JSONObject(WebUtils.get(client_update_data));
+		return clientUpdateJson;
+	}
+
+	public JSONObject getUpdateJson(boolean b) throws IOException {
+		if(b == false) return getUpdateJson();
+		return updateJson = new JSONObject(WebUtils.get(update_data));
+	}
+	
+	public JSONObject getClientUpdateJson(boolean b) throws IOException {
+		if(b == false) return getClientUpdateJson();
+		return clientUpdateJson = new JSONObject(WebUtils.get(client_update_data));
 	}
 
 }

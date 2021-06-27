@@ -161,7 +161,7 @@ public class ModpackPanel extends JPanel {
 		int ih = image.getHeight(null);
 		double r = (double) iw / (double) ih;
 		int w = (int) (r * (double)ITEM_HEIGHT);
-		int factor = greatestCommonFactor(iw, ih);
+		//int factor = greatestCommonFactor(iw, ih);
 		//Log.debug(id + " image scaled to: " + w + "x" + ITEM_HEIGHT + " (" + iw / factor + ":" + ih / factor + ")");
 		image = image.getScaledInstance(w, ITEM_HEIGHT, Image.SCALE_SMOOTH);
 		updateContents();
@@ -177,6 +177,11 @@ public class ModpackPanel extends JPanel {
 		if(s1 != null) this.updateText1 = s1;
 		if(s2 != null) this.updateText2 = s2;
 		if(percent >= 0) this.updatePercent = percent;
+		Launcher.inst.queue(new Runnable() {
+			public void run() {
+				updateContents();
+			}
+		});
 	}
 	
 	public void updateContents() {
@@ -214,9 +219,9 @@ public class ModpackPanel extends JPanel {
 			for(int i = 0; i < descArr.length; i++) g.drawString(descArr[i], x, 16 + th + (i * (th + 1)));
 		}
 		if(isUpdating()) {
-			int percent = 10;
-			String s = "Обновление";
-			String p = "Скачивание: mods (6.3/100.0Mb) (0.5Mb/s) (6%)";
+			int percent = this.updatePercent;
+			String s = this.updateText1;
+			String p = this.updateText2;
 			
 			String s1 = s + " " + percent + "%";
 			String s2 = p;
@@ -250,44 +255,40 @@ public class ModpackPanel extends JPanel {
 	 * @param font Шрифт
 	 */
 	private static String[] getStringArray(String text, int width, FontMetrics font) {
-		if (text == null || text.length() == 0 || (text.length() == 1 && text.charAt(0) == ' ')) {
+		if(text == null || text.length() == 0 || (text.length() == 1 && text.charAt(0) == ' ')) {
 			return new String[0];
 		}
 		text = text.replace('\r', '\0');
 		ArrayList<String> v = new ArrayList<String>(5);
 		char[] chars = text.toCharArray();
-		if (font.stringWidth(text) > width) {
+		if(font.stringWidth(text) > width) {
 			int i1 = 0;
 			for (int i2 = 0; i2 < text.length(); i2++) {
-				if (chars[i2] == '\n') {
+				if(chars[i2] == '\n') {
 					v.add(text.substring(i1, i2));
 					i2 = i1 = i2 + 1;
-				} else {
-					if (text.length() - i2 <= 1) {
-						v.add(text.substring(i1, text.length()));
-						break;
-					} else if (font.stringWidth(text.substring(i1, i2)) >= width) {
-						boolean f = false;
-						for (int j = i2; j > i1; j--) {
-							char c = text.charAt(j);
-							if (c == ' ' || c == '-' || c == '.') {
-								f = true;
-								v.add(text.substring(i1, j + 1));
-								i2 = i1 = j + 1;
-								break;
-							}
+				} else if(text.length() - i2 <= 1) {
+					v.add(text.substring(i1, text.length()));
+					break;
+				} else if(font.stringWidth(text.substring(i1, i2)) >= width) {
+					boolean f = false;
+					for (int j = i2; j > i1; j--) {
+						char c = text.charAt(j);
+						if(c == ' ' || c == '-' || c == '.') {
+							f = true;
+							v.add(text.substring(i1, j + 1));
+							i2 = i1 = j + 1;
+							break;
 						}
-						if (!f) {
-							i2 = i2 - 2;
-							v.add(text.substring(i1, i2));
-							i2 = i1 = i2 + 1;
-						}
+					}
+					if(!f) {
+						i2 = i2 - 2;
+						v.add(text.substring(i1, i2));
+						i2 = i1 = i2 + 1;
 					}
 				}
 			}
-		} else {
-			v.add(text);
-		}
+		} else v.add(text);
 		return v.toArray(new String[0]);
 	}
 
