@@ -1,0 +1,106 @@
+{
+	"ui": {
+		"modpackdefaultheight": 240
+	},
+	"modpacks": [
+		"vanilla",
+		"oil",
+		"mastertech",
+		"realrpg",
+		"realmagic",
+		"spacetech",
+		"cognition",
+		"cognitionl",
+		"entrance"
+	],
+	"vanilla": {
+		"name": "Vanilla Classic",
+		"category": "Приключения",
+		"description": "Если вы не любите индустриальные, магические или любые другие большие модификации, а хотите сохранить \"ванильность\" Майнкрафта, то эта сборка для вас!. Вместо добавления новых вещей происходит расширение и добавление новых механик в уже существующий уклад игры. Сборка подойдет как новичкам, так и опытным ребятам. В этой сборке можно погрузиться в выживание и узнать Майнкрафт таким, каким он был на заре своего появления. Мы постарались создать режим, в котором будет много интересных сюрпризов для игроков. Она также хорошо подходит для слабых ПК и отлично оптимизирована.",
+		"img": "http://dl.nnproject.cc/lgame/img/vanilla.jpg",
+		"last_version": "2.7.26",
+		"client": "forge1.12.2",
+		"update_data": "http://dl.nnproject.cc/lgame/vanilla/update.json",
+		"client_update_data": "http://dl.nnproject.cc/lgame/forge1.12.2/update.json"
+	},
+	"oil": {
+		"name": "OIL Craft",
+		"category": "Приключения, Реализм, Техника",
+		"description": "Реалистичная сборка, которая пронесёт вас по пяти эпохам. В начале - вы неандерталец, в процессе развития, изучая всё новые и новые технологии, у вас появится возможность создавать транспорт, добывать и перерабатывать ресурсы, и на протяжении всего этого времени, будут сменятся времена года. Главная цель сборки - это добыча и переработка нефти. Кроме того, в ней вас ждёт сумеречный лес. Сборка отлично подходит для слабых ПК.",
+		"img": "http://dl.nnproject.cc/lgame/img/oil.jpg",
+		"last_version": "2.2.42",
+		"client": "forge1.12.2",
+		"update_data": "http://dl.nnproject.cc/lgame/oil/update.json",
+		"client_update_data": "http://dl.nnproject.cc/lgame/forge1.12.2/update.json"
+	},
+	"mastertech": {
+		"name": "MasterTech: Hollow Beginning",
+		"category": "Приключения, Реализм, Хардкор, RPG, Космос, Техника, Магия",
+		"description": "MasterTech: Hollow Beginning - Это большая сборка, охватывающая огромное количество различных тематик. В сборке вас ждёт множество Приключений, Индустрии, Магии, Хардкора, Космоса и увлекательного RPG с многочисленными путешествиями через разнообразные миры, ведь их более 50! Игра начинается в Незере, довольно тёмном и непримечательном измерении. И кроме всего этого в сборке присутствует более 1000 квестов которые помогут вам разобраться во всём этом. А также тут более 1500 изменённых рецептов, которые не дадут вам заскучать и создадут связь между всеми модами.",
+		"img": "http://dl.nnproject.cc/lgame/img/mastertech.jpg",
+		"last_version": "1.4.5",
+		"client": "forge1.12.2",
+		"update_data": "http://dl.nnproject.cc/lgame/mastertech/update.json",
+		"client_update_data": "http://dl.nnproject.cc/lgame/forge1.12.2/update.json"
+	},
+	"realrpg": {
+		"name": "Realistic RPG",
+		"category": "Приключения, Реализм, RPG, Хардкор",
+		"description": "Реализм! И немного RPG. Сборка подходит для любителей реализма. В ней присутствует небольшое количество квестов и множество модификаций, делающих мир Майнкрафта реалистичней. В сборке есть новая генерация мира и времена года. Теперь растения будут прекращать свой рост зимой, а температура воздуха понижаться. Так же присутствует жажда, голод и усталость. Много новых биомов и мобов и не только, всё это делает игру хардкорной. Сборка будет работать на слабых ПК.",
+		"img": "http://dl.nnproject.cc/lgame/img/realrpg.jpg",
+		"last_version": "1.3.6",
+		"client": "forge1.12.2",
+		"update_data": "http://dl.nnproject.cc/lgame/realrpg/update.json",
+		"client_update_data": "http://dl.nnproject.cc/lgame/forge1.12.2/update.json"
+	},
+	"realmagic": {
+		"name": "Real Magic",
+		"category": "Приключения, Реализм, RPG, Хардкор, Магия",
+		"description": "Сборка создана на основе Realistic RPG, с добавлением большого количества магии в игру. Она объединяет в себе такие тематики как: Реализм, Приключения, RPG, Хардкор, Магия. Самый главный и обширный элемент сборки это магия.",
+		"img": "http://dl.nnproject.cc/lgame/img/realmagic.jpg",
+		"last_version": "1.3.3",
+		"client": "forge1.12.2",
+		"update_data": "http://dl.nnproject.cc/lgame/realmagic/update.json",
+		"client_update_data": "http://dl.nnproject.cc/lgame/forge1.12.2/update.json"
+	},
+	"spacetech": {
+		"name": "Space Technology",
+		"category": "Приключения, Реализм, RPG, Хардкор, Техника, Космос",
+		"description": "Сборка создана на основе Realistic RPG, с добавлением большого количества индустриальных модов. Она объединяет в себе такие тематики как: Реализм, Приключения, RPG, Хардкор, Индустрия, Космос. Самый главный и обширный элемент сборки это космос, он представлен в виде модификации Galacticraft и дополнением для неё Galaxy Space. А освоиться в сборке вам помогут квесты.",
+		"img": "http://dl.nnproject.cc/lgame/img/space.jpg",
+		"last_version": "1.1.6",
+		"client": "forge1.12.2",
+		"update_data": "http://dl.nnproject.cc/lgame/cognition/update.json",
+		"client_update_data": "http://dl.nnproject.cc/lgame/forge1.12.2/update.json"
+	},
+	"cognition": {
+		"name": "Cognition",
+		"category": "Приключения, Реализм, RPG, Хардкор, Техника, Космос, Магия",
+		"description": "Это обширная сборка, обхватывающая большое количество тематик. Таких как Приключения, Реализм, RPG, Хардкор, Космос, ТехноМагия. Приключения представлены в новых структурах и биомах в мире, а так же путешествиями по космосу. Реализм представлен в виде новых механик горения факела, голода, жажды, усталости, температуры, сезонов и новых звуков. Теперь зимой растения прекращают свой рост, а температура воздуха понижается. RPG представлено в виде новых мобов, прокачкой ХП и сражением с боссами. А освоиться в сборке вам помогут более 500 квестов. Покоряй, изучай, постигай",
+		"img": "http://dl.nnproject.cc/lgame/img/cognition.jpg",
+		"last_version": "1.2.16",
+		"client": "forge1.12.2",
+		"update_data": "http://dl.nnproject.cc/lgame/cognition/update.json",
+		"client_update_data": "http://dl.nnproject.cc/lgame/forge1.12.2/update.json"
+	},
+	"cognitionl": {
+		"name": "Cognition Lite",
+		"category": "Приключения, RPG, Техника, Космос, Магия",
+		"description": "Это уменьшенная копия Cognition. Оптимизированная для слабых ПК. В ней присутствуют все глобальные модификации что есть в полной версии сборки. Но отсутствуют различные декоративные и расширяющие функционал моды.",
+		"img": "http://dl.nnproject.cc/lgame/img/cognitionl.jpg",
+		"last_version": "1.1.8",
+		"client": "forge1.12.2",
+		"update_data": "http://dl.nnproject.cc/lgame/cognitionl/update.json",
+		"client_update_data": "http://dl.nnproject.cc/lgame/forge1.12.2/update.json"
+	},
+	"entrance": {
+		"name": "Entrance To Darkness",
+		"category": "Приключения, RPG, Магия",
+		"description": "Данная сборка даст вам незабываемый опыт и покажет необычные механики. Вы можете развиваться как хотите, но есть одна незадача - Вы потеряли знания об использовании различных предметов и модов и вам предстоит находить и получать забытые знания, изучая для этого как популярные моды по типу Botania или Thaumcraft, так и менее популярные, но не менее интересные моды, как Bewitchment, Astral Sorcery или Into The Maelstrom. В сборке присутствуют квесты, которые помогут вам разобраться в прохождении, а также несколько изменённых крафтов чтобы был стимул изучать несколько модификаций, а не зацикливаться на одной. Кроме этого, многие моды были полностью переведены на Русский язык специально для вас!",
+		"img": "http://dl.nnproject.cc/lgame/img/entrance.jpg",
+		"last_version": "1.1",
+		"client": "forge1.12.2",
+		"update_data": "http://dl.nnproject.cc/lgame/entrance/update.json",
+		"client_update_data": "http://dl.nnproject.cc/lgame/forge1.12.2/update.json"
+	}
+}

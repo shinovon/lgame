@@ -3,7 +3,7 @@
 	"date": "19.06.2021",
 	"human_readable_version": "2.2.42",
 	"update_build": 2,
-	"client": "http://dl.nnproject.cc/tdlauncher/1.12.2forge/update.json",
+	"client": "http://dl.nnproject.cc/lgame/1.12.2forge/update.json",
 	"has_mods": true,
 	"integrity_check": {
 		"dirs": [
