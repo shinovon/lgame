@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import org.json.JSONArray;
@@ -20,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import ru.lgame.launcher.utils.FileUtils;
+import ru.lgame.launcher.utils.InputStreamCopier;
 import ru.lgame.launcher.utils.Log;
 
 public final class Updater implements Runnable {
@@ -41,6 +43,12 @@ public final class Updater implements Runnable {
 	private boolean updating;
 
 	private boolean failed;
+
+	private String clientMainClass;
+	private String[] clientTweakClasses;
+	private String clientAssetIndex;
+	
+	private static Process clientProcess;
 
 	 
 	private Updater(Modpack m, Auth a, boolean b) {
@@ -113,13 +121,15 @@ public final class Updater implements Runnable {
 		File vvf = new File(p + "version");
 		if(!vvf.exists()) return false;
 		JSONObject j = updateJson.getJSONObject("integrity_check");
-		JSONArray a = j.getJSONArray("dirs");
-		Iterator<Object> i = a.iterator();
-		while(i.hasNext()) {
-			JSONObject o = (JSONObject) i.next();
-			if(o.getString("type").equals("exists")) {
-				String d = path(o.getString("p"));
-				if(!new File(p + d).exists()) return false;
+		if(j.has("dirs")) {
+			JSONArray a = j.getJSONArray("dirs");
+			Iterator<Object> i = a.iterator();
+			while(i.hasNext()) {
+				JSONObject o = (JSONObject) i.next();
+				if(o.getString("type").equals("exists")) {
+					String d = path(o.getString("path"));
+					if(!new File(p + d).exists()) return false;
+				}
 			}
 		}
 		if(updateJson.getBoolean("has_mods")) {
@@ -199,16 +209,18 @@ public final class Updater implements Runnable {
 		vvf = new File(p + "version");
 		if(!vvf.exists()) return false;
 		JSONObject j = clientJson.getJSONObject("integrity_check");
-		JSONArray a = j.getJSONArray("dirs");
-		Iterator<Object> i = a.iterator();
-		while(i.hasNext()) {
-			JSONObject o = (JSONObject) i.next();
-			if(o.getString("type").equals("exists")) {
-				String d = path(o.getString("p"));
-				if(!new File(p + d).exists()) return false;
+		if(j.has("dirs")) {
+			JSONArray a = j.getJSONArray("dirs");
+			Iterator<Object> i = a.iterator();
+			while(i.hasNext()) {
+				JSONObject o = (JSONObject) i.next();
+				if(o.getString("type").equals("exists")) {
+					String d = path(o.getString("path"));
+					if(!new File(p + d).exists()) return false;
+				}
 			}
 		}
-
+		
 		if(clientJson.has("libraries")) {
 			JSONObject md = clientJson.getJSONObject("libraries");
 			String digest = clientJson.getString("checksum_algorithm");
@@ -230,13 +242,49 @@ public final class Updater implements Runnable {
 					return false;
 				}
 			}
-			FileFilter filter = (file) -> !file.isDirectory() && file.getName().toLowerCase().endsWith(".jar");
+			FileFilter filter = (file) -> file.isDirectory() || file.getName().toLowerCase().endsWith(".jar");
 			File[] mods = new File(p + "libraries" + File.separator).listFiles(filter);
 			if(mods != null)
 			for (File f : mods) {
+				if(f.isDirectory()) continue;
 				String n = f.getName().toLowerCase();
 				if(!names.contains(n)) {
-					Log.info("Excess mod: " + n);
+					Log.info("Excess jar libary: " + n);
+					return false;
+				}
+			}
+		}
+		
+
+		if(clientJson.has("libraries")) {
+			JSONObject md = clientJson.getJSONObject("natives");
+			String digest = clientJson.getString("checksum_algorithm");
+			ArrayList<String> names = new ArrayList<String>();
+			JSONObject ck = md.getJSONObject("checksums");
+			for (String s : ck.keySet()) {
+				names.add(s);
+				String hash = ck.getString(s);
+				String filep = p + "libraries" + File.separator + s;
+				File file = new File(filep);
+				if (!file.exists()) {
+					Log.info("not exists: " + s);
+					deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
+					return false;
+				}
+				if (hash(filep, digest).equalsIgnoreCase(hash)) {
+					deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
+					Log.info("wrong checksum: " + s);
+					return false;
+				}
+			}
+			FileFilter filter = (file) -> file.isDirectory() || (file.getName().toLowerCase().endsWith(".dll") || file.getName().toLowerCase().endsWith(".so"));
+			File[] mods = new File(p + "natives" + File.separator).listFiles(filter);
+			if(mods != null)
+			for (File f : mods) {
+				if(f.isDirectory()) continue;
+				String n = f.getName().toLowerCase();
+				if(!names.contains(n)) {
+					Log.info("Excess dynamic libary: " + n);
 					return false;
 				}
 			}
@@ -245,7 +293,7 @@ public final class Updater implements Runnable {
 	}
 
 	private boolean checkClientInstalled() {
-		String p = Config.get("path") + modpack.client() + File.separator;
+		String p = getClientDir();
 		File f = new File(p + "client.jar");
 		if(!f.exists()) return false;
 		f = new File(p + "version");
@@ -281,16 +329,19 @@ public final class Updater implements Runnable {
 		try {
 			json = modpack.getUpdateJson(true);
 			clientJson = modpack.getClientUpdateJson(true);
+			clientAssetIndex = clientJson.getString("asset_index");
+			clientMainClass = clientJson.getJSONObject("run").getString("mainclass");
+			clientTweakClasses = clientJson.getJSONObject("run").getJSONArray("tweak_classes").toList().toArray(new String[0]);
 		} catch (IOException e) {
 			e.printStackTrace();
 			if(modpackState == 0 || forceUpdate) {
-				fatalError("Нет подключения к интернету или сервер не отвечает!", e, Errors.UPDATER_RUN_GETUPDATEJSON_IOEXCEPTION);
+				updateFatalError("Нет подключения к интернету или сервер не отвечает!", e, Errors.UPDATER_RUN_GETUPDATEJSON_IOEXCEPTION);
 				return;
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 			if(modpackState == 0 || forceUpdate) {
-				fatalError("Ошибка парса", e, Errors.UPDATER_RUN_GETUPDATEJSON_JSONEXCEPTION);
+				updateFatalError("Ошибка парса", e, Errors.UPDATER_RUN_GETUPDATEJSON_JSONEXCEPTION);
 				return;
 			}
 		}
@@ -300,7 +351,8 @@ public final class Updater implements Runnable {
 		try {
 			clientNeedsUpdate = checkClientNeedUpdate();
 		} catch (Exception e1) {
-			fatalError("Ошибка проверки клиента", e1, Errors.UPDATER_RUN_CHECKCLIENT_EXCEPTION);
+			updateFatalError("Ошибка проверки клиента", e1, Errors.UPDATER_RUN_CHECKCLIENT_EXCEPTION);
+			return;
 		}
 		// Сборка установлена, нужно проверить обновления
 		if(modpackState == -100) {
@@ -311,7 +363,7 @@ public final class Updater implements Runnable {
 				if(!checkModpackIntegrity(modpack, json)) modpackState = 3;
 				else if(checkUpdatesAvailable(modpack)) modpackState = 2;
 			} catch (Exception e) {
-				fatalError("Ошибка проверки сборки", e, Errors.UPDATER_RUN_CHECKMODPACK_EXCEPTION);
+				updateFatalError("Ошибка проверки сборки", e, Errors.UPDATER_RUN_CHECKMODPACK_EXCEPTION);
 				return;
 			}
 		}
@@ -327,7 +379,12 @@ public final class Updater implements Runnable {
 		}
 		case 1:
 		{
-			startClient();
+			try {
+				startClient();
+			} catch (Exception e) {
+				clientError("Запуск не удался", e);
+				return;
+			}
 			ret = false;
 			break;
 		}
@@ -349,7 +406,7 @@ public final class Updater implements Runnable {
 		}
 		default:
 		{
-			fatalError("default", modpackState, Errors.UPDATER_GETMODPACKSTATE_ILLEGAL_VALUE);
+			updateFatalError("default", modpackState, Errors.UPDATER_GETMODPACKSTATE_ILLEGAL_VALUE);
 			ret = false;
 			break;
 		}
@@ -370,18 +427,67 @@ public final class Updater implements Runnable {
 
 	private void update() {
 		updating = true;
-		String p = Config.get("path") + modpack.id() + File.separator;
+		String p = getModpackDir();
 		
 	}
 	
 	private void install() {
 		updating = true;
-		String p = Config.get("path") + modpack.id() + File.separator;
+		String p = getModpackDir();
 		
 	}
 
-	private void startClient() {
-		
+	private void startClient() throws Exception {
+		if (clientProcess != null)
+			throw new IllegalStateException("Client still running!");
+		try {
+
+			File[] libraries = getClientLibariesFiles();
+			HashSet<File> d = new HashSet<File>();
+			d.add(new File(getClientDir()));
+			for (File f: libraries) d.add(f);
+			ArrayList<String> jvmArgs = new ArrayList<>();
+			jvmArgs.add("-Xms" + Config.get("xms") + "M");
+			jvmArgs.add("-Xmx" + Config.get("xmx") + "M");
+			jvmArgs.add("-Djava.library.path=" + getNativesDir());
+
+			ArrayList<String> appArgs = new ArrayList<>();
+			appArgs.add("--username");
+			appArgs.add(auth.getUsername());
+			appArgs.add("--accessToken");
+			appArgs.add("null");
+			appArgs.add("--gameDir");
+			appArgs.add(getModpackDir());
+			appArgs.add("--assetsDir");
+			appArgs.add(getAssetsDir());
+			appArgs.add("--assetIndex");
+			appArgs.add(clientAssetIndex);
+			for (String tw : clientTweakClasses) {
+				appArgs.add("--tweakClass");
+				appArgs.add(tw);
+			}
+			appArgs.add("--modpackid");
+			appArgs.add(modpack.id());
+			appArgs.add("--userProperties");
+			appArgs.add("{}");
+			clientProcess = StartUtil.startJarProcess(new File(getModpackDir()), d, clientMainClass, jvmArgs,
+					appArgs);
+			final InputStreamCopier input = new InputStreamCopier(clientProcess.getInputStream(), System.out);
+			final InputStreamCopier error = new InputStreamCopier(clientProcess.getErrorStream(), System.out);
+			error.start();
+			input.start();
+			final int exitCode = clientProcess.waitFor();
+			Log.info("Client exit code: " + exitCode);
+			if (exitCode == 1 || exitCode == -1) {
+				clientError("Клиент аварийно завершился! Код: " + exitCode);
+			}
+			input.interrupt();
+			error.interrupt();
+			clientProcess = null;
+		} catch (NullPointerException e) {
+			Log.error("startClient()", e);
+			clientProcess = null;
+		}
 	}
 
 	private void reset() {
@@ -389,37 +495,74 @@ public final class Updater implements Runnable {
 		running = false;
 		failed = false;
 	}
+	
+	public String getClientDir() {
+		return Config.get("path") + modpack.client() + File.separator;
+	}
+	
+	public String getModpackDir() {
+		return Config.get("path") + modpack.id() + File.separator;
+	}
 
-	private void fatalError(String s, Throwable t, int i) {
+	public String getAssetsDir() {
+		return getClientDir() + "assets" + File.separator;
+	}
+
+	public String getLibrariesDir() {
+		return getClientDir() + "libraries" + File.separator;
+	}
+
+	public String getNativesDir() {
+		return getClientDir() + "natives" + File.separator;
+	}
+
+	public File[] getClientLibariesFiles() {
+		return new File(getClientDir() + "libraries" + File.separator).listFiles((file) -> file.isDirectory() || file.getName().toLowerCase().endsWith(".jar"));
+	}
+
+	public String getClientPath() {
+		return getClientDir() + "client.jar";
+	}
+
+	private void clientError(String s) {
+		Launcher.inst.showError("Ошибка клиента", s);	
+	}
+
+	private void clientError(String s, Throwable t) {
+		String e = Log.exceptionToString(t);
+		Launcher.inst.showError("Ошибка клиента", s , s + "\n" + e);	
+	}
+
+	private void updateFatalError(String s, Throwable t, int i) {
 		String e = Log.exceptionToString(t);
 		Launcher.inst.showError("Ошибка обновления", s + " (Код ошибки: "  + Errors.toHexString(i) + ")", s + " (Код ошибки: " + Errors.toHexString(i) + ")\n" + e);	
-		fatalError();
+		updateFatalError();
 	}
 
-	private void fatalError(String s, String s2, int i) {
+	private void updateFatalError(String s, String s2, int i) {
 		Launcher.inst.showError("Ошибка обновления", s, s + ": " + s2 + " (Код ошибки: " +  Errors.toHexString(i) + ")");
-		fatalError();
+		updateFatalError();
 	}
 
-	private void fatalError(String s, int i1, int i2) {
+	private void updateFatalError(String s, int i1, int i2) {
 		String e = Log.exceptionToString(new Exception());
 		Launcher.inst.showError("Ошибка обновления", s, s + ": " + Errors.toHexString(i1) + " (Код ошибки: " + Errors.toHexString(i2) + ")\n" + e);
-		fatalError();
+		updateFatalError();
 	}
 
-	private void fatalError(String s, String s2) {
+	private void updateFatalError(String s, String s2) {
 		Launcher.inst.showError("Ошибка обновления", s, s2);
-		fatalError();
+		updateFatalError();
 	}
 
 	private void fatalError(String s) {
 		Log.error(s);
 		String e = Log.exceptionToString(new Exception());
 		Launcher.inst.showError("Ошибка обновления", s, e);
-		fatalError();
+		updateFatalError();
 	}
 	
-	private void fatalError() {
+	private void updateFatalError() {
 		updating = false;
 		forceUpdate = false;
 		running = false;

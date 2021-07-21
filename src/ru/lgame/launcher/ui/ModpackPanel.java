@@ -248,47 +248,79 @@ public class ModpackPanel extends JPanel {
 		return (height == 0) ? width : greatestCommonFactor(height, width % height);
 	}
 	
+	public static String replace(String str, String from, String to) {
+		if(from.equals(""))
+			return str;
+		if(str.indexOf(from) < 0)
+			return str;
+		if (from.length() == 1 && to.length() == 1)
+			return str.replace(from.charAt(0), to.charAt(0));
+		int var3 = 0;
+
+		while (var3 >= 0 && var3 < str.length()) {
+			var3 = str.indexOf(from, var3);
+			if (var3 >= 0) {
+				str = str.substring(0, var3) + to + str.substring(var3 + from.length());
+				++var3;
+			}
+		}
+		return str;
+	}
+
 	/**
 	 * Добавляет в текст переносы строки чтобы поместился в окне
 	 * @param text Текст
-	 * @param width Максимальная ирина
+	 * @param width Максимальная ширина
 	 * @param font Шрифт
 	 */
-	private static String[] getStringArray(String text, int width, FontMetrics font) {
-		if(text == null || text.length() == 0 || (text.length() == 1 && text.charAt(0) == ' ') || width <= 1 || font == null || (width <= font.charWidth('A') + 2)) {
+	public static String[] getStringArray(String text, int maxWidth, FontMetrics font) {
+		if (text == null || text.length() == 0 || text.equals(" ") || maxWidth < font.charWidth('A') + 5) {
 			return new String[0];
 		}
-		text = text.replace('\r', '\0');
-		ArrayList<String> v = new ArrayList<String>(5);
+		text = replace(text, "\r", "");
+		ArrayList<String> v = new ArrayList<String>();
 		char[] chars = text.toCharArray();
-		if(font.stringWidth(text) > width) {
-			int i1 = 0;
-			for (int i2 = 0; i2 < text.length(); i2++) {
-				if(chars[i2] == '\n') {
-					v.add(text.substring(i1, i2));
-					i2 = i1 = i2 + 1;
-				} else if(text.length() - i2 <= 1) {
-					v.add(text.substring(i1, text.length()));
-					break;
-				} else if(font.stringWidth(text.substring(i1, i2)) >= width) {
-					boolean f = false;
-					for (int j = i2; j > i1; j--) {
-						char c = text.charAt(j);
-						if(c == ' ' || c == '-' || c == '.') {
-							f = true;
-							v.add(text.substring(i1, j + 1));
-							i2 = i1 = j + 1;
-							break;
+		if (text.indexOf('\n') > -1) {
+			int j = 0;
+			for (int i = 0; i < text.length(); i++) {
+				if (chars[i] == '\n') {
+					v.add(text.substring(j, i));
+					j = i + 1;
+				}
+			}
+			v.add(text.substring(j, text.length()));
+		} else {
+			v.add(text);
+		}
+		for (int i = 0; i < v.size(); i++) {
+			String s = (String) v.get(i);
+			if(font.stringWidth(s) >= maxWidth) {
+				int i1 = 0;
+				for (int i2 = 0; i2 < s.length(); i2++) {
+					if (font.stringWidth(text.substring(i1, i2)) >= maxWidth) {
+						boolean space = false;
+						for (int j = i2; j > i1; j--) {
+							char c = s.charAt(j);
+							if (c == ' ' || c == '-') {
+								space = true;
+								v.set(i, s.substring(i1, j + 1));
+								v.add(i + 1, s.substring(j + 1));
+								i += 1;
+								i2 = i1 = j + 1;
+								break;
+							}
 						}
-					}
-					if(!f) {
-						i2 = i2 - 2;
-						v.add(text.substring(i1, i2));
-						i2 = i1 = i2 + 1;
+						if (!space) {
+							i2 = i2 - 2;
+							v.set(i, s.substring(i1, i2));
+							v.add(i + 1, s.substring(i2));
+							i2 = i1 = i2 + 1;
+							i += 1;
+						}
 					}
 				}
 			}
-		} else v.add(text);
+		}
 		return v.toArray(new String[0]);
 	}
 

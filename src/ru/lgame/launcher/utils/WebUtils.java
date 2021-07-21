@@ -20,7 +20,7 @@ import java.util.Map;
 import ru.lgame.launcher.Launcher;
 
 public class WebUtils {
-	public static ProgressListener listener;
+	private static ProgressListener listener;
 	
 	public static int downloaded;
 	public static int need;

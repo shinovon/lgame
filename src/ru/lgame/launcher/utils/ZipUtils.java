@@ -11,7 +11,8 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public final class ZipUtils {
-	public static ProgressListener listener;
+	private static ProgressListener listener;
+	
 	public static String currentFile;
 	public static boolean done = false;
 	

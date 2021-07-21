@@ -1,6 +1,6 @@
 {
 	"id": "oil",
-	"date": "19.06.2021",
+	"date": "22.07.2021",
 	"human_readable_version": "2.2.42",
 	"update_build": 2,
 	"client": "http://dl.nnproject.cc/lgame/1.12.2forge/update.json",
@@ -93,85 +93,73 @@
 			"install_script": {
 				"download": [
 					{
-						"condition": "always",
 						"url": "http://dl.nnproject.cc/lgame/oil/mods.zip",
-						"dir": "temp",
 						"name": "mods.zip",
-						"type": "mods"
+						"type": "mods",
+						"dir": "temp"
 
 					},
 					{
-						"condition": "always",
 						"url": "http://dl.nnproject.cc/lgame/oil/scripts.zip",
-						"dir": "temp",
 						"name": "scripts.zip",
-						"type": "resources"
+						"type": "resources",
+						"dir": "temp"
 					},
 					{
-						"condition": "always",
 						"url": "http://dl.nnproject.cc/lgame/oil/resources.zip",
-						"dir": "temp",
 						"name": "resources.zip",
-						"type": "resources"
+						"type": "resources",
+						"dir": "temp"
 					},
 					{
-						"condition": "always",
 						"url": "http://dl.nnproject.cc/lgame/oil/config.zip",
-						"dir": "temp",
 						"name": "config.zip",
-						"type": "config"
+						"type": "config",
+						"dir": "temp"
 					},
 					{
-						"condition": "always",
 						"url": "http://dl.nnproject.cc/lgame/oil/options.zip",
-						"dir": "temp",
 						"name": "options.zip",
-						"type": "options"
+						"type": "options",
+						"dir": "temp"
 					},
 					{
-						"condition": "always",
 						"url": "http://dl.nnproject.cc/lgame/oil/resourcepacks.zip",
-						"dir": "temp",
 						"name": "resourcepacks.zip",
-						"type": "extra"
+						"type": "extra",
+						"dir": "temp"
 					}
 				],
 				"unzip": [
 					{
-						"condition": "always",
-						"from": "temp",
 						"name": "mods.zip",
-						"path": "/mods/"
+						"path": "/mods/",
+						"from": "temp"
 					},
 					{
-						"condition": "always",
-						"from": "temp",
 						"name": "resources.zip",
-						"path": "/resources/"
+						"path": "/resources/",
+						"from": "temp"
 					},
 					{
-						"condition": "always",
-						"from": "temp",
 						"name": "scripts.zip",
-						"path": "/scripts/"
+						"path": "/scripts/",
+						"from": "temp"
 					},
 					{
-						"condition": "always",
-						"from": "temp",
 						"name": "config.zip",
-						"path": "/config/"
+						"path": "/config/",
+						"from": "temp"
 					},
 					{
-						"condition": "always",
-						"from": "temp",
 						"name": "options.zip",
-						"path": "/"
+						"path": "/",
+						"from": "temp"
 					},
 					{
-						"condition": "exists",
-						"from": "temp",
 						"name": "resourcepacks.zip",
-						"path": "/resourcepacks/"
+						"path": "/resourcepacks/",
+						"from": "temp"
 					}
 				],
 				"post_install": [
@@ -185,62 +173,58 @@
 				],
 				"download": [
 					{
-						"condition": "checkmods",
+						"check": {"type": "mods"}, 
 						"url": "http://dl.nnproject.cc/lgame/oil/mods.zip",
-						"dir": "temp",
 						"name": "mods.zip",
-						"type": "mods"
+						"type": "mods",
+						"dir": "temp"
 					},
 					{
-						"condition": "always",
+						"check": {"type": "force"}, 
 						"url": "http://dl.nnproject.cc/lgame/oil/scripts.zip",
-						"dir": "temp",
 						"name": "scripts.zip",
-						"type": "resources"
+						"type": "resources",
+						"dir": "temp"
 					},
 					{
-						"condition": "always",
+						"check": {"type": "force"}, 
 						"url": "http://dl.nnproject.cc/lgame/oil/resources.zip",
-						"dir": "temp",
 						"name": "resources.zip",
-						"type": "resources"
+						"type": "resources",
+						"dir": "temp"
 					},
 					{
-						"condition": "always",
+						"check": {"type": "force"}, 
 						"url": "http://dl.nnproject.cc/lgame/oil/config.zip",
-						"dir": "temp",
 						"name": "config.zip",
-						"type": "config"
+						"type": "config",
+						"dir": "temp"
 					}
 				],
 				"unzip": [
 					{
-						"condition": "exists",
-						"from": "temp",
 						"name": "mods.zip",
-						"path": "/mods/"
+						"path": "/mods/",
+						"from": "temp"
 					},
 					{
-						"condition": "always",
-						"from": "temp",
 						"name": "resources.zip",
-						"path": "/resources/"
+						"path": "/resources/",
+						"from": "temp"
 					},
 					{
-						"condition": "always",
-						"from": "temp",
 						"name": "scripts.zip",
-						"path": "/scripts/"
+						"path": "/scripts/",
+						"from": "temp"
 					},
 					{
-						"condition": "always",
-						"from": "temp",
 						"name": "config.zip",
-						"path": "/config/"
+						"path": "/config/",
+						"from": "temp"
 					}
 				],
 				"post_update": [
-					{"remove":"temp"}
+					{"remove": "temp"}
 				]
 			},
 		}

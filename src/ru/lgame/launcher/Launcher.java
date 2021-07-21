@@ -384,15 +384,16 @@ public class Launcher {
 			infopane.setText(text);
 			pane.add(infopane, BorderLayout.NORTH);
 		}
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setPreferredSize(new Dimension(600, 200));
-		pane.add(scrollPane, BorderLayout.CENTER);
-		JTextArea textArea = new JTextArea();
-		textArea.setFont(new Font("Consolas", Font.PLAIN, 12));
-		textArea.setEditable(false);
-		textArea.setText(trace);
-		scrollPane.setViewportView(textArea);
-
+		if(trace != null) {
+			JScrollPane scrollPane = new JScrollPane();
+			scrollPane.setPreferredSize(new Dimension(600, 200));
+			pane.add(scrollPane, BorderLayout.CENTER);
+			JTextArea textArea = new JTextArea();
+			textArea.setFont(new Font("Consolas", Font.PLAIN, 12));
+			textArea.setEditable(false);
+			textArea.setText(trace);
+			scrollPane.setViewportView(textArea);
+		}
 		JPanel buttonPane = new JPanel();
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(buttonPane, BorderLayout.SOUTH);
@@ -412,6 +413,10 @@ public class Launcher {
         dialog.setLocationRelativeTo(frame);
         dialog.show();
         dialog.dispose();
+	}
+
+	public void showError(String title, String text) {
+		showError(title, text, null);
 	}
 
 }

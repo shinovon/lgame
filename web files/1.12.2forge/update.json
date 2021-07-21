@@ -1,8 +1,9 @@
 {
 	"id": "1.12.2forge",
-	"date": "19.06.2021",
-	"format": 1,
+	"date": "22.07.2021",
+	"format": 2,
 	"update_build": 1,
+	"asset_index": "1.12",
 	"integrity_check": {
 		"dirs": [
 			{"type": "exists", "path": "assets/"}
@@ -83,6 +84,105 @@
 				"lwjgl-platform-2.9.4-nightly-20150209-natives-windows.jar": "b84d5102b9dbfabfeb5e43c7e2828d98a7fc80e0",
 				"scala-swing_2.11-1.0.1.jar": "b1cdd92bd47b1e1837139c1c53020e86bb9112ae"
 			}
+		},
+		"update": {
+			"updates_check": {"type": "update_build"},
+			"update_scripts": {
+				"install_script": {
+					"download": [
+						{
+							"url": "http://dl.nnproject.cc/lgame/1.12.2forge/client.jar", 
+							"name": "client.jar", 
+							"dir": "/"
+						},
+						{
+							"url": "http://dl.nnproject.cc/lgame/1.12.2forge/libraries.zip", 
+							"name": "libraries.zip", 
+							"dir": "temp"
+						},
+						{
+							"url": "http://dl.nnproject.cc/lgame/1.12.2forge/natives.zip", 
+							"name": "natives.zip", 
+							"dir": "temp"
+						},
+						{
+							"url": "http://dl.nnproject.cc/lgame/1.12.2forge/assets.zip", 
+							"name": "assets.zip", 
+							"dir": "temp"
+						}
+					],
+					"unzip": [
+						{
+							"name": "libraries.zip", 
+							"path": "/libraries/", 
+							"from": "temp"
+						},
+						{
+							"name": "natives.zip", 
+							"path": "/natives/", 
+							"from": "temp"
+						},
+						{
+							"name": "assets.zip", 
+							"path": "/assets/", 
+							"from": "temp"
+						}
+					]
+				},
+				"update_script": {
+					"remove": [
+					],
+					"download": [
+						{
+							"check": {"type": "force"}, 
+							"url": "http://dl.nnproject.cc/lgame/1.12.2forge/client.jar", 
+							"name": "client.jar", 
+							"dir": "/"
+						},
+						{
+							"check": {"type": "libaries", "path": "libaries"},
+							"url": "http://dl.nnproject.cc/lgame/1.12.2forge/libraries.zip",
+							"name": "libraries.zip",
+							"dir": "temp"
+						},
+						{
+							"check": {"type": "natives", "path": "natives"},
+							"url": "http://dl.nnproject.cc/lgame/1.12.2forge/natives.zip",
+							"name": "natives.zip",
+							"dir": "temp"
+						},
+						{
+							"check": {"type": "exists", "path": "assets"},
+							"url": "http://dl.nnproject.cc/lgame/1.12.2forge/assets.zip",
+							"name": "assets.zip",
+							"dir": "temp"
+						}
+					],
+					"unzip": [
+						{
+							"name": "libraries.zip", 
+							"path": "/libraries/", 
+							"from": "temp"
+						},
+						{
+							"name": "natives.zip", 
+							"path": "/natives/", 
+							"from": "temp"
+						},
+						{
+							"name": "assets.zip", 
+							"path": "/assets/", 
+							"from": "assets"
+						}
+					]
+				}
+			},
+		},
+		"run": {
+			"mainclass": "net.minecraft.launchwrapper.Launch",
+			"tweak_classes": [
+				"net.minecraftforge.fml.common.launcher.FMLTweaker"
+			]
 		}
 	}
 }
