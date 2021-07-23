@@ -1,11 +1,12 @@
 Инструкция для оформления update.json клиента
-Версия 2 от 22.07.2021
+Версия 3 от 23.07.2021
 {
 	id: (string) иденификатор клиента
 	date: (string) дата последнего изменения, формат: ДД.ММ.ГГГГ (пример: 22.07.2021)
 	format: (int) 1 (версия формата данных)
 	update_build: (int) номер обновления понимаемая лаунчером
 	asset_index: (string) индекс ассетов
+	client_sha1: (string) Хеш-сумма SHA-1 файла client.jar
 	integrity_check: (object) конфигурация для проверки целостности
 	{
 		dirs: (array) обязательные папки сборки, формат записей: {"type": "тип проверки", "path": "название папки/файла"}
@@ -46,12 +47,14 @@
 			{
 				download: (array)
 				unzip: (array)
+				post_install: (array)
 			},
 			update_script: (object) сценарий обновления
 			{
-				remove: (array)
+				pre_remove_dirs: (array)
 				download: (array)
 				unzip: (array)
+				post_update: (array)
 			}
 		}
 	},

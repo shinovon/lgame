@@ -32,12 +32,14 @@ public class Modpack {
 	
 	private JSONObject updateJson;
 	private JSONObject clientUpdateJson;
+	private int cachedState;
 	
 	public Modpack(String id) {
 		this.id = id;
 	}
 	
 	public Modpack parse(JSONObject o) {
+		cachedState = -999;
 		updateJson = null;
 		clientUpdateJson = null;
 		name = o.optString("name", id);
@@ -142,8 +144,18 @@ public class Modpack {
 		return this.equals(Updater.getNowUpdatingModpack());
 	}
 
+	public boolean isStarted() {
+		return this.equals(Updater.getNowRunningModpack());
+	}
+
 	public int getState() {
-		return Updater.getModpackState(this);
+		if(cachedState != -999) return cachedState;
+		if(isUpdating() || isStarted()) return cachedState = 1;
+		return cachedState = Updater.getModpackState(this);
+	}
+	
+	public void setUpdateInfo(String s1, String s2, int percent) {
+		if(ui != null) ui.setUpdateInfo(s1, s2, percent);
 	}
 	
 	public JSONObject getUpdateJson() throws IOException {

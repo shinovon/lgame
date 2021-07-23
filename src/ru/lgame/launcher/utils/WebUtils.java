@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -24,8 +23,9 @@ public class WebUtils {
 	
 	public static int downloaded;
 	public static int need;
-	public static double percent;
 	private static String useragent = "Mozilla/5.0";
+
+	public static double speed;
 	
 	public static void setListener(ProgressListener p) {
 		listener = p;
@@ -48,54 +48,96 @@ public class WebUtils {
 	public final static void download(String a, String b) throws IOException, InterruptedException {
 		downloadNormal(a, b);
 	}
+	
+	private static double round(double d) {
+		int pow = 100;
+		double tmp = d * pow;
+		return (double) (int) ((tmp - (int) tmp) >= 0.5 ? tmp + 1 : tmp) / pow;
+	}
 
 	public final static void downloadNormal(String uri, String path)
 			throws IOException, InterruptedException {
+		File f = new File(path);
+		File d = f.getParentFile();
+		if(!d.exists()) d.mkdirs();
 		if(Thread.interrupted()) throw new InterruptedException("Thread.interrupted()");
 		if(listener != null)
 		downloaded = 0;
 		need = 0;
+		speed = 0;
+		Thread st = new Thread() {
+			public void run() {
+				int ld = downloaded;
+				try {
+					while(true) {
+						Thread.sleep(1000);
+						speed = round((downloaded - ld) / 1024D / 1024D);
+						ld = downloaded;
+					}
+				} catch (Exception e) {
+				}
+			}
+		};
 		try {
 			URL url = new URL(uri);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestProperty("User-Agent", useragent);
 			con.setRequestMethod("GET");
-			FileOutputStream out = new FileOutputStream(path);
-			InputStream in = ((URLConnection) con).getInputStream();
-			byte buffer[] = new byte[4096];
-			int read;
+			FileOutputStream fout = new FileOutputStream(path);
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			con.setConnectTimeout(10000);
 			con.setReadTimeout(10000);
+			con.setDoInput(true);
+			InputStream in = con.getInputStream();
+			byte buffer[] = new byte[16 * 1024];
+			int read;
 			need = con.getContentLength();
 			Log.info("Downloading: " + uri + " to " + path + " size: " + need + "k");
+			int i = 0;
+			st.start();
+			if(listener != null) listener.startDownload(f.getName());
 			while ((read = in.read(buffer)) != -1) {
 				out.write(buffer, 0, read);
 				downloaded += read;
-				percent = (double) ((double) ((double) downloaded / (double) need) * 100f);
-				if(Thread.interrupted()) {
-					Log.warn("Download interrupt!");
-					out.close();
-					in.close();
-					((HttpURLConnection) con).disconnect();
-					Launcher.inst.queue(new Runnable() {
-						public void run() {
-							try {
-								new File(path).delete();
-							} catch (Exception e) {
+				if(i++ >= 16) {
+					i = 0;
+					if(listener != null) {
+						int percent;
+						if(downloaded <= 0) percent = 0;
+						else percent = (int) ((double) ((double) downloaded / (double) need) * 100D);
+						listener.downloadProgress(f.getName(), speed, percent);
+					}
+
+					if(Thread.interrupted()) {
+						Log.warn("Download interrupt!");
+						out.close();
+						fout.close();
+						in.close();
+						((HttpURLConnection) con).disconnect();
+						Launcher.inst.queue(new Runnable() {
+							public void run() {
+								try {
+									new File(path).delete();
+								} catch (Exception e) {
+								}
 							}
-						}
-					});
-					throw new InterruptedException("Thread.interrupted()");
+						});
+						throw new InterruptedException("Thread.interrupted()");
+					}
 				}
 			}
+			if(listener != null) listener.downloadProgress(f.getName(), speed, 100);
 			Log.debug("Size of " + path + " " + downloaded);
 			if(downloaded != need) Log.warn("Content-Size and actual file size does not match!!");
+			st.interrupt();
 			in.close();
+			con.disconnect();
+			byte[] bytes = out.toByteArray();
 			out.close();
-			((HttpURLConnection) con).disconnect();
+			fout.write(bytes);
+			fout.close();
+			if(listener != null) listener.doneDownload(f.getName());
 		} catch (IOException e) {
-			throw new IOException(uri, e);
-		} finally {
 			Launcher.inst.queue(new Runnable() {
 				public void run() {
 					try {
@@ -104,6 +146,7 @@ public class WebUtils {
 					}
 				}
 			});
+			throw new IOException(uri, e);
 		}
 		downloaded = 0;
 		need = 0;
@@ -172,8 +215,8 @@ public class WebUtils {
 	public interface ProgressListener {
 		public void startDownload(String filename);
 		
-		public void downloadProgress(String filename, int percent);
+		public void downloadProgress(String filename, double speed, int percent);
 
-		public void doneDownload(String zipFile);
+		public void doneDownload(String filename);
 	}
 }

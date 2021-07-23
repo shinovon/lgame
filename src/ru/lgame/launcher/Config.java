@@ -24,6 +24,8 @@ public class Config {
 	public static void loadDefaults() {
 		set("path", Launcher.getModpacksDefaultDir());
 		set("username", "");
+		set("xmx", "4096");
+		set("xms", "512");
 	}
 
 	public static void loadConfig() {
@@ -57,7 +59,7 @@ public class Config {
 
 	public static int getInt(String key) {
 		if(properties.containsKey(key)) return Integer.parseInt((String) properties.get(key));
-		else return -1;
+		else return 0;
 	}
 
 	public static long getLong(String key) {

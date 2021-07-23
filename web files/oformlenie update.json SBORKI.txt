@@ -1,9 +1,9 @@
 Инструкция для оформления update.json сборки
-Версия 2 от 07.06.2021
+Версия 3 от 23.07.2021
 {
 	id: (string) иденификатор сборки
 	date: (string) дата последнего изменения, формат: ДД.ММ.ГГГГ (пример: 07.06.2021)
-	format: (int) 2 (версия формата данных)
+	format: (int) 3 (версия формата данных)
 	human_readable_version: (string) текстовая версия
 	update_build: (int) номер обновления понимаемая лаунчером
 	client: (string) ссылка на update.json клиента
@@ -40,14 +40,17 @@
 		{
 			install_script: (object) сценарий первого скачивания
 			{
+				pre_remove_dirs: (array)
 				download: (array)
 				unzip: (array)
+				post_install: (array)
 			},
 			update_script: (object) сценарий обновления
 			{
-				remove: (array)
+				pre_remove_dirs: (array)
 				download: (array)
 				unzip: (array)
+				post_update: (array)
 			}
 		}
 	}

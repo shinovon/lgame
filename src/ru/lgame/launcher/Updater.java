@@ -23,8 +23,10 @@ import org.json.JSONObject;
 import ru.lgame.launcher.utils.FileUtils;
 import ru.lgame.launcher.utils.InputStreamCopier;
 import ru.lgame.launcher.utils.Log;
+import ru.lgame.launcher.utils.ZipUtils;
+import ru.lgame.launcher.utils.WebUtils;
 
-public final class Updater implements Runnable {
+public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUtils.ProgressListener {
 	
 	private static Updater currentInst;
 
@@ -47,6 +49,16 @@ public final class Updater implements Runnable {
 	private String clientMainClass;
 	private String[] clientTweakClasses;
 	private String clientAssetIndex;
+
+	private String currentUnzipFile;
+
+	private boolean repeated;
+
+	public boolean clientStarted;
+
+	private int tasksDone;
+
+	private int totalTasks;
 	
 	private static Process clientProcess;
 
@@ -133,47 +145,71 @@ public final class Updater implements Runnable {
 			}
 		}
 		if(updateJson.getBoolean("has_mods")) {
-			JSONObject md = updateJson.getJSONObject("mods");
-			boolean ignoreExcessMods = md.getBoolean("ignore_excess_mods");
-			boolean removeAll = md.getBoolean("remove_all_if_check_failed");
-			boolean deleteBlacklisted = md.getBoolean("delete_blacklist_mods");
-			String digest = updateJson.getString("checksum_algorithm");
-			ArrayList<String> names = new ArrayList<String>();
-			JSONObject ck = md.getJSONObject("checksums");
-			for (String s : ck.keySet()) {
-				names.add(s);
-				String hash = ck.getString(s);
-				String filep = p + "mods" + File.separator + s;
-				File file = new File(filep);
-				if (!file.exists()) {
-					Log.info("not exists: " + s);
-					if(removeAll) deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
-					return false;
+			return checkMods(m, p, j);
+		}
+		return true;
+	}
+	
+	/**
+	 * Проверка модов
+	 */
+	public static boolean checkMods(Modpack m, String p, JSONObject integrityCheck) throws Exception {
+		JSONObject md = integrityCheck.getJSONObject("mods");
+		boolean ignoreExcessMods = md.getBoolean("ignore_excess_mods");
+		boolean removeAll = md.getBoolean("remove_all_if_check_failed");
+		boolean deleteBlacklisted = md.getBoolean("delete_blacklist_mods");
+		String digest = md.getString("checksum_algorithm");
+		ArrayList<String> names = new ArrayList<String>();
+		JSONObject ck = md.getJSONObject("checksums");
+		for (String s : ck.keySet()) {
+			names.add(s);
+			String hash = ck.getString(s);
+			String filep = p + "mods" + File.separator + s;
+			File file = new File(filep);
+			if (!file.exists()) {
+				Log.info("not exists: " + file);
+				if(removeAll) {
+					try {
+						deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
+					} catch (Exception e) {
+					}
 				}
-				if (hash(filep, digest).equalsIgnoreCase(hash)) {
+				return false;
+			}
+			if (!hash(filep, digest).equalsIgnoreCase(hash)) {
+				Log.info("wrong checksum: " + s);
+				if(removeAll) deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
+				else {
+					try {
+						new File(filep).delete();
+					} catch (Exception e) {
+					}
+				}
+				return false;
+			}
+		}
+		String[] blacklist = md.getJSONArray("words_blacklist").toList().toArray(new String[0]);
+		FileFilter filter = (file) -> !file.isDirectory() && file.getName().toLowerCase().endsWith(".jar");
+		File[] mods = new File(p + "mods" + File.separator).listFiles(filter);
+		if(mods != null)
+		for (File f : mods) {
+			String n = f.getName().toLowerCase();
+			for(String s: blacklist) if(n.contains(s.toLowerCase())) {
+				Log.info("blacklisted mod: " + n);
+				if(deleteBlacklisted) f.delete();
+				else {
 					if(removeAll) deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
-					Log.info("wrong checksum: " + s);
 					return false;
 				}
 			}
-			String[] blacklist = updateJson.getJSONArray("words_blacklist").toList().toArray(new String[0]);
-			FileFilter filter = (file) -> !file.isDirectory() && file.getName().toLowerCase().endsWith(".jar");
-			File[] mods = new File(p + "mods" + File.separator).listFiles(filter);
-			if(mods != null)
-			for (File f : mods) {
-				String n = f.getName().toLowerCase();
-				for(String s: blacklist) if(n.contains(s.toLowerCase())) {
-					Log.info("blacklisted mod: " + n);
-					if(deleteBlacklisted) f.delete();
-					else {
-						if(removeAll) deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
-						return false;
-					}
+			if(!ignoreExcessMods && !names.contains(n)) {
+				Log.info("Excess mod: " + n);
+				if(removeAll) deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
+				else try {
+					new File(p + n).delete();
+				} catch (Exception e) {
 				}
-				if(!ignoreExcessMods && !names.contains(n)) {
-					Log.info("Excess mod: " + n);
-					return false;
-				}
+				return false;
 			}
 		}
 		return true;
@@ -202,6 +238,10 @@ public final class Updater implements Runnable {
 		return !checkClientIntegrity();
 	}
 
+
+	/**
+	 * Проверка целостности клиента
+	 */
 	private boolean checkClientIntegrity() throws Exception {
 		String p = Config.get("path") + modpack.client() + File.separator;
 		File vvf = new File(p + "client.jar");
@@ -222,74 +262,89 @@ public final class Updater implements Runnable {
 		}
 		
 		if(clientJson.has("libraries")) {
-			JSONObject md = clientJson.getJSONObject("libraries");
-			String digest = clientJson.getString("checksum_algorithm");
-			ArrayList<String> names = new ArrayList<String>();
-			JSONObject ck = md.getJSONObject("checksums");
-			for (String s : ck.keySet()) {
-				names.add(s);
-				String hash = ck.getString(s);
-				String filep = p + "libraries" + File.separator + s;
-				File file = new File(filep);
-				if (!file.exists()) {
-					Log.info("not exists: " + s);
-					deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
-					return false;
-				}
-				if (hash(filep, digest).equalsIgnoreCase(hash)) {
-					deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
-					Log.info("wrong checksum: " + s);
-					return false;
-				}
+			if(!checkClientLibraries(p)) return false;
+		}
+
+		if(clientJson.has("natives")) {
+			return checkClientNatives(p);
+		}
+		return true;
+	}
+
+	/**
+	 * Проверка библиотек клиента
+	 */
+	private boolean checkClientLibraries(String p) throws Exception {
+		JSONObject md = clientJson.getJSONObject("libraries");
+		String digest = clientJson.getString("checksum_algorithm");
+		ArrayList<String> names = new ArrayList<String>();
+		JSONObject ck = md.getJSONObject("checksums");
+		for (String s : ck.keySet()) {
+			names.add(s);
+			String hash = ck.getString(s);
+			String filep = p + "libraries" + File.separator + s;
+			File file = new File(filep);
+			if (!file.exists()) {
+				Log.info("not exists: " + s);
+				deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
+				return false;
 			}
-			FileFilter filter = (file) -> file.isDirectory() || file.getName().toLowerCase().endsWith(".jar");
-			File[] mods = new File(p + "libraries" + File.separator).listFiles(filter);
-			if(mods != null)
-			for (File f : mods) {
-				if(f.isDirectory()) continue;
-				String n = f.getName().toLowerCase();
-				if(!names.contains(n)) {
-					Log.info("Excess jar libary: " + n);
-					return false;
-				}
+			if (!hash(filep, digest).equalsIgnoreCase(hash)) {
+				deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
+				Log.info("wrong checksum: " + s);
+				return false;
 			}
 		}
-		
-
-		if(clientJson.has("libraries")) {
-			JSONObject md = clientJson.getJSONObject("natives");
-			String digest = clientJson.getString("checksum_algorithm");
-			ArrayList<String> names = new ArrayList<String>();
-			JSONObject ck = md.getJSONObject("checksums");
-			for (String s : ck.keySet()) {
-				names.add(s);
-				String hash = ck.getString(s);
-				String filep = p + "libraries" + File.separator + s;
-				File file = new File(filep);
-				if (!file.exists()) {
-					Log.info("not exists: " + s);
-					deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
-					return false;
-				}
-				if (hash(filep, digest).equalsIgnoreCase(hash)) {
-					deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
-					Log.info("wrong checksum: " + s);
-					return false;
-				}
-			}
-			FileFilter filter = (file) -> file.isDirectory() || (file.getName().toLowerCase().endsWith(".dll") || file.getName().toLowerCase().endsWith(".so"));
-			File[] mods = new File(p + "natives" + File.separator).listFiles(filter);
-			if(mods != null)
-			for (File f : mods) {
-				if(f.isDirectory()) continue;
-				String n = f.getName().toLowerCase();
-				if(!names.contains(n)) {
-					Log.info("Excess dynamic libary: " + n);
-					return false;
-				}
+		FileFilter filter = (file) -> file.isDirectory() || file.getName().toLowerCase().endsWith(".jar");
+		File[] mods = new File(p + "libraries" + File.separator).listFiles(filter);
+		if(mods != null)
+		for (File f : mods) {
+			if(f.isDirectory()) continue;
+			String n = f.getName().toLowerCase();
+			if(!names.contains(n)) {
+				Log.info("Excess jar libary: " + n);
+				return false;
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Проверка нативных библиотек клиента
+	 */
+	private boolean checkClientNatives(String p) throws Exception {
+		JSONObject md = clientJson.getJSONObject("natives");
+		String digest = clientJson.getString("checksum_algorithm");
+		ArrayList<String> names = new ArrayList<String>();
+		JSONObject ck = md.getJSONObject("checksums");
+		for (String s : ck.keySet()) {
+			names.add(s);
+			String hash = ck.getString(s);
+			String filep = p + "libraries" + File.separator + s;
+			File file = new File(filep);
+			if (!file.exists()) {
+				Log.info("not exists: " + s);
+				deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
+				return false;
+			}
+			if (!hash(filep, digest).equalsIgnoreCase(hash)) {
+				deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
+				Log.info("wrong checksum: " + s);
+				return false;
+			}
+		}
+		FileFilter filter = (file) -> file.isDirectory() || (file.getName().toLowerCase().endsWith(".dll") || file.getName().toLowerCase().endsWith(".so"));
+		File[] mods = new File(p + "natives" + File.separator).listFiles(filter);
+		if(mods != null)
+		for (File f : mods) {
+			if(f.isDirectory()) continue;
+			String n = f.getName().toLowerCase();
+			if(!names.contains(n)) {
+				Log.info("Excess dynamic libary: " + n);
+				return false;
+			}
+		}
+		return false;
 	}
 
 	private boolean checkClientInstalled() {
@@ -322,31 +377,49 @@ public final class Updater implements Runnable {
 		return null;
 	}
 
+	public static Modpack getNowRunningModpack() {
+		if(currentInst == null) return null;
+		if(currentInst.running && currentInst.clientStarted) return currentInst.modpack;
+		return null;
+	}
+
 	public void run() {
 		if(running) throw new IllegalStateException("Already running!");
+		currentInst = this;
 		running = true;
+		updating = true;
+		modpack.setUpdateInfo(repeated ? "Обновление" : "Сбор информации", repeated ? "Проверка правильности установки" : "Проверка установки", 0);
 		int modpackState = forceUpdate ? 3 : checkInstalled(modpack) ? -100 : 0;
 		try {
+			modpack.setUpdateInfo(null, "Скачивание конфигурации сборки", 33);
 			json = modpack.getUpdateJson(true);
+			modpack.setUpdateInfo(null, "Скачивание конфигурации клиента", 67);
 			clientJson = modpack.getClientUpdateJson(true);
 			clientAssetIndex = clientJson.getString("asset_index");
 			clientMainClass = clientJson.getJSONObject("run").getString("mainclass");
 			clientTweakClasses = clientJson.getJSONObject("run").getJSONArray("tweak_classes").toList().toArray(new String[0]);
 		} catch (IOException e) {
-			e.printStackTrace();
 			if(modpackState == 0 || forceUpdate) {
 				updateFatalError("Нет подключения к интернету или сервер не отвечает!", e, Errors.UPDATER_RUN_GETUPDATEJSON_IOEXCEPTION);
 				return;
 			}
 		} catch (JSONException e) {
-			e.printStackTrace();
 			if(modpackState == 0 || forceUpdate) {
 				updateFatalError("Ошибка парса", e, Errors.UPDATER_RUN_GETUPDATEJSON_JSONEXCEPTION);
 				return;
 			}
 		}
+		modpack.setUpdateInfo(null, null, 100);
+		try {
+			Thread.sleep(10);
+		} catch (InterruptedException e2) {
+			interrupted();
+			return;
+		}
+		modpack.setUpdateInfo("Проверка установки", "Проверка целостности клиента", 0);
 		//boolean packInstalled = modpackState != 0;
 		boolean clientInstalled = checkClientInstalled();
+		modpack.setUpdateInfo(null, "Проверка наличия обновлений клиента", 25);
 		boolean clientNeedsUpdate = false;
 		try {
 			clientNeedsUpdate = checkClientNeedUpdate();
@@ -354,6 +427,7 @@ public final class Updater implements Runnable {
 			updateFatalError("Ошибка проверки клиента", e1, Errors.UPDATER_RUN_CHECKCLIENT_EXCEPTION);
 			return;
 		}
+		modpack.setUpdateInfo(null, "Проверка целостности сборки", 50);
 		// Сборка установлена, нужно проверить обновления
 		if(modpackState == -100) {
 			modpackState = 1;
@@ -361,24 +435,39 @@ public final class Updater implements Runnable {
 			else if(clientNeedsUpdate) modpackState = 5;
 			try {
 				if(!checkModpackIntegrity(modpack, json)) modpackState = 3;
-				else if(checkUpdatesAvailable(modpack)) modpackState = 2;
+				else {
+					modpack.setUpdateInfo(null, "Проверка наличия обновлений сборки", 75);
+					if(checkUpdatesAvailable(modpack)) modpackState = 2;
+				}
 			} catch (Exception e) {
 				updateFatalError("Ошибка проверки сборки", e, Errors.UPDATER_RUN_CHECKMODPACK_EXCEPTION);
 				return;
 			}
 		}
+		modpack.setUpdateInfo(null, null, 100);
+		try {
+			Thread.sleep(10);
+		} catch (InterruptedException e2) {
+			interrupted();
+			return;
+		}
+		Log.debug("install state: " + modpackState);
+		modpack.setUpdateInfo("Обновление", "Инициализация системы обновления", 0);
 		// обнова либо старт сборки
-		boolean ret = true;
+		boolean ret = !repeated;
 		switch(modpackState) {
 		case 0:
 		{
+			modpack.setUpdateInfo("Обновление", "Обновление клиента", 0);
 			if(!clientInstalled) installClient();
 			else if(clientNeedsUpdate) updateClient();
+			modpack.setUpdateInfo("Обновление", "Установка сборки", -2);
 			install();
 			break;
 		}
 		case 1:
 		{
+			modpack.setUpdateInfo("", "Запуск клиента", 100);
 			try {
 				startClient();
 			} catch (Exception e) {
@@ -391,64 +480,281 @@ public final class Updater implements Runnable {
 		case 2:
 		case 3:
 		{
+			modpack.setUpdateInfo("Обновление", "Обновление клиента", 0);
 			if(!clientInstalled) installClient();
 			else if(clientNeedsUpdate) updateClient();
+			modpack.setUpdateInfo("Обновление", "Обновление сборки", -2);
 			update();
 			break;
 		}
 		case 4: {
+			modpack.setUpdateInfo("Обновление", "Установка клиента", 0);
 			installClient();
 			break;
 		}
 		case 5: {
+			modpack.setUpdateInfo("Обновление", "Обновление клиента", 0);
 			updateClient();
 			break;
 		}
 		default:
 		{
+			modpack.setUpdateInfo("", "Обработка ошибки", -2);
 			updateFatalError("default", modpackState, Errors.UPDATER_GETMODPACKSTATE_ILLEGAL_VALUE);
 			ret = false;
 			break;
 		}
 		}
 		if(ret && !failed) {
-			Log.info("Updater repeat");
+			modpack.setUpdateInfo("Обновление", "Повторная инициализация системы обновления", 100);
+			Log.debug("Updater repeat");
+			reset();
+			repeated = true;
+			run();
+			return;
 		}
+		reset();
 	}
 
 	private void updateClient() {
+		totalTasks = 0;
+		tasksDone = 0;
 		updating = true;
+		String p = getClientDir();
+		String t = Launcher.getTempDir();
+		JSONObject script = clientJson.getJSONObject("update").getJSONObject("update_scripts").getJSONObject("update_script");
+		JSONArray download = script.getJSONArray("download");
+		JSONArray unzip = script.getJSONArray("unzip");
+		JSONArray preremove = script.optJSONArray("pre_remove_dirs");
+		JSONArray post = script.optJSONArray("post_update");
+		totalTasks += download.length();
+		totalTasks += unzip.length();
+		if(preremove == null || scriptedRemoveDirs(preremove, p, t)) {
+			if(download == null || scriptedDownload(download, p, t)) {
+				if(unzip == null || scriptedUnzip(unzip, p, t)) {
+					if(post != null) scriptedPost(post, p, t);
+					return;
+				} else {
+					updateFatalError();
+					return;
+				}
+			} else {
+				updateFatalError();
+				return;
+			}
+		}
 	}
 
 	private void installClient() {
+		totalTasks = 0;
+		tasksDone = 0;
 		updating = true;
-		
+		String p = getClientDir();
+		File pf = new File(p);
+		if(!pf.exists()) pf.mkdirs();
+		String t = Launcher.getTempDir();
+		JSONObject script = clientJson.getJSONObject("update").getJSONObject("update_scripts").getJSONObject("install_script");
+		JSONArray download = script.getJSONArray("download");
+		JSONArray unzip = script.getJSONArray("unzip");
+		JSONArray post = script.optJSONArray("post_install");
+		totalTasks += download.length();
+		totalTasks += unzip.length();
+		if(download == null || scriptedDownload(download, p, t)) {
+			if(unzip == null || scriptedUnzip(unzip, p, t)) {
+				if(post != null) scriptedPost(post, p, t);
+			} else updateFatalError();
+		} else updateFatalError();
 	}
 
 	private void update() {
+		totalTasks = 0;
+		tasksDone = 0;
 		updating = true;
 		String p = getModpackDir();
-		
+		String t = Launcher.getTempDir();
+		JSONObject script = json.getJSONObject("update").getJSONObject("update_scripts").getJSONObject("update_script");
+		JSONArray download = script.getJSONArray("download");
+		JSONArray unzip = script.getJSONArray("unzip");
+		JSONArray preremove = script.optJSONArray("pre_remove_dirs");
+		JSONArray post = script.optJSONArray("post_update");
+		totalTasks += download.length();
+		totalTasks += unzip.length();
+		if(preremove == null || scriptedRemoveDirs(preremove, p, t)) {
+			if(download == null || scriptedDownload(download, p, t)) {
+				if(unzip == null || scriptedUnzip(unzip, p, t)) {
+					if(post != null) scriptedPost(post, p, t);
+				} else updateFatalError();
+			} else updateFatalError();
+		}
 	}
 	
 	private void install() {
+		totalTasks = 0;
+		tasksDone = 0;
 		updating = true;
 		String p = getModpackDir();
-		
+		File pf = new File(p);
+		if(!pf.exists()) pf.mkdirs();
+		String t = Launcher.getTempDir();
+		JSONObject script = json.getJSONObject("update").getJSONObject("update_scripts").getJSONObject("install_script");
+		JSONArray download = script.optJSONArray("download");
+		JSONArray unzip = script.optJSONArray("unzip");
+		JSONArray post = script.optJSONArray("post_install");
+		totalTasks += download.length();
+		totalTasks += unzip.length();
+		if(download == null || scriptedDownload(download, p, t)) {
+			if(unzip == null || scriptedUnzip(unzip, p, t)) {
+				if(post != null) scriptedPost(post, p, t);
+				return;
+			} else {
+				updateFatalError();
+				return;
+			}
+		} else {
+			updateFatalError();
+			return;
+		}
+	}
+	
+	private void scriptedPost(JSONArray j, String root, String temp) {
+		for(Iterator<Object> it = j.iterator(); it.hasNext(); ) {
+			try {
+				JSONObject o = (JSONObject) it.next();
+				if(o.has("remove")) {
+					String s = o.getString("remove");
+					if(s.equals("temp")) {
+						deleteDirectoryContents(Paths.get(temp));
+					} else deleteDirectoryRecursion(Paths.get(root, s));
+				}
+			} catch (Exception e) {
+			}
+		}
+	}
+	
+	private boolean scriptedRemoveDirs(JSONArray j, String root, String temp) {
+		for(Iterator<Object> it = j.iterator(); it.hasNext(); ) {
+			try {
+				String s = (String) it.next();
+				if(s.equals("temp")) {
+					deleteDirectoryContents(Paths.get(temp));
+				} else deleteDirectoryRecursion(Paths.get(root, s));
+			} catch (Exception e) {
+				break;
+			}
+		}
+		return true;
+	}
+
+	private boolean scriptedDownload(JSONArray j, String root, String temp) {
+		modpack.setUpdateInfo(null, "Скачивание", -2);
+		WebUtils.setListener(this);
+		String p = root;
+		String tp = temp;
+		if(p.endsWith(File.separator)) p.substring(0, p.length() - 1);
+		if(tp.endsWith(File.separator)) tp.substring(0, tp.length() - 1);
+		for(Iterator<Object> it = j.iterator(); it.hasNext(); ) {
+			JSONObject o = (JSONObject) it.next();
+			String name = o.getString("name");
+			modpack.setUpdateInfo(null, "Скачивание: " + name + " (0%)", percentI());
+			if(o.has("check")) {
+				JSONObject check = o.getJSONObject("check");
+				String type = check.optString("type");
+				if(type != null && !type.equals("force")) {
+					try {
+						boolean b = false;
+						if(type.equals("mods")) {
+							if(checkMods(modpack, root, json)) b = true;
+						} else if(type.equals("libraries")) {
+							if(checkClientLibraries(root)) b = true;
+						} else if(type.equals("natives")) {
+							if(checkClientNatives(root)) b = true;
+						} else if(type.equals("exists")) {
+							if(new File(p + path(check.getString("path"))).exists()) b = true;
+						}
+						if(b) {
+							tasksDone++;
+							continue;
+						}
+					} catch (Exception e) {
+						updateFatalError("scriptedDownload(): check", e, Errors.UPDATER_SCRIPTEDDOWNLOAD_CHECK);
+					}
+				}
+			}
+			String url = o.getString("url");
+			String dir = path(o.getString("dir"));
+			if(dir.equals(File.separator)) dir = root + name;
+			else if(dir.equals("temp")) dir = temp + name;
+			else dir = p + dir + name;
+			try {
+				WebUtils.download(url, dir);
+			} catch (Exception e) {
+				updateFatalError("scriptedDownload(): download", e, Errors.UPDATER_SCRIPTEDDOWNLOAD_DOWNLOAD);
+				return false;
+			}
+			tasksDone++;
+		}
+		return true;
+	}
+	
+	private boolean scriptedUnzip(JSONArray j, String root, String temp) {
+		modpack.setUpdateInfo(null, "Распаковка архивов", -2);
+		ZipUtils.setListener(this);
+		String p = root;
+		String tp = temp;
+		if(p.endsWith(File.separator)) p.substring(0, p.length() - 1);
+		if(tp.endsWith(File.separator)) tp.substring(0, tp.length() - 1);
+		for(Iterator<Object> it = j.iterator(); it.hasNext(); ) {
+			JSONObject o = (JSONObject) it.next();
+			String name = o.optString("name");
+			String path = o.optString("path");
+			String from = o.optString("from");
+			path = path(path);
+			from = path(from);
+			if(path.equals(File.separator)) path = root;
+			else if(path.equals("temp")) path = temp;
+			else path = p + path;
+			if(from.equals("temp")) from = temp + name;
+			else from = tp + from + name;
+			currentUnzipFile = name;
+			modpack.setUpdateInfo(null, "Распаковка: " + name + " (0%)", percentI());
+			if(!new File(from).exists()) {
+				tasksDone++;
+				continue;
+			}
+			try {
+				ZipUtils.unzip(from, path);
+			} catch (Exception e) {
+				updateFatalError("scriptedUnzip(): unzip", e, Errors.UPDATER_SCRIPTEDUNZIP_UNZIP);
+				return false;
+			}
+			tasksDone++;
+		}
+		return true;
+	}
+
+	private int percentI(double i) {
+		return (int) (percentD() + (i * (1D / (double) totalTasks) * 100D));
+	}
+	
+	private double percentD() {
+		return ((double) tasksDone / (double) totalTasks) * 100D;
+	}
+	
+	private int percentI() {
+		return (int) percentD();
 	}
 
 	private void startClient() throws Exception {
 		if (clientProcess != null)
 			throw new IllegalStateException("Client still running!");
 		try {
-
 			File[] libraries = getClientLibariesFiles();
 			HashSet<File> d = new HashSet<File>();
-			d.add(new File(getClientDir()));
+			d.add(new File(getClientJarPath()));
 			for (File f: libraries) d.add(f);
 			ArrayList<String> jvmArgs = new ArrayList<>();
-			jvmArgs.add("-Xms" + Config.get("xms") + "M");
-			jvmArgs.add("-Xmx" + Config.get("xmx") + "M");
+			jvmArgs.add("-Xms" + Config.getInt("xms") + "M");
+			jvmArgs.add("-Xmx" + Config.getInt("xmx") + "M");
 			jvmArgs.add("-Djava.library.path=" + getNativesDir());
 
 			ArrayList<String> appArgs = new ArrayList<>();
@@ -468,6 +774,8 @@ public final class Updater implements Runnable {
 			}
 			appArgs.add("--modpackid");
 			appArgs.add(modpack.id());
+			appArgs.add("--modpackname");
+			appArgs.add(modpack.getName());
 			appArgs.add("--userProperties");
 			appArgs.add("{}");
 			clientProcess = StartUtil.startJarProcess(new File(getModpackDir()), d, clientMainClass, jvmArgs,
@@ -476,6 +784,7 @@ public final class Updater implements Runnable {
 			final InputStreamCopier error = new InputStreamCopier(clientProcess.getErrorStream(), System.out);
 			error.start();
 			input.start();
+			clientStarted();
 			final int exitCode = clientProcess.waitFor();
 			Log.info("Client exit code: " + exitCode);
 			if (exitCode == 1 || exitCode == -1) {
@@ -484,10 +793,27 @@ public final class Updater implements Runnable {
 			input.interrupt();
 			error.interrupt();
 			clientProcess = null;
+			clientStopped();
 		} catch (NullPointerException e) {
 			Log.error("startClient()", e);
 			clientProcess = null;
 		}
+	}
+
+	private void clientStarted() {
+		forceUpdate = false;
+		running = true;
+		failed = false;
+		updating = false;
+		clientStarted = true;
+	}
+
+	private void clientStopped() {
+		forceUpdate = false;
+		running = false;
+		failed = false;
+		updating = false;
+		clientStarted = false;
 	}
 
 	private void reset() {
@@ -520,7 +846,7 @@ public final class Updater implements Runnable {
 		return new File(getClientDir() + "libraries" + File.separator).listFiles((file) -> file.isDirectory() || file.getName().toLowerCase().endsWith(".jar"));
 	}
 
-	public String getClientPath() {
+	public String getClientJarPath() {
 		return getClientDir() + "client.jar";
 	}
 
@@ -563,6 +889,15 @@ public final class Updater implements Runnable {
 	}
 	
 	private void updateFatalError() {
+		currentInst = null;
+		updating = false;
+		forceUpdate = false;
+		running = false;
+		failed = true;
+	}
+	
+	private void interrupted() {
+		currentInst = null;
 		updating = false;
 		forceUpdate = false;
 		running = false;
@@ -601,6 +936,10 @@ public final class Updater implements Runnable {
 	}
 
 	private static void deleteDirectoryRecursion(Path path) throws IOException {
+		deleteDirectoryContents(path);
+		Files.delete(path);
+	}
+	private static void deleteDirectoryContents(Path path) throws IOException {
 		if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
 			try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) {
 				for (Path entry : entries) {
@@ -608,7 +947,46 @@ public final class Updater implements Runnable {
 				}
 			}
 		}
-		Files.delete(path);
+	}
+
+	@Override
+	public void startZip(String zipFile) {
+		
+	}
+
+	@Override
+	public void doneZip(String zipFile) {
+		
+	}
+
+	@Override
+	public void startUnzip(String zipFile) {
+		
+	}
+
+	@Override
+	public void unzipProgress(String currentFile, int totalPercent, int currentFilePercent) {
+		modpack.setUpdateInfo(null, "Распаковка: " + currentUnzipFile + ": " + currentFile + " (" + totalPercent + "%)", percentI(totalPercent / 100D));
+	}
+
+	@Override
+	public void doneUnzip(String zipFile) {
+		
+	}
+
+	@Override
+	public void startDownload(String filename) {
+		
+	}
+
+	@Override
+	public void downloadProgress(String filename, double speed, int percent) {
+		modpack.setUpdateInfo(null, "Скачивание: " +  filename + " (" + speed + "Mb/s) (" + percent + "%)", percentI(percent / 100D));
+	}
+
+	@Override
+	public void doneDownload(String zipFile) {
+		
 	}
 
 }

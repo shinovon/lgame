@@ -39,8 +39,10 @@ import ru.lgame.launcher.utils.Log;
 import ru.lgame.launcher.utils.WebUtils;
 
 public class Launcher {
+
 	
-	public static final String version = "concept demo";
+	public static final String version = "0.1";
+	public static final String string_version = "concept demo";
 	
 	public static final boolean DEBUG = true;
 	
@@ -99,18 +101,17 @@ public class Launcher {
 						loadingFrame.setVisible(true);
 						loadingFrame.setText("Инициализация");
 					} catch (Exception e) {
-						e.printStackTrace();
 					}
 				}
 			});
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		eventThread.setPriority(2);
 		eventThread.start();
 		getLauncherDir();
-		createDirsIfNecessary();
 		Config.init();
+		createDirsIfNecessary();
+		Config.saveConfig();
 		loadingFrame.setText("Получение данных о сборках");
 		if(tryLoadModpacksFromServer()) {
 		} else if(loadCachedLauncherJson()) {
@@ -128,12 +129,12 @@ public class Launcher {
 					loadingFrame.setVisible(false);
 					frame.setVisible(true);
 				} catch (Exception e) {
-					e.printStackTrace();
+					showError("Ошибка лаунчера", "Инициализация интерфейса", e);
 				}
 			}
 		});
 	}
-	
+
 	/**
 	 * Создать недостающие директории
 	 */
@@ -143,6 +144,10 @@ public class Launcher {
 			if(!f.exists()) f.mkdirs();
 			f = new File(getCacheDir());
 			if(!f.exists()) f.mkdirs();
+			if(Config.get("path") != null) {
+				f = new File(Config.get("path"));
+				if(!f.exists()) f.mkdirs();
+			}
 		} catch (Exception e) {
 			showError("Ошибка", "Ошибка создания директорий", Log.exceptionToString(e));
 		}
@@ -228,12 +233,10 @@ public class Launcher {
 						loadingFrame.setText("Получение данных о сборках");
 						loadingFrame.setVisible(true);
 					} catch (Exception e) {
-						e.printStackTrace();
 					}
 				}
 			});
 		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		if(!tryLoadModpacksFromServer()) loadCachedLauncherJson();
 		loadingFrame.setVisible(false);
@@ -349,7 +352,7 @@ public class Launcher {
 		try {
 			return ImageIO.read(f);
 		} catch (IOException e) {
-			Log.error("getCachedImage failed: " + e);
+			Log.error("getCachedImage()", e);
 		}
 		return null;
 	}
@@ -370,6 +373,7 @@ public class Launcher {
 
 	@SuppressWarnings("deprecation")
 	public void showError(String title, String text, String trace) {
+		Log.error("showError(): " + trace);
 		JDialog dialog = new JDialog(frame, title, true);
         Container contentPane = dialog.getContentPane();
         contentPane.setLayout(new BorderLayout());
@@ -416,7 +420,11 @@ public class Launcher {
 	}
 
 	public void showError(String title, String text) {
-		showError(title, text, null);
+		showError(title, text, (String) null);
+	}
+	
+	public void showError(String title, String text, Throwable e) {
+		showError(title, text, Log.exceptionToString(e));
 	}
 
 }

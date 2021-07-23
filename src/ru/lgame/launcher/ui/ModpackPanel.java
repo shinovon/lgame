@@ -2,6 +2,7 @@ package ru.lgame.launcher.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -25,6 +26,10 @@ import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.Modpack;
 import ru.lgame.launcher.utils.Log;
 
+/**
+ * Панелька сборки с описанием и картинкой
+ * @author Shinovon
+ */
 public class ModpackPanel extends JPanel {
 	
 	private static final long serialVersionUID = 5622859608833406220L;
@@ -51,7 +56,7 @@ public class ModpackPanel extends JPanel {
 
 	private String updateText1;
 	private String updateText2;
-	private int updatePercent;
+	private int updatePercent = -1;
 
 	public ModpackPanel(String id) {
 		this(id, null);
@@ -173,11 +178,17 @@ public class ModpackPanel extends JPanel {
 		return modpack.isUpdating();
 	}
 	
-	public void setUpdateInfo(String s1, String s2, int percent) {
+	public boolean isStarted() {
+		if(modpack == null) return false;
+		return modpack.isStarted();
+	}
+	
+	public synchronized void setUpdateInfo(String s1, String s2, int percent) {
 		if(s1 != null) this.updateText1 = s1;
 		if(s2 != null) this.updateText2 = s2;
-		if(percent >= 0) this.updatePercent = percent;
-		Launcher.inst.queue(new Runnable() {
+		if(percent >= -1) this.updatePercent = percent;
+		if(percent > 100) this.updatePercent = 100;
+		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				updateContents();
 			}
@@ -218,22 +229,34 @@ public class ModpackPanel extends JPanel {
 		if(descArr != null) {
 			for(int i = 0; i < descArr.length; i++) g.drawString(descArr[i], x, 16 + th + (i * (th + 1)));
 		}
-		if(isUpdating()) {
+		if(isStarted()) {
+			g.setColor(new Color(0, 200, 57));
+			g.fillRect(0, 0, w, 3);
+			g.fillRect(0, 0, 3, h);
+			g.fillRect(0, h - 3, w, 3);
+			g.fillRect(w - 3, 0, 3, h);
+			Font f2 = g.getFont().deriveFont(12.0F);
+			g.setFont(f2);
+			g.drawString("Запущена", x, h - (g.getFontMetrics(f2).getHeight() / 2));
+		} else if(isUpdating()) {
 			int percent = this.updatePercent;
 			String s = this.updateText1;
 			String p = this.updateText2;
+			if(s == null) s = "null";
+			if(p == null) p = "null"; 
+			String s1 = s + (percent >= 0 ? " " + percent + "%" : "");
+			String s2 = "" + p;
 			
-			String s1 = s + " " + percent + "%";
-			String s2 = p;
-			
-			int px = x - 5;
 			int ptx = x;
-			int pww = w - px;
-			g.setColor(new Color(57, 57, 57));
-			g.fillRect(px, h - 4, pww, 4);
-			g.setColor(new Color(65, 119, 179));
-			int pw = (int) ((double)pww*((double)percent/100D));
-			g.fillRect(px, h - 4, pw, 4);
+			if(percent != -1) {
+				int px = x - 5;
+				int pww = w - px;
+				g.setColor(new Color(57, 57, 57));
+				g.fillRect(px, h - 4, pww, 4);
+				g.setColor(new Color(65, 119, 179));
+				int pw = (int) ((double)pww*((double)percent/100D));
+				g.fillRect(px, h - 4, pw, 4);
+			}
 			Font f2 = g.getFont().deriveFont(12.0F);
 			g.setFont(f2);
 			g.drawString(s1, ptx, h - th - th2 - 3);

@@ -1,6 +1,7 @@
 {
 	"id": "oil",
 	"date": "22.07.2021",
+	"format": 3,
 	"human_readable_version": "2.2.42",
 	"update_build": 2,
 	"client": "http://dl.nnproject.cc/lgame/1.12.2forge/update.json",
@@ -163,11 +164,11 @@
 					}
 				],
 				"post_install": [
-					{"remove":"temp"}
+					{"remove": "temp"}
 				]
 			},
 			"update_script": {
-				"remove_dirs": [
+				"pre_remove_dirs": [
 					"scripts",
 					"config"
 				],

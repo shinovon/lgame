@@ -7,7 +7,6 @@ import java.util.Calendar;
 import ru.lgame.launcher.Launcher;
 
 public class Log {
-
 	public static void info(String x) {
 		log("INFO ", x);
 	}
@@ -26,6 +25,10 @@ public class Log {
 
 	public static void error(String s, Throwable e) {
 		error(s + ": " + exceptionToString(e));
+	}
+
+	public static void warn(String s, Throwable e) {
+		warn(s + ": " + exceptionToString(e));
 	}
 
 	private static void log(String lvl, String x) {
@@ -54,5 +57,4 @@ public class Log {
 		e.printStackTrace(pw);
 		return sw.toString();
 	}
-
 }

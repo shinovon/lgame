@@ -15,20 +15,20 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
 import ru.lgame.launcher.Auth;
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.Modpack;
+import ru.lgame.launcher.utils.Log;
 import ru.lgame.launcher.utils.StackLayout;
-import javax.swing.JLabel;
 
 /**
  * Окно лаунчера
@@ -260,7 +260,7 @@ public class LauncherFrm extends JFrame {
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				Log.error("addModpacks(): interrupted", e);
 			}
 		}
 	}
@@ -272,14 +272,8 @@ public class LauncherFrm extends JFrame {
 		try {
 			String x = UIManager.getSystemLookAndFeelClassName();
 			UIManager.setLookAndFeel(x);
-		} catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (InstantiationException e1) {
-			e1.printStackTrace();
-		} catch (IllegalAccessException e1) {
-			e1.printStackTrace();
-		} catch (UnsupportedLookAndFeelException e1) {
-			e1.printStackTrace();
+		} catch (Exception e1) {
+			Log.error("setUI()", e1);
 		}
 
 	}
