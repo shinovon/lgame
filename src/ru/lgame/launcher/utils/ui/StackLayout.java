@@ -11,7 +11,7 @@
  * Microsystems, Inc. All Rights Reserved.
  */
 
-package ru.lgame.launcher.utils;
+package ru.lgame.launcher.utils.ui;
 
 import java.awt.*;
 

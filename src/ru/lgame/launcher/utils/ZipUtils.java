@@ -5,10 +5,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
+
+import net.sf.jazzlib.ZipEntry;
+import net.sf.jazzlib.ZipFile;
+import net.sf.jazzlib.ZipInputStream;
+import net.sf.jazzlib.ZipOutputStream;
+import ru.lgame.launcher.utils.logging.Log;
 
 public final class ZipUtils {
 	private static ProgressListener listener;
@@ -41,6 +43,7 @@ public final class ZipUtils {
 		currentFile = "";
 	}
 
+	@SuppressWarnings("unchecked")
 	public static void unzip(String zipFile, String outputFolder) throws IOException, InterruptedException {
 		if(Thread.interrupted()) throw new InterruptedException("Thread.interrupted()");
 		Log.info("Unzipping " + zipFile + " to " + outputFolder);
@@ -99,7 +102,10 @@ public final class ZipUtils {
 			ze = zis.getNextEntry();
 			processedEntries++;
 		}
-		zis.closeEntry();
+		try {
+			zis.closeEntry();
+		} catch (IOException e) {
+		}
 		zis.close();
 		if(listener != null) listener.doneUnzip(zipFile);
 		currentFile = "";

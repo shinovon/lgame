@@ -17,6 +17,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.Map;
 
 import ru.lgame.launcher.Launcher;
+import ru.lgame.launcher.utils.logging.Log;
 
 public class WebUtils {
 	private static ProgressListener listener;
@@ -153,7 +154,7 @@ public class WebUtils {
 	}
 
 	public final static String get(final String url) throws IOException {
-		Log.debug("GET " + url);
+		Log.info("GET " + url);
 		InputStream is = null;
 		try {
 			HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();

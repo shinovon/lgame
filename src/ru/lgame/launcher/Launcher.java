@@ -27,24 +27,32 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
-import javax.xml.bind.DatatypeConverter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.mojang.authlib.exceptions.InvalidCredentialsException;
+
+import ru.lgame.launcher.auth.Auth;
+import ru.lgame.launcher.auth.AuthStore;
+import ru.lgame.launcher.ui.AccountsFrm;
 import ru.lgame.launcher.ui.LauncherFrm;
 import ru.lgame.launcher.ui.LoadingFrm;
+import ru.lgame.launcher.ui.LoggerFrm;
 import ru.lgame.launcher.utils.FileUtils;
-import ru.lgame.launcher.utils.Log;
 import ru.lgame.launcher.utils.WebUtils;
+import ru.lgame.launcher.utils.logging.Log;
 
+/**
+ * @author Shinovon
+ */
 public class Launcher {
-
 	
-	public static final String version = "0.1";
-	public static final String string_version = "concept demo";
-	
+	public static final String version = "0.3";
+	public static final String build_date = "30.07.2021";
 	public static final boolean DEBUG = true;
+	
+	public static final String string_version = build_date + "-01" + " dev " + (DEBUG ? "debug on" : "");
 	
 	private static final String LAUNCHER_JSON_URL = "http://dl.nnproject.cc/lgame/launcher.json";
 
@@ -55,6 +63,8 @@ public class Launcher {
 	private ArrayList<Runnable> queuedTasks;
 
 	protected LoadingFrm loadingFrame;
+	protected AccountsFrm accountsFrame;
+	protected LoggerFrm loggerFrame;
 	protected LauncherFrm frame;
 	
 	private ArrayList<String> modpackIds;
@@ -100,6 +110,7 @@ public class Launcher {
 						loadingFrame = new LoadingFrm();
 						loadingFrame.setVisible(true);
 						loadingFrame.setText("Инициализация");
+						loggerFrame = new LoggerFrm();
 					} catch (Exception e) {
 					}
 				}
@@ -112,6 +123,11 @@ public class Launcher {
 		Config.init();
 		createDirsIfNecessary();
 		Config.saveConfig();
+		try {
+			AuthStore.init();
+		} catch (InvalidCredentialsException e) {
+			showError("Аккаунты", "У одного или нескольких аккаунтов MOJANG просрочился токен!");
+		}
 		loadingFrame.setText("Получение данных о сборках");
 		if(tryLoadModpacksFromServer()) {
 		} else if(loadCachedLauncherJson()) {
@@ -128,8 +144,10 @@ public class Launcher {
 					frame = new LauncherFrm();
 					loadingFrame.setVisible(false);
 					frame.setVisible(true);
-				} catch (Exception e) {
+					accountsFrame = new AccountsFrm();
+				} catch (Throwable e) {
 					showError("Ошибка лаунчера", "Инициализация интерфейса", e);
+					System.exit(1);
 				}
 			}
 		});
@@ -363,9 +381,12 @@ public class Launcher {
 	public static String getMD5String(String x) {
 		try {
 			MessageDigest md = MessageDigest.getInstance("MD5");
-			md.update(x.getBytes());
-			byte[] digest = md.digest();
-			return DatatypeConverter.printHexBinary(digest).toLowerCase();
+			byte[] array = md.digest(x.getBytes());
+			StringBuffer sb = new StringBuffer();
+			for (int i = 0; i < array.length; ++i) {
+				sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+			}
+			return sb.toString();
 		} catch (NoSuchAlgorithmException e) {
 		}
 		return null;
@@ -375,6 +396,7 @@ public class Launcher {
 	public void showError(String title, String text, String trace) {
 		Log.error("showError(): " + trace);
 		JDialog dialog = new JDialog(frame, title, true);
+		dialog.setAlwaysOnTop(true);
         Container contentPane = dialog.getContentPane();
         contentPane.setLayout(new BorderLayout());
         JPanel pane = new JPanel();
@@ -425,6 +447,83 @@ public class Launcher {
 	
 	public void showError(String title, String text, Throwable e) {
 		showError(title, text, Log.exceptionToString(e));
+	}
+
+	public Auth currentAuth() {
+		return AuthStore.getSelected();
+	}
+
+	public void showAccountsFrame() {
+		accountsFrame.setVisible(true);
+	}
+
+	public void showLoggerFrame() {
+		loggerFrame.setVisible(true);
+	}
+
+	public static String getFrmTitle() {
+		return "Демонстрационный билд. Не готов к распространению (" + string_version + ")";
+	}
+
+	@SuppressWarnings("deprecation")
+	public void clientError(String title, String s, String trace) {
+		JDialog dialog = new JDialog(frame, title, true);
+		dialog.setAlwaysOnTop(true);
+        Container contentPane = dialog.getContentPane();
+        contentPane.setLayout(new BorderLayout());
+        JPanel pane = new JPanel();
+        contentPane.add(pane, BorderLayout.CENTER);
+		pane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		pane.setLayout(new BorderLayout());
+		if(s != null && s.length() > 0) {
+			JTextPane infopane = new JTextPane();
+			infopane.setBackground(SystemColor.menu);
+			infopane.setEditable(false);
+			infopane.setText(s);
+			pane.add(infopane, BorderLayout.NORTH);
+		}
+		if(trace != null) {
+			JScrollPane scrollPane = new JScrollPane();
+			scrollPane.setPreferredSize(new Dimension(600, 200));
+			pane.add(scrollPane, BorderLayout.CENTER);
+			JTextArea textArea = new JTextArea();
+			textArea.setFont(new Font("Consolas", Font.PLAIN, 12));
+			textArea.setEditable(false);
+			textArea.setText(trace);
+			scrollPane.setViewportView(textArea);
+		}
+		JPanel buttonPane = new JPanel();
+		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		contentPane.add(buttonPane, BorderLayout.SOUTH);
+		{
+			JButton okButton = new JButton("OK");
+			okButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					dialog.dispose();
+				}
+			});
+			okButton.setActionCommand("OK");
+			buttonPane.add(okButton);
+			dialog.getRootPane().setDefaultButton(okButton);
+			JButton logsButton = new JButton("Показать логи");
+			logsButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					showLoggerFrame();
+					dialog.dispose();
+				}
+			});
+			logsButton.setActionCommand("OK");
+			buttonPane.add(logsButton);
+		}
+		dialog.pack();
+        dialog.setResizable(false);
+        dialog.setLocationRelativeTo(frame);
+        dialog.show();
+        dialog.dispose();
+	}
+
+	public LoggerFrm loggerFrame() {
+		return loggerFrame;
 	}
 
 }

@@ -1,0 +1,253 @@
+{
+	"id": "vanilla",
+	"date": "30.07.2021",
+	"format": 3,
+	"human_readable_version": "2.7.26",
+	"update_build": 1,
+	"client": "http://dl.nnproject.cc/lgame/1.12.2forge/update.json",
+	"has_mods": true,
+	"integrity_check": {
+		"dirs": [
+			{"type": "mods"},
+			{
+				"type": "exists", "path": "scripts/"
+			},
+			{
+				"type": "exists", "path": "resources/"
+			},
+			{
+				"type": "exists", "path": "config/"
+			}
+		],
+		"mods": {
+			"ignore_excess_mods": true,
+			"delete_blacklist_mods": true,
+			"words_blacklist": [],
+			"remove_all_if_check_failed": true,
+			"checksum_algorithm": "SHA-1",
+			"checksums": {
+				"JustEnoughResources-1.12.2-0.9.2.60.jar": "3d4c9b8bb4ad948c7e26b7becd1c836f8cb34d07",
+				"AppleCore-mc1.12.2-3.4.0.jar": "a6a57a76936a559088e9282aacde6f761d7e0b39",
+				"Rex's-Additional-Structures-1.12.x-(v.2.3.1).jar": "7345e07cf2fdee3fd5578647824aa5b7468ccb93",
+				"jei_1.12.2-4.16.1.302.jar": "3e88d2896ca868c3cedb65e117ad3a1b82488fa8",
+				"SmoothFont-mc1.12.2-2.1.2.jar": "f904ba15339103acb898b6a618b87f6498b3d8bc",
+				"[1.12]TreeCapitator-client-1.43.0.jar": "d58eb72603d7d58ad5a5982da8684fe2b9703bfb",
+				"HardcoreDarkness-MC1.12.2-2.0.jar": "1bced77c70bbc1442412c397e1ca108627bda282",
+				"HungerOverhaul-1.12.2-1.3.3.jenkins148.jar": "6ac289e44ae54f30b116c30a60dee82721c7d690",
+				"OreLib-1.12.2-3.6.0.1.jar": "5debb0481552c54bb6ad72d56b05b31d92e2f5d8",
+				"BetterMineshaftsForge-1.12.2-2.1.1.jar": "36a62e77d821a78d37f494b018506acdcfbad290",
+				"CreativeCore_v1.10.34_mc1.12.2.jar": "a4d4d6f795618ae1a5a00129b3567385fb94cedd",
+				"MPUtils-1.12.2-1.5.7.jar": "5c034b16d420af6d8b935f3416608f1cd1378ea9",
+				"ItemFilters-1.0.4.2.jar": "6b6560aea35c6e0e8a550ea7044501412b0fb335",
+				"FancyBlockParticles-1.12.x-2.4.1.jar": "256b53b26298c2f59590f02ba67889821afd79b1",
+				"CraftTweaker2-1.12-4.1.20.607.jar": "5e3c488d51951a0960a8b18c541bb1946cd7217e",
+				"FpsReducer-mc1.12.2-1.18.jar": "9fe2074d6251aa6dc8047c45e63be57f01b1a0b3",
+				"AppleSkin-mc1.12-1.0.14.jar": "d798af79de48be0f00c772943e5ec5a2fb5659fa",
+				"Huds-1.12.2-1.0.6.jar": "8e4d64732a3a6041fd47c45f58908031c9b7251a",
+				"Hwyla-1.8.26-B41_1.12.2.jar": "7280d5c0dab42436549bcefc63ff64a1049e5501",
+				"FTBQuests-1202.9.0.15.jar": "03413411b820e0fb91f36013aa5954dde3bc85e9",
+				"OptiFine_1.12.2_HD_U_G5.jar": "ca3aea3a09ce215906c346fe190907fe0347b0c4",
+				"titlechanger-1.1.4.jar": "2def940726743bef161adc2c729c4ea009ad294f",
+				"Streams-1.12-0.4.9.jar": "82408b7604a56f06fbb25f23e9aef2ea154e17c2",
+				"[1.12]bspkrsCore-universal-7.6.0.1.jar": "9ae9811f387a960381e5c82fae2a7f79d0480a27",
+				"walljump-1.12.2-1.3.2.jar": "5721af09ca9201f9cfe23abd787e0b5e3375fb3e",
+				"stg-1.12.2-1.2.3.jar": "d79494b27d6b9193714fbad2f054951dc9c2320f",
+				"ItemPhysic_Full_1.4.34_mc1.12.2.jar": "7b5691bd9eeac36de3a924fadf500353e0c00a9f",
+				"RTG-1.12.2-6.1.0.0-snapshot.1.jar": "c91302fbb29f7c34cdf930eb90a847ccaf48f5a2",
+				"morepaintings-paintings-1.12.2-5.0.1.2.jar": "56cfbddccfa9edb611fde4adf69cb2dd4fadcaa5",
+				"DynamicSurroundingsHuds-1.12.2-3.6.0.0.jar": "017d7b1ded52ea61561457d29c337d065c2dd8ff",
+				"classicbar-0.5.4.jar": "5b30591b84575961bc5cade13c45861ad1937216",
+				"Wawla-1.12.2-2.6.275.jar": "783157c607149875de1e045d72382d370256257c",
+				"journeymap-1.12.2-5.7.1.jar": "3da4323f71bcadcf140002a9f49578f0cd5ce8a8",
+				"WinterWonderLand-1.2.2.jar": "5d9ac2a1a0a3ac303ae26fef0a3a7651e01cda05",
+				"Farseek-1.12-2.5.1.jar": "73664ec7575085d4a18010a9bce636b43ea40b60",
+				"ElecCore-1.12.2-1.9.453.jar": "112cda98b049902b8c073ec37b96495ff5e0bdf6",
+				"DynamicSurroundings-1.12.2-3.6.1.0.jar": "3d5d62c9d44517991d19e165d2051209b2d06bf3",
+				"mpbasic-1.12.2-1.4.11.jar": "d033d21e0806203e5daa173259691f0f1c8e6255",
+				"noRecipeBook_v1.2.2formc1.12.2.jar": "699a1235d426775c87123ea34c5bad3bb51fc03e",
+				"bettercaves-1.12.2-2.0.4.jar": "1924c9881c84373c4f887ad87b1089466b291d3f",
+				"FTBLib-5.4.7.2.jar": "7c20cd223bc2334edf153e074f35acdbcab3c976",
+				"AmbientSounds_v3.0.16_mc1.12.2.jar": "b14bea0de23d64bf322f2da7fd56b1ce33c18e89",
+				"webshooter-1.11-1.0.2.jar": "a12f1efc7db0b3304958410ec4b24bd189357195",
+				"InventoryTweaks-1.63.jar": "6e00827d1a009da39fa6db5afd2a3d6b024abfe9",
+				"betterunderground-1.1.7.jar": "1d7c60a9da680c53d4d2ff040cfeadfb562fc4ed",
+				"ResourceLoader-MC1.12.1-1.5.3.jar": "d8c10e6e29df5f9bc51e468642d9b3cae5f2f8e4"
+			}
+		}
+	},
+	"update": {
+		"updates_check": {"type": "update_build"},
+		"update_scripts": {
+			"install_script": {
+				"download": [
+					{
+						"url": "http://dl.nnproject.cc/lgame/vanilla/mods0.zip",
+						"name": "mods0.zip",
+						"type": "mods",
+						"dir": "temp"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/vanilla/mods1.zip",
+						"name": "mods1.zip",
+						"type": "mods",
+						"dir": "temp"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/vanilla/scripts.zip",
+						"name": "scripts.zip",
+						"type": "resources",
+						"dir": "temp"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/vanilla/resources.zip",
+						"name": "resources.zip",
+						"type": "resources",
+						"dir": "temp"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/vanilla/config.zip",
+						"name": "config.zip",
+						"type": "config",
+						"dir": "temp"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/vanilla/options.zip",
+						"name": "options.zip",
+						"type": "options",
+						"dir": "temp"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/vanilla/journeymap.zip",
+						"name": "journeymap.zip",
+						"type": "config",
+						"dir": "temp"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/vanilla/resourcepacks.zip",
+						"name": "resourcepacks.zip",
+						"type": "extra",
+						"dir": "temp"
+					}
+				],
+				"unzip": [
+					{
+						"name": "mods0.zip",
+						"path": "/mods/",
+						"from": "temp"
+					},
+					{
+						"name": "mods1.zip",
+						"path": "/mods/",
+						"from": "temp"
+					},
+					{
+						"name": "resources.zip",
+						"path": "/resources/",
+						"from": "temp"
+					},
+					{
+						"name": "scripts.zip",
+						"path": "/scripts/",
+						"from": "temp"
+					},
+					{
+						"name": "config.zip",
+						"path": "/config/",
+						"from": "temp"
+					},
+					{
+						"name": "options.zip",
+						"path": "/",
+						"from": "temp"
+					},
+					{
+						"name": "journeymap.zip",
+						"path": "/journeymap/",
+						"from": "temp"
+					},
+					{
+						"name": "resourcepacks.zip",
+						"path": "/resourcepacks/",
+						"from": "temp"
+					}
+				],
+				"post_install": [
+					{"remove": "temp"}
+				]
+			},
+			"update_script": {
+				"pre_remove_dirs": [
+					"scripts",
+					"config"
+				],
+				"download": [
+					{
+						"check": {"type": "mods"}, 
+						"url": "http://dl.nnproject.cc/lgame/vanilla/mods0.zip",
+						"name": "mods0.zip",
+						"type": "mods",
+						"dir": "temp"
+					},
+					{
+						"check": {"type": "mods"}, 
+						"url": "http://dl.nnproject.cc/lgame/vanilla/mods1.zip",
+						"name": "mods1.zip",
+						"type": "mods",
+						"dir": "temp"
+					},
+					{
+						"check": {"type": "force"}, 
+						"url": "http://dl.nnproject.cc/lgame/vanilla/scripts.zip",
+						"name": "scripts.zip",
+						"type": "resources",
+						"dir": "temp"
+					},
+					{
+						"check": {"type": "force"}, 
+						"url": "http://dl.nnproject.cc/lgame/vanilla/resources.zip",
+						"name": "resources.zip",
+						"type": "resources",
+						"dir": "temp"
+					},
+					{
+						"check": {"type": "force"}, 
+						"url": "http://dl.nnproject.cc/lgame/vanilla/config.zip",
+						"name": "config.zip",
+						"type": "config",
+						"dir": "temp"
+					}
+				],
+				"unzip": [
+					{
+						"name": "mods0.zip",
+						"path": "/mods/",
+						"from": "temp"
+					},
+					{
+						"name": "mods1.zip",
+						"path": "/mods/",
+						"from": "temp"
+					},
+					{
+						"name": "resources.zip",
+						"path": "/resources/",
+						"from": "temp"
+					},
+					{
+						"name": "scripts.zip",
+						"path": "/scripts/",
+						"from": "temp"
+					},
+					{
+						"name": "config.zip",
+						"path": "/config/",
+						"from": "temp"
+					}
+				],
+				"post_update": [
+					{"remove": "temp"}
+				]
+			},
+		}
+	}
+}

@@ -1,0 +1,221 @@
+{
+	"id": "realrpg",
+	"date": "30.07.2021",
+	"format": 3,
+	"human_readable_version": "1.3.6",
+	"update_build": 1,
+	"client": "http://dl.nnproject.cc/lgame/1.12.2forge/update.json",
+	"has_mods": true,
+	"integrity_check": {
+		"dirs": [
+			{"type": "mods"},
+			{
+				"type": "exists", "path": "local/"
+			},
+			{
+				"type": "exists", "path": "config/"
+			}
+		],
+		"mods": {
+			"ignore_excess_mods": true,
+			"delete_blacklist_mods": true,
+			"words_blacklist": [],
+			"remove_all_if_check_failed": true,
+			"checksum_algorithm": "SHA-1",
+			"checksums": {
+				"BiomesOPlenty-1.12.2-7.0.1.2444-universal.jar": "6f281febea0746d2229f692cb719bd017ec70b32",
+				"level-up-hp-1.12.2-1.3.0.jar": "baf510551bed32647541022caa44e3e8e279141d",
+				"SereneSeasons-1.12.2-1.2.18-universal.jar": "05acc4faf6f5ca31215599c0ebf778ba18a9121b",
+				"DynamicTrees-1.12.2-0.9.7.jar": "3208cb6925283d73057aa393b89e44a6cf41593f",
+				"Farseek-1.12-2.4.jar": "3a53b19023284e8adfab59fdc569068066da402f",
+				"journeymap-1.12.2-5.5.9.jar": "84f78861e4171d69bbdf67e826528a4a85f4b4e8",
+				"HardcoreDarkness-MC1.12.2-2.0.jar": "1bced77c70bbc1442412c397e1ca108627bda282",
+				"OreLib-1.12.2-3.6.0.1.jar": "5debb0481552c54bb6ad72d56b05b31d92e2f5d8",
+				"ItemPhysic_Full_1.4.28_mc1.12.2.jar": "6baedd931fcc4ffb310f10f75f421030f2d827cb",
+				"ItemFilters-1.0.3.12.jar": "2cf5299329443cde00b9d43027949bc1aba11597",
+				"AppleCore-mc1.12.2-3.1.5.jar": "70b8334f49d3888cd7fc2169bd8378aca60973d6",
+				"FancyBlockParticles-1.12.x-2.4.1.jar": "256b53b26298c2f59590f02ba67889821afd79b1",
+				"TTFR-1.12.1-1.9.1.jar": "6d557f637500b84cbb4d6d86339f5e4ad2680d13",
+				"CustomMobSpawner-3.11.5.jar": "a65bd1e9c9ef568aee35efe276efa80dffc50482",
+				"TConstruct-1.12.2-2.13.0.179.jar": "7fd6b23bf0d91881a0d449362b153283b249907a",
+				"Hwyla-1.8.26-B41_1.12.2.jar": "7280d5c0dab42436549bcefc63ff64a1049e5501",
+				"zombieawareness-1.12.1-1.11.15.jar": "2f2ed1fcab97a522cbc8db929e8fa002a5885b79",
+				"walljump-1.12.2-1.3.2.jar": "5721af09ca9201f9cfe23abd787e0b5e3375fb3e",
+				"stg-1.12.2-1.2.3.jar": "d79494b27d6b9193714fbad2f054951dc9c2320f",
+				"staminaplus-1.1.1.jar": "f335dd9a84697110ab933b994c5904bc22b08995",
+				"morepaintings-paintings-1.12.2-5.0.1.2.jar": "56cfbddccfa9edb611fde4adf69cb2dd4fadcaa5",
+				"RoguelikeDungeons-1.12.2-1.8.0.jar": "b62a39f5313fe3e2bd324cf2371ec472d3e3e15c",
+				"Aquaculture-1.12.2-1.6.8.jar": "9db4558bc156fbcd201625c6ccb0df52fec52c0f",
+				"ironchest-1.12.2-7.0.72.847.jar": "adc4c785a484c5d5a4ab9a29e1937faeed4312dd",
+				"conarm-1.12.2-1.2.5.4.jar": "c831d3e736aa651e3671676a2fea7262c48a7313",
+				"DrZharks MoCreatures Mod-12.0.5.jar": "e84e919972e215cbe9ac49b7a743fcdd792c7600",
+				"SophisticatedWolves-1.12.2-3.13.8.jar": "55873227583819c02f897170c24fdd017612ffcc",
+				"preview_OptiFine_1.12.2_HD_U_F6_pre1.jar": "23a8be042f354ec97c99672906c3e61fdf54ca2c",
+				"FTBLib-5.4.4.5.jar": "739da870868234cd4d1edd8f65089e6c68633711",
+				"betterunderground-1.1.7.jar": "1d7c60a9da680c53d4d2ff040cfeadfb562fc4ed",
+				"Mantle-1.12-1.3.3.55.jar": "a1e5d5c197dae3e92637cafb8cd996185191165b",
+				"ToughAsNails-1.12.2-3.1.0.141-universal.jar": "594c723d9708616b0f69bec1fb2d884d9ade7444",
+				"HungerOverhaul-1.12.2-1.3.3.jenkins148.jar": "6ac289e44ae54f30b116c30a60dee82721c7d690",
+				"coroutil-1.12.1-1.2.36.jar": "843943756f803f9ef5d7fbdc74dcd403122179a1",
+				"InventoryTweaks-1.64%2Bdev.150.jar": "1578a9b57148469104292ac0f2faa2aca565bf76",
+				"Chisel-MC1.12.2-1.0.1.44.jar": "d9a74dde6aafade73328dbf45bf7ec8aca30e038",
+				"DynamicTreesPHC-1.12.2-1.4.2.jar": "2e429e9705cb49afb72e2650001d003fd755ce42",
+				"backpack-3.0.2-1.12.2.jar": "081807b00c859d209aafda8622f2126316d10c25",
+				"Huds-1.12.2-1.0.6.jar": "8e4d64732a3a6041fd47c45f58908031c9b7251a",
+				"jei_1.12.2-4.15.0.293.jar": "a9571911167b5081df25d8b19ef9ded519045957",
+				"DynamicTreesBOP-1.12.2-1.4.1e.jar": "1cbe1b51bccc0f4c2601ac22e350ba17e9ed95f8",
+				"EnderCompass-1.12-1.2.6.2.jar": "02a1bca78ca34828def389ac4cd1132a4390cb76",
+				"CreativeCore_v1.9.90_mc1.12.2.jar": "056520140c3aa07bdf83c4d2c9f5e2ccd21eb00c",
+				"CookingForBlockheads_1.12.2-6.5.0.jar": "8e7b73b39c0bdae84a4be445027747c9bae935c4",
+				"DynamicSurroundingsHuds-1.12.2-3.6.0.0.jar": "017d7b1ded52ea61561457d29c337d065c2dd8ff",
+				"tinkersjei-1.2.jar": "0ee37cbd099fd3693f1f45673ba498ce7e3a3849",
+				"classicbar-0.5.4.jar": "5b30591b84575961bc5cade13c45861ad1937216",
+				"RealisticTorches-1.12.2-2.1.1.jar": "4e90e5315bc7666b42f5284cd9d2f02489d30d90",
+				"CTM-MC1.12.2-1.0.1.30.jar": "d9133571636ec2c4c590dd69ac41ef813c63a8ab",
+				"ShadowMC-1.12-3.8.0.jar": "b8a768faf4cef751dbfadec81bd9a8a14b11ce42",
+				"DynamicSurroundings-1.12.2-3.6.0.2.jar": "6df972a875738ee010ad2d5b334ef2794099737b",
+				"Streams-1.12-0.4.8.jar": "9ee62e24b308a4f05fbd73094deb761f11c20bb9",
+				"WinterWonderLand-1.2.2.jar": "5d9ac2a1a0a3ac303ae26fef0a3a7651e01cda05",
+				"ElecCore-1.12.2-1.9.453.jar": "112cda98b049902b8c073ec37b96495ff5e0bdf6",
+				"wolfarmor-1.12.2-2.2.3.1798-universal.jar": "9275d38bab9301d9703fe8112284cbcad2ca3556",
+				"Forgelin_1.7.4.jar": "84d4d66cb3d2d185e8d8fb096ce00f89987cd940",
+				"noRecipeBook_v1.2.2formc1.12.2.jar": "699a1235d426775c87123ea34c5bad3bb51fc03e",
+				"AppleSkin-mc1.12-1.0.9.jar": "23162a97cab0adb4be2fc6d3937c613929d1d5c7",
+				"Rex%27s-Additional-Structures-1.12.x-(v.2.3.1).jar": "7345e07cf2fdee3fd5578647824aa5b7468ccb93",
+				"webshooter-1.11-1.0.2.jar": "a12f1efc7db0b3304958410ec4b24bd189357195",
+				"FTBQuests-1.8.0.237.jar": "6b844e001339535cb820072207b638b6e908a13e",
+				"gravestone-1.10.3.jar": "b2cc9a25054fd6878ba242a6080a2866140bbeb0",
+				"Pam%27s+HarvestCraft+1.12.2zf.jar": "ffeb8369801e898c8a1598b37d124c251f40ba93"
+			}
+		}
+	},
+	"update": {
+		"updates_check": {"type": "update_build"},
+		"update_scripts": {
+			"install_script": {
+				"download": [
+					{
+						"url": "http://dl.nnproject.cc/lgame/realrpg/mods.zip",
+						"name": "mods.zip",
+						"type": "mods",
+						"dir": "temp"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/realrpg/config.zip",
+						"name": "config.zip",
+						"type": "config",
+						"dir": "temp"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/realrpg/local.zip",
+						"name": "local.zip",
+						"type": "config",
+						"dir": "temp"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/realrpg/options.zip",
+						"name": "options.zip",
+						"type": "options",
+						"dir": "temp"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/realrpg/journeymap.zip",
+						"name": "journeymap.zip",
+						"type": "config",
+						"dir": "temp"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/realrpg/resourcepacks.zip",
+						"name": "resourcepacks.zip",
+						"type": "extra",
+						"dir": "temp"
+					}
+				],
+				"unzip": [
+					{
+						"name": "mods.zip",
+						"path": "/mods/",
+						"from": "temp"
+					},
+					{
+						"name": "config.zip",
+						"path": "/config/",
+						"from": "temp"
+					},
+					{
+						"name": "local.zip",
+						"path": "/local/",
+						"from": "temp"
+					},
+					{
+						"name": "options.zip",
+						"path": "/",
+						"from": "temp"
+					},
+					{
+						"name": "journeymap.zip",
+						"path": "/journeymap/",
+						"from": "temp"
+					},
+					{
+						"name": "resourcepacks.zip",
+						"path": "/resourcepacks/",
+						"from": "temp"
+					}
+				],
+				"post_install": [
+					{"remove": "temp"}
+				]
+			},
+			"update_script": {
+				"pre_remove_dirs": [
+					"config",
+					"local"
+				],
+				"download": [
+					{
+						"check": {"type": "mods"}, 
+						"url": "http://dl.nnproject.cc/lgame/realrpg/mods.zip",
+						"name": "mods0.zip",
+						"type": "mods",
+						"dir": "temp"
+					},
+					{
+						"check": {"type": "force"}, 
+						"url": "http://dl.nnproject.cc/lgame/realrpg/config.zip",
+						"name": "config.zip",
+						"type": "config",
+						"dir": "temp"
+					},
+					{
+						"check": {"type": "force"}, 
+						"url": "http://dl.nnproject.cc/lgame/realrpg/local.zip",
+						"name": "local.zip",
+						"type": "config",
+						"dir": "temp"
+					}
+				],
+				"unzip": [
+					{
+						"name": "mods.zip",
+						"path": "/mods/",
+						"from": "temp"
+					},
+					{
+						"name": "config.zip",
+						"path": "/config/",
+						"from": "temp"
+					},
+					{
+						"name": "local.zip",
+						"path": "/local/",
+						"from": "temp"
+					}
+				],
+				"post_update": [
+					{"remove": "temp"}
+				]
+			},
+		}
+	}
+}

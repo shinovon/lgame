@@ -24,7 +24,7 @@ import javax.swing.event.ChangeListener;
 
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.Modpack;
-import ru.lgame.launcher.utils.Log;
+import ru.lgame.launcher.utils.logging.Log;
 
 /**
  * Панелька сборки с описанием и картинкой
@@ -35,6 +35,7 @@ public class ModpackPanel extends JPanel {
 	private static final long serialVersionUID = 5622859608833406220L;
 
 	private static final int ITEM_HEIGHT = 240;
+	private static final int MAX_WIDTH = 560;
 
 	private Modpack modpack;
 	
@@ -115,7 +116,7 @@ public class ModpackPanel extends JPanel {
 	protected void selected() {
 		Log.debug("selected: " + id);
 		setBorder(new MatteBorder(1, 1, 1, 1, Color.BLACK));
-		Launcher.inst.frame().setSelected(this);
+		Launcher.inst.frame().mainPane().setSelected(this);
 	}
 
 	/**
@@ -224,6 +225,7 @@ public class ModpackPanel extends JPanel {
 			x += image.getWidth(null);
 		}
 		int tw = w - x - 5;
+		if(tw > MAX_WIDTH) tw = MAX_WIDTH;
 		if((descArr == null || lastW != w) && desc != null) descArr = getStringArray(desc, tw, g.getFontMetrics());
 		g.drawString(modpackName, x, 12);
 		if(descArr != null) {

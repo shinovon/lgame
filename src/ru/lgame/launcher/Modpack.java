@@ -10,8 +10,8 @@ import javax.imageio.ImageIO;
 import org.json.JSONObject;
 
 import ru.lgame.launcher.ui.ModpackPanel;
-import ru.lgame.launcher.utils.Log;
 import ru.lgame.launcher.utils.WebUtils;
+import ru.lgame.launcher.utils.logging.Log;
 
 /**
  * Объект сборки
@@ -146,6 +146,11 @@ public class Modpack {
 
 	public boolean isStarted() {
 		return this.equals(Updater.getNowRunningModpack());
+	}
+
+	public int getStateRst() {
+		if(isUpdating() || isStarted()) return cachedState = 1;
+		return cachedState = Updater.getModpackState(this);
 	}
 
 	public int getState() {

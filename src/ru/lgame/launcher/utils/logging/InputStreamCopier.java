@@ -1,4 +1,4 @@
-package ru.lgame.launcher.utils;
+package ru.lgame.launcher.utils.logging;
 
 import java.io.IOException;
 import java.io.InputStream;

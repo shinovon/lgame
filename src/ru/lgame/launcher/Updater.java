@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -15,15 +16,18 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.zip.ZipException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.utils.FileUtils;
-import ru.lgame.launcher.utils.InputStreamCopier;
-import ru.lgame.launcher.utils.Log;
 import ru.lgame.launcher.utils.ZipUtils;
+import ru.lgame.launcher.utils.logging.ClientLog;
+import ru.lgame.launcher.utils.logging.InputStreamCopier;
+import ru.lgame.launcher.utils.logging.Log;
 import ru.lgame.launcher.utils.WebUtils;
 
 public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUtils.ProgressListener {
@@ -176,15 +180,20 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				}
 				return false;
 			}
-			if (!hash(filep, digest).equalsIgnoreCase(hash)) {
-				Log.info("wrong checksum: " + s);
-				if(removeAll) deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
-				else {
-					try {
-						new File(filep).delete();
-					} catch (Exception e) {
+			try {
+				if (!hash(filep, digest).equalsIgnoreCase(hash)) {
+					Log.info("wrong checksum: " + s);
+					if(removeAll) deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
+					else {
+						try {
+							new File(filep).delete();
+						} catch (Exception e) {
+						}
 					}
+					return false;
 				}
+			} catch (IOException e) {
+				Log.error("file error", e);
 				return false;
 			}
 		}
@@ -428,8 +437,10 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			return;
 		}
 		modpack.setUpdateInfo(null, "Проверка целостности сборки", 50);
-		// Сборка установлена, нужно проверить обновления
+		//сбросить кэшированное состояние сборки
+		modpack.getStateRst();
 		if(modpackState == -100) {
+			// Сборка установлена, нужно проверить обновления
 			modpackState = 1;
 			if(!clientInstalled) modpackState = 4;
 			else if(clientNeedsUpdate) modpackState = 5;
@@ -533,6 +544,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			if(download == null || scriptedDownload(download, p, t)) {
 				if(unzip == null || scriptedUnzip(unzip, p, t)) {
 					if(post != null) scriptedPost(post, p, t);
+					clientVersionFile();
 					return;
 				} else {
 					updateFatalError();
@@ -562,6 +574,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		if(download == null || scriptedDownload(download, p, t)) {
 			if(unzip == null || scriptedUnzip(unzip, p, t)) {
 				if(post != null) scriptedPost(post, p, t);
+				clientVersionFile();
 			} else updateFatalError();
 		} else updateFatalError();
 	}
@@ -583,6 +596,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			if(download == null || scriptedDownload(download, p, t)) {
 				if(unzip == null || scriptedUnzip(unzip, p, t)) {
 					if(post != null) scriptedPost(post, p, t);
+					modpackVersionFile();
 				} else updateFatalError();
 			} else updateFatalError();
 		}
@@ -605,6 +619,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		if(download == null || scriptedDownload(download, p, t)) {
 			if(unzip == null || scriptedUnzip(unzip, p, t)) {
 				if(post != null) scriptedPost(post, p, t);
+				modpackVersionFile();
 				return;
 			} else {
 				updateFatalError();
@@ -615,7 +630,29 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			return;
 		}
 	}
+
+	private void clientVersionFile() {
+		String s = Config.get("path") + modpack.client() + File.separator;
+		File f = new File(s + "version");
+		if(f.exists()) f.delete();
+		try {
+			FileUtils.writeString(f, "" + clientJson.getInt("update_build"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
+	private void modpackVersionFile() {
+		String s = Config.get("path") + modpack.id() + File.separator;
+		File f = new File(s + "version");
+		if(f.exists()) f.delete();
+		try {
+			FileUtils.writeString(f, "" + json.getInt("update_build"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void scriptedPost(JSONArray j, String root, String temp) {
 		for(Iterator<Object> it = j.iterator(); it.hasNext(); ) {
 			try {
@@ -652,6 +689,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		String tp = temp;
 		if(p.endsWith(File.separator)) p.substring(0, p.length() - 1);
 		if(tp.endsWith(File.separator)) tp.substring(0, tp.length() - 1);
+		int mods = -1;
 		for(Iterator<Object> it = j.iterator(); it.hasNext(); ) {
 			JSONObject o = (JSONObject) it.next();
 			String name = o.getString("name");
@@ -663,7 +701,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					try {
 						boolean b = false;
 						if(type.equals("mods")) {
-							if(checkMods(modpack, root, json)) b = true;
+							if(mods != -1) {
+								if(mods == 1) b = true;
+							} else if((mods = checkMods(modpack, root, json.getJSONObject("integrity_check")) ? 1 : 0) == 1) b = true;
 						} else if(type.equals("libraries")) {
 							if(checkClientLibraries(root)) b = true;
 						} else if(type.equals("natives")) {
@@ -712,7 +752,11 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			from = path(from);
 			if(path.equals(File.separator)) path = root;
 			else if(path.equals("temp")) path = temp;
-			else path = p + path;
+			else {
+				if(path.startsWith(File.separator))
+					path = p + path.substring(1);
+				else path = p + path;
+			}
 			if(from.equals("temp")) from = temp + name;
 			else from = tp + from + name;
 			currentUnzipFile = name;
@@ -723,6 +767,11 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			}
 			try {
 				ZipUtils.unzip(from, path);
+			} catch (ZipException e) {
+				if(!e.toString().equalsIgnoreCase("zip file is empty")) {
+					updateFatalError("scriptedUnzip(): unzip", e, Errors.UPDATER_SCRIPTEDUNZIP_UNZIP);
+					return false;
+				}
 			} catch (Exception e) {
 				updateFatalError("scriptedUnzip(): unzip", e, Errors.UPDATER_SCRIPTEDUNZIP_UNZIP);
 				return false;
@@ -756,12 +805,26 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			jvmArgs.add("-Xms" + Config.getInt("xms") + "M");
 			jvmArgs.add("-Xmx" + Config.getInt("xmx") + "M");
 			jvmArgs.add("-Djava.library.path=" + getNativesDir());
+			jvmArgs.add("-Dfile.encoding=UTF-8");
 
 			ArrayList<String> appArgs = new ArrayList<>();
-			appArgs.add("--username");
-			appArgs.add(auth.getUsername());
-			appArgs.add("--accessToken");
-			appArgs.add("null");
+			if(auth.isCracked()) {
+				appArgs.add("--username");
+				appArgs.add(auth.getUsername());
+				appArgs.add("--accessToken");
+				appArgs.add("null");
+				appArgs.add("--userProperties");
+				appArgs.add("{}");
+			} else if(auth.isMojang()) {
+				appArgs.add("--username");
+				appArgs.add(auth.getUsername());
+				appArgs.add("--uuid");
+				appArgs.add(auth.getMojangUUID());
+				appArgs.add("--accessToken");
+				appArgs.add(auth.getMojangAuthToken());
+				appArgs.add("--userProperties");
+				appArgs.add("{}");
+			}
 			appArgs.add("--gameDir");
 			appArgs.add(getModpackDir());
 			appArgs.add("--assetsDir");
@@ -776,16 +839,16 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			appArgs.add(modpack.id());
 			appArgs.add("--modpackname");
 			appArgs.add(modpack.getName());
-			appArgs.add("--userProperties");
-			appArgs.add("{}");
 			clientProcess = StartUtil.startJarProcess(new File(getModpackDir()), d, clientMainClass, jvmArgs,
 					appArgs);
-			final InputStreamCopier input = new InputStreamCopier(clientProcess.getInputStream(), System.out);
-			final InputStreamCopier error = new InputStreamCopier(clientProcess.getErrorStream(), System.out);
+			PrintStream ps = ClientLog.getInstance();
+			final InputStreamCopier input = new InputStreamCopier(clientProcess.getInputStream(), ps);
+			final InputStreamCopier error = new InputStreamCopier(clientProcess.getErrorStream(), ps);
 			error.start();
 			input.start();
 			clientStarted();
 			final int exitCode = clientProcess.waitFor();
+			ps.append("\nLOG END\n");
 			Log.info("Client exit code: " + exitCode);
 			if (exitCode == 1 || exitCode == -1) {
 				clientError("Клиент аварийно завершился! Код: " + exitCode);
@@ -851,12 +914,14 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 
 	private void clientError(String s) {
-		Launcher.inst.showError("Ошибка клиента", s);	
+		String x = ClientLog.getInstance().getLastException();
+		if(x == null) x = "No Error";
+		Launcher.inst.clientError("Ошибка клиента", s, x);	
 	}
 
 	private void clientError(String s, Throwable t) {
 		String e = Log.exceptionToString(t);
-		Launcher.inst.showError("Ошибка клиента", s , s + "\n" + e);	
+		Launcher.inst.clientError("Ошибка клиента", s, s + "\n" + e);	
 	}
 
 	private void updateFatalError(String s, Throwable t, int i) {

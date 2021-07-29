@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import ru.lgame.launcher.utils.Log;
+import ru.lgame.launcher.utils.logging.Log;
 
 public class StartUtil {
 	public static Process startJarProcess(File dir, Set<File> classpath, String mainClass, List<String> jvmArgs, List<String> appArgs) throws IOException {
