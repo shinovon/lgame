@@ -122,27 +122,51 @@ public class NativeJFileChooser extends JFileChooser {
         }
 
         final CountDownLatch latch = new CountDownLatch(1);
-        (new Runnable() {
-            @Override
-            public void run() {
-            	
-                if (parent != null) {
-                    parent.setEnabled(false);
-                }
-
-                if (isDirectorySelectionEnabled()) {
-                    currentFile = directoryChooser.showDialog(null);
-                } else {
-                    if (isMultiSelectionEnabled()) {
-                        currentFiles = fileChooser.showOpenMultipleDialog(null);
-                    } else {
-                        currentFile = fileChooser.showOpenDialog(null);
+        try {
+            (new Runnable() {
+                @Override
+                public void run() {
+                	
+                    if (parent != null) {
+                        parent.setEnabled(false);
                     }
-                }
-                latch.countDown();
-            }
 
-        }).run();
+                    if (isDirectorySelectionEnabled()) {
+                        currentFile = directoryChooser.showDialog(null);
+                    } else {
+                        if (isMultiSelectionEnabled()) {
+                            currentFiles = fileChooser.showOpenMultipleDialog(null);
+                        } else {
+                            currentFile = fileChooser.showOpenDialog(null);
+                        }
+                    }
+                    latch.countDown();
+                }
+
+            }).run();
+        } catch (Exception e) {
+	        Platform.runLater(new Runnable() {
+	            @Override
+	            public void run() {
+	
+	                if (parent != null) {
+	                    parent.setEnabled(false);
+	                }
+	
+	                if (isDirectorySelectionEnabled()) {
+	                    currentFile = directoryChooser.showDialog(null);
+	                } else {
+	                    if (isMultiSelectionEnabled()) {
+	                        currentFiles = fileChooser.showOpenMultipleDialog(null);
+	                    } else {
+	                        currentFile = fileChooser.showOpenDialog(null);
+	                    }
+	                }
+	                latch.countDown();
+	            }
+	
+	        });
+        }
         try {
             latch.await();
         } catch (InterruptedException ex) {

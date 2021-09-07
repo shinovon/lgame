@@ -29,7 +29,11 @@ public class StartUtil {
 	private static String getJavaExec() {
 		String p = Config.get("javapath");
 		String exec = "java.exe";
-		if(p != null && p != "") {
+		if(p != null && p != "" && p != "  " && p != " ") {
+			p = p.replace("\\", File.separator);
+			p = p.replace("/", File.separator);
+			if(p.endsWith("bin" + File.separator)) return p + exec;
+			if(p.endsWith("bin")) return p + File.separator + exec;
 			if(p.endsWith(File.separator)) return p + "bin" + File.separator + exec;
 			return p + File.separator + "bin" + File.separator + exec;
 		}

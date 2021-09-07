@@ -44,14 +44,14 @@ public class Log {
 		String p = "[" + date() + "] [" + lvl + "]" + (sec != null ? " [" + sec + "]" : "");
 		for(int i = 0; i < arr.length; i++) {
 			String s = p + " " + arr[i];
-			println(s);
+			println(s, lvl.equalsIgnoreCase("debug"));
 		}
 	}
 
-	private static void println(String s) {
+	private static void println(String s, boolean stdonly) {
 		System.out.println(s);
 		buffer.append(s).append("\n");
-		if(Launcher.inst != null && Launcher.inst.loggerFrame() != null)
+		if(Launcher.inst != null && Launcher.inst.loggerFrame() != null && !stdonly)
 			Launcher.inst.loggerFrame().append(s + "\n");
 	}
 

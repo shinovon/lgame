@@ -14,6 +14,7 @@ import ru.lgame.launcher.utils.logging.Log;
 public class Config {
 
 	private static Properties properties = new Properties();
+	private static boolean later;
 	
 	public static void init() {
 		loadDefaults();
@@ -28,7 +29,7 @@ public class Config {
 		set("xms", "512");
 	}
 
-	public static void loadConfig() {
+	public synchronized static void loadConfig() {
 		try {
 			properties.load(new FileInputStream(Launcher.getConfigPath()));
 		} catch (IOException e) {
@@ -78,11 +79,24 @@ public class Config {
 
 	@SuppressWarnings("deprecation")
 	public static void saveConfig() {
+		Log.debug("saving config");
 		try {
 			properties.save(new FileOutputStream(Launcher.getConfigPath()), "LGame Launcher Configuration file");
 		} catch (IOException e) {
 			Log.error("Failed to save properties", e);
 		}
+	}
+
+	public static void saveLater() {
+		later = true;
+		Launcher.inst.queue(new Runnable() {
+			public void run() {
+				if(!later) return;
+				saveConfig();
+				later = false;
+			}
+		});
+		
 	}
 
 }

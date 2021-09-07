@@ -147,7 +147,7 @@ public class LauncherPane extends JPanel {
 				if(Launcher.inst.currentAuth() != null) {
 					int i = Launcher.inst.currentAuth().checkAuth();
 					if(i == 0) {
-						Config.saveConfig();
+						Config.saveLater();
 						if(forceUpdateCheck.isSelected()) 
 							Launcher.inst.runForceUpdate(Launcher.inst.currentAuth(), selected.getModpack());
 						else Launcher.inst.run(Launcher.inst.currentAuth(), selected.getModpack());
@@ -156,7 +156,7 @@ public class LauncherPane extends JPanel {
 					}
 				} else if(usernameField != null) {
 					Config.set("username", usernameField.getText());
-					Config.saveConfig();
+					Config.saveLater();
 					if(usernameField.getText() == null || usernameField.getText().length() <= 4) {
 						JOptionPane.showMessageDialog(frm, "Введите никнейм", "", JOptionPane.WARNING_MESSAGE);
 						return;
@@ -213,7 +213,6 @@ public class LauncherPane extends JPanel {
 	 * Добавить сборку в список
 	 */
 	private void addModpack(ModpackPanel sb) {
-		sb.getModpack().getState();
 		sb.setButtonGroup(bg);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;

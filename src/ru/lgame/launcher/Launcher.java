@@ -48,11 +48,11 @@ import ru.lgame.launcher.utils.logging.Log;
  */
 public class Launcher {
 	
-	public static final String version = "0.3";
-	public static final String build_date = "30.07.2021";
+	public static final String version = "0.3.1";
+	public static final String build_date = "07.09.2021";
 	public static final boolean DEBUG = true;
 	
-	public static final String string_version = build_date + "-01" + " dev " + (DEBUG ? "debug on" : "");
+	public static final String string_version = version + " (" + build_date + "-01" + " dev)";
 	
 	private static final String LAUNCHER_JSON_URL = "http://dl.nnproject.cc/lgame/launcher.json";
 
@@ -233,12 +233,14 @@ public class Launcher {
 		launcherJson = new JSONObject(json);
 		JSONArray arr = launcherJson.getJSONArray("modpacks");
 		Iterator<Object> i = arr.iterator();
+		Modpack m;
 		while(i.hasNext()) {
 			String id = (String) i.next();
 			if(!modpackIds.contains(id)) {
 				modpackIds.add(id);
-				modpacks.add(new Modpack(id).parse(launcherJson.getJSONObject(id)));
-			} else getModpackById(id).parse(launcherJson.getJSONObject(id));
+				modpacks.add(m = new Modpack(id).parse(launcherJson.getJSONObject(id)));
+			} else m = getModpackById(id).parse(launcherJson.getJSONObject(id));
+			m.getStateRst();
 		}
 	}
 
@@ -462,7 +464,8 @@ public class Launcher {
 	}
 
 	public static String getFrmTitle() {
-		return "Демонстрационный билд. Не готов к распространению (" + string_version + ")";
+		//return "LGame Launcher " + string_version;
+		return "lgame main";
 	}
 
 	@SuppressWarnings("deprecation")
@@ -524,6 +527,11 @@ public class Launcher {
 
 	public LoggerFrm loggerFrame() {
 		return loggerFrame;
+	}
+
+	public void pathChanged() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

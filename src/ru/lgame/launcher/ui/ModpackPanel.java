@@ -34,7 +34,8 @@ public class ModpackPanel extends JPanel {
 	
 	private static final long serialVersionUID = 5622859608833406220L;
 
-	private static final int ITEM_HEIGHT = 240;
+	private static final int ITEM_HEIGHT = 242;
+	private static final int IMAGE_HEIGHT = 240;
 	private static final int MAX_WIDTH = 560;
 
 	private Modpack modpack;
@@ -166,10 +167,10 @@ public class ModpackPanel extends JPanel {
 		int iw = image.getWidth(null);
 		int ih = image.getHeight(null);
 		double r = (double) iw / (double) ih;
-		int w = (int) (r * (double)ITEM_HEIGHT);
+		int w = (int) (r * (double)IMAGE_HEIGHT);
 		//int factor = greatestCommonFactor(iw, ih);
 		//Log.debug(id + " image scaled to: " + w + "x" + ITEM_HEIGHT + " (" + iw / factor + ":" + ih / factor + ")");
-		image = image.getScaledInstance(w, ITEM_HEIGHT, Image.SCALE_SMOOTH);
+		image = image.getScaledInstance(w, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
 		updateContents();
 		return this;
 	}
@@ -214,32 +215,43 @@ public class ModpackPanel extends JPanel {
 					RenderingHints.VALUE_ANTIALIAS_ON);
 		}
 		g.setColor(Color.BLACK);
+		boolean b = true;
 		Font f = g.getFont();
+		int yyy = 1;
 		int w = getWidth();
-		int h = getHeight();
+		int h = getHeight() - 2;
+		int rh = getHeight() - 2;
 		int th = g.getFontMetrics().getHeight();
 		int th2 = th / 2;
 		int x = 5;
 		if(image != null) {
-			g.drawImage(image, 0, 0, null);
-			x += image.getWidth(null);
+			g.drawImage(image, b ? w - image.getWidth(null) - 1 : 0, yyy, null);
+			if(b) w -= image.getWidth(null);
 		}
-		int tw = w - x - 5;
+		int tw = w - x - 12;
 		if(tw > MAX_WIDTH) tw = MAX_WIDTH;
-		if((descArr == null || lastW != w) && desc != null) descArr = getStringArray(desc, tw, g.getFontMetrics());
-		g.drawString(modpackName, x, 12);
+		Font of = g.getFont();
+		Font nameFont = new Font(Font.SANS_SERIF, Font.BOLD, 18);
+		g.setFont(nameFont);
+		g.drawString(modpackName, x, g.getFontMetrics(nameFont).getHeight() / 2 + 4);
+		int ty = g.getFontMetrics(nameFont).getHeight() + 8 + yyy;
+		Font descFont = new Font(Font.SANS_SERIF, 0, 14);
+		g.setFont(descFont);
+		if((descArr == null || lastW != w) && desc != null) descArr = getStringArray(desc, tw, g.getFontMetrics(descFont));
 		if(descArr != null) {
-			for(int i = 0; i < descArr.length; i++) g.drawString(descArr[i], x, 16 + th + (i * (th + 1)));
+			int dth = g.getFontMetrics(descFont).getHeight() - 6;
+			for(int i = 0; i < descArr.length; i++) g.drawString(descArr[i], x, ty + (i * (dth + 1)));
 		}
+		g.setFont(of);
 		if(isStarted()) {
 			g.setColor(new Color(0, 200, 57));
 			g.fillRect(0, 0, w, 3);
 			g.fillRect(0, 0, 3, h);
-			g.fillRect(0, h - 3, w, 3);
-			g.fillRect(w - 3, 0, 3, h);
+			g.fillRect(0, rh - 3, w, 3);
+			g.fillRect(w - 3, 0, 3, rh);
 			Font f2 = g.getFont().deriveFont(12.0F);
 			g.setFont(f2);
-			g.drawString("Запущена", x, h - (g.getFontMetrics(f2).getHeight() / 2));
+			g.drawString("Запущена", x, rh - (g.getFontMetrics(f2).getHeight() / 2));
 		} else if(isUpdating()) {
 			int percent = this.updatePercent;
 			String s = this.updateText1;

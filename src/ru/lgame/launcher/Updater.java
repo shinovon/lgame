@@ -93,7 +93,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	public static int getModpackState(Modpack m) {
 		if(!checkInstalled(m)) return 0;
 		try {
-			if(!checkModpackIntegrity(m)) return 3;
+			//if(!checkModpackIntegrity(m)) return 3;
 			if(checkUpdatesAvailable(m)) return 2;
 		} catch (FileNotFoundException e) {
 			return -2;
@@ -916,6 +916,13 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	private void clientError(String s) {
 		String x = ClientLog.getInstance().getLastException();
 		if(x == null) x = "No Error";
+		if(x.contains("java.lang.NoClassDefFoundError: java/util/jar/Pack200") || 
+				x.contains("java.lang.ClassNotFoundException: java.util.jar.Pack200")) {
+		x = "Возможное решение:\nОшибка несовместимости Forge с версией Java!!\nИспользуйте версию Java меньше 14 \n"
+				+ "(8 - самый оптимальный вариант)\n" + x;
+		} else if(x.contains("AppClassLoader cannot be cast to class java.net.URLClassLoader")) {
+			x = "Возможное решение:\nОшибка несовместимости Forge с версией Java!!\nИспользуйте версию Java 8\n" + x;
+			}
 		Launcher.inst.clientError("Ошибка клиента", s, x);	
 	}
 
