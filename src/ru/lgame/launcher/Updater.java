@@ -24,6 +24,7 @@ import org.json.JSONObject;
 
 import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.utils.FileUtils;
+import ru.lgame.launcher.utils.LauncherOfflineException;
 import ru.lgame.launcher.utils.ZipUtils;
 import ru.lgame.launcher.utils.logging.ClientLog;
 import ru.lgame.launcher.utils.logging.InputStreamCopier;
@@ -63,6 +64,10 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	private int tasksDone;
 
 	private int totalTasks;
+
+	private boolean offline;
+
+	private JSONObject clientStartJson;
 	
 	private static Process clientProcess;
 
@@ -136,6 +141,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		String p = Config.get("path") + m.id() + File.separator;
 		File vvf = new File(p + "version");
 		if(!vvf.exists()) return false;
+		if(updateJson == null) throw new LauncherOfflineException();
 		JSONObject j = updateJson.getJSONObject("integrity_check");
 		if(j.has("dirs")) {
 			JSONArray a = j.getJSONArray("dirs");
@@ -240,6 +246,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		if(!f.exists()) return true;
 		f = new File(p + "version");
 		if(!f.exists()) return true;
+		if(clientJson == null) throw new LauncherOfflineException();
 		try {
 			if(!FileUtils.getString(f).equalsIgnoreCase("" + clientJson.getInt("update_build"))) return true;
 		} catch (Exception e) {
@@ -400,13 +407,28 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		modpack.setUpdateInfo(repeated ? "Обновление" : "Сбор информации", repeated ? "Проверка правильности установки" : "Проверка установки", 0);
 		int modpackState = forceUpdate ? 3 : checkInstalled(modpack) ? -100 : 0;
 		try {
+			modpack.setUpdateInfo(null, "Получение дескриптора запуска клиента", 15);
+			clientStartJson = modpack.getClientStartJson(modpackState == 0 || forceUpdate);
+			if(clientStartJson == null) {
+				if(modpackState == 0 || forceUpdate)
+					updateFatalError("Нет подключения к интернету или сервер не отвечает!", 0, Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
+				else
+					updateFatalError("Файл дескриптора запуска клиента отсутсвует! Без него игра в оффлайн режиме невозможна!", 0, Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
+				return;
+			}
+			System.out.println(clientStartJson.toString());
+			clientAssetIndex = clientStartJson.getString("asset_index");
+			clientMainClass = clientStartJson.getString("mainclass");
+			clientTweakClasses = clientStartJson.getJSONArray("tweak_classes").toList().toArray(new String[0]);
 			modpack.setUpdateInfo(null, "Скачивание конфигурации сборки", 33);
 			json = modpack.getUpdateJson(true);
 			modpack.setUpdateInfo(null, "Скачивание конфигурации клиента", 67);
 			clientJson = modpack.getClientUpdateJson(true);
-			clientAssetIndex = clientJson.getString("asset_index");
-			clientMainClass = clientJson.getJSONObject("run").getString("mainclass");
-			clientTweakClasses = clientJson.getJSONObject("run").getJSONArray("tweak_classes").toList().toArray(new String[0]);
+		} catch (LauncherOfflineException e) {
+			if(modpackState == 0 || forceUpdate) {
+				updateFatalError("Нет подключения к интернету или сервер не отвечает!", e.getCause(), Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
+				return;
+			}
 		} catch (IOException e) {
 			if(modpackState == 0 || forceUpdate) {
 				updateFatalError("Нет подключения к интернету или сервер не отвечает!", e, Errors.UPDATER_RUN_GETUPDATEJSON_IOEXCEPTION);
@@ -432,6 +454,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		boolean clientNeedsUpdate = false;
 		try {
 			clientNeedsUpdate = checkClientNeedUpdate();
+		} catch (LauncherOfflineException e) {
+			offline = true;
 		} catch (Exception e1) {
 			updateFatalError("Ошибка проверки клиента", e1, Errors.UPDATER_RUN_CHECKCLIENT_EXCEPTION);
 			return;
@@ -450,6 +474,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					modpack.setUpdateInfo(null, "Проверка наличия обновлений сборки", 75);
 					if(checkUpdatesAvailable(modpack)) modpackState = 2;
 				}
+			} catch (LauncherOfflineException e) {
+				offline = true;
 			} catch (Exception e) {
 				updateFatalError("Ошибка проверки сборки", e, Errors.UPDATER_RUN_CHECKMODPACK_EXCEPTION);
 				return;
@@ -633,6 +659,13 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	private void clientVersionFile() {
 		String s = Config.get("path") + modpack.client() + File.separator;
+		File f2 = new File(s + "start.json");
+		if(f2.exists()) f2.delete();
+		try {
+			FileUtils.writeString(f2, clientStartJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		File f = new File(s + "version");
 		if(f.exists()) f.delete();
 		try {
@@ -943,7 +976,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 
 	private void updateFatalError(String s, int i1, int i2) {
-		String e = Log.exceptionToString(new Exception());
+		String e = Log.getTraceString(2);
 		Launcher.inst.showError("Ошибка обновления", s, s + ": " + Errors.toHexString(i1) + " (Код ошибки: " + Errors.toHexString(i2) + ")\n" + e);
 		updateFatalError();
 	}

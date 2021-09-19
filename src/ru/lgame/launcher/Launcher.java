@@ -258,7 +258,9 @@ public class Launcher {
 			});
 		} catch (Exception e) {
 		}
-		if(!tryLoadModpacksFromServer()) loadCachedLauncherJson();
+		if(!tryLoadModpacksFromServer()) {
+			loadCachedLauncherJson();
+		}
 		loadingFrame.setVisible(false);
 	}
 	

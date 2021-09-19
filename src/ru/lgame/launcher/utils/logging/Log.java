@@ -71,6 +71,18 @@ public class Log {
 		e.printStackTrace(pw);
 		return sw.toString();
 	}
+
+	public static String getTraceString(int j) {
+		j = j + 1;
+		String s = exceptionToString(new Exception());
+		s = s.replace("\r", "");
+		s = s.replace("\tat ", "");
+		for(int i = 0; i < j; i++)
+		if(s.indexOf("\n") != -1) {
+			s = s.substring(s.indexOf("\n") + 1);
+		}
+		return s;
+	}
 	
 	public static void clearBuffer() {
 		buffer.delete(0, buffer.length());
