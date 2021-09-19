@@ -129,8 +129,10 @@ class DeflaterHuffman
 	    System.err.println("bits: "+(bits+1)+" count: "+bl_counts[bits]
 			       +" nextCode: "+Integer.toHexString(code));
 	}
-      if (DeflaterConstants.DEBUGGING && code != 65536)
-	throw new RuntimeException("Inconsistent bl_counts!");
+      if (DeflaterConstants.DEBUGGING) {
+		if (code != 65536)
+			throw new RuntimeException("Inconsistent bl_counts!");
+	}
       
       for (int i=0; i < numCodes; i++)
 	{

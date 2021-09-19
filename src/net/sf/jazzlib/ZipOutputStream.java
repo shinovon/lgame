@@ -57,7 +57,7 @@ import java.util.Vector;
  */
 public class ZipOutputStream extends DeflaterOutputStream implements ZipConstants
 {
-  private Vector entries = new Vector();
+  private Vector<ZipEntry> entries = new Vector<ZipEntry>();
   private CRC32 crc = new CRC32();
   private ZipEntry curEntry = null;
 
@@ -338,7 +338,7 @@ public class ZipOutputStream extends DeflaterOutputStream implements ZipConstant
     int numEntries = 0;
     int sizeEntries = 0;
     
-    Enumeration en = entries.elements();
+    Enumeration<ZipEntry> en = entries.elements();
     while (en.hasMoreElements())
       {
 	ZipEntry entry = (ZipEntry) en.nextElement();

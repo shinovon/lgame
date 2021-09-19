@@ -213,9 +213,26 @@ public class ModpackPanel extends JPanel {
 			g2d.setRenderingHint(
 					RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
+			//g2d.setRenderingHint(
+			//		RenderingHints.KEY_TEXT_ANTIALIASING,
+			//		RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		}
 		g.setColor(Color.BLACK);
 		boolean b = true;
+		Font f1;
+		try {
+			f1 = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/font/Montserrat-Regular.ttf"));
+		} catch (Exception e) {
+			Log.warn("Font load failed: " + e.toString());
+			f1 = Font.getFont(Font.SANS_SERIF);
+		}
+		Font f2;
+		try {
+			f2 = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/font/Montserrat-Bold.ttf"));
+		} catch (Exception e) {
+			Log.warn("Font load failed: " + e.toString());
+			f2 = Font.getFont(Font.SANS_SERIF);
+		}
 		Font f = g.getFont();
 		int yyy = 1;
 		int w = getWidth();
@@ -231,11 +248,11 @@ public class ModpackPanel extends JPanel {
 		int tw = w - x - 12;
 		if(tw > MAX_WIDTH) tw = MAX_WIDTH;
 		Font of = g.getFont();
-		Font nameFont = new Font(Font.SANS_SERIF, Font.BOLD, 18);
+		Font nameFont = f2.deriveFont(Font.BOLD, 18);
 		g.setFont(nameFont);
-		g.drawString(modpackName, x, g.getFontMetrics(nameFont).getHeight() / 2 + 4);
-		int ty = g.getFontMetrics(nameFont).getHeight() + 8 + yyy;
-		Font descFont = new Font(Font.SANS_SERIF, 0, 14);
+		g.drawString(modpackName, x, g.getFontMetrics(nameFont).getHeight() / 2 + 5);
+		int ty = g.getFontMetrics(nameFont).getHeight() + 10 + yyy;
+		Font descFont = f1.deriveFont(0, 16);
 		g.setFont(descFont);
 		if((descArr == null || lastW != w) && desc != null) descArr = getStringArray(desc, tw, g.getFontMetrics(descFont));
 		if(descArr != null) {
@@ -245,13 +262,13 @@ public class ModpackPanel extends JPanel {
 		g.setFont(of);
 		if(isStarted()) {
 			g.setColor(new Color(0, 200, 57));
-			g.fillRect(0, 0, w, 3);
+			g.fillRect(0, 0, w - 1, 3);
 			g.fillRect(0, 0, 3, h);
-			g.fillRect(0, rh - 3, w, 3);
-			g.fillRect(w - 3, 0, 3, rh);
-			Font f2 = g.getFont().deriveFont(12.0F);
-			g.setFont(f2);
-			g.drawString("Запущена", x, rh - (g.getFontMetrics(f2).getHeight() / 2));
+			g.fillRect(0, rh - 2, w - 1, 3);
+			g.fillRect(w - 4, 0, 3, rh);
+			Font ff = g.getFont().deriveFont(12.0F);
+			g.setFont(ff);
+			g.drawString("Запущена", x, rh - (g.getFontMetrics(ff).getHeight() / 2));
 		} else if(isUpdating()) {
 			int percent = this.updatePercent;
 			String s = this.updateText1;
@@ -266,13 +283,13 @@ public class ModpackPanel extends JPanel {
 				int px = x - 5;
 				int pww = w - px;
 				g.setColor(new Color(57, 57, 57));
-				g.fillRect(px, h - 4, pww, 4);
+				g.fillRect(px, h - 3, pww - 1, 4);
 				g.setColor(new Color(65, 119, 179));
 				int pw = (int) ((double)pww*((double)percent/100D));
-				g.fillRect(px, h - 4, pw, 4);
+				g.fillRect(px, h - 3, pw - 1, 4);
 			}
-			Font f2 = g.getFont().deriveFont(12.0F);
-			g.setFont(f2);
+			Font ff = g.getFont().deriveFont(12.0F);
+			g.setFont(ff);
 			g.drawString(s1, ptx, h - th - th2 - 3);
 			g.setFont(f);
 			g.setColor(Color.BLACK);

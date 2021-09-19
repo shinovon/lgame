@@ -15,6 +15,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.utils.logging.Log;
@@ -83,30 +84,32 @@ public class WebUtils {
 			URL url = new URL(uri);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			con.setRequestProperty("User-Agent", useragent);
+			//con.setRequestProperty("Accept-Encoding", "gzip");
 			con.setRequestMethod("GET");
 			FileOutputStream fout = new FileOutputStream(path);
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			con.setConnectTimeout(10000);
-			con.setReadTimeout(10000);
+			con.setReadTimeout(20000);
 			con.setDoInput(true);
-			InputStream in = con.getInputStream();
+			con.connect();
+			InputStream in = getHTTPInputStream(con);
 			byte buffer[] = new byte[16 * 1024];
 			int read;
 			need = con.getContentLength();
-			Log.info("Downloading: " + uri + " to " + path + " size: " + need + "k");
+			Log.info("Downloading: " + uri + " to " + path + " size: " + (need / 1024) + "k");
 			int i = 0;
 			st.start();
 			if(listener != null) listener.startDownload(f.getName());
 			while ((read = in.read(buffer)) != -1) {
 				out.write(buffer, 0, read);
 				downloaded += read;
-				if(i++ >= 16) {
+				if(i++ >= 32) {
 					i = 0;
 					if(listener != null) {
 						int percent;
 						if(downloaded <= 0) percent = 0;
 						else percent = (int) ((double) ((double) downloaded / (double) need) * 100D);
-						listener.downloadProgress(f.getName(), speed, percent);
+						listener.downloadProgress(f.getName(), speed, percent, need - downloaded);
 					}
 
 					if(Thread.interrupted()) {
@@ -127,7 +130,7 @@ public class WebUtils {
 					}
 				}
 			}
-			if(listener != null) listener.downloadProgress(f.getName(), speed, 100);
+			if(listener != null) listener.downloadProgress(f.getName(), speed, 100, 0);
 			Log.debug("Size of " + path + " " + downloaded);
 			if(downloaded != need) Log.warn("Content-Size and actual file size does not match!!");
 			st.interrupt();
@@ -153,6 +156,18 @@ public class WebUtils {
 		need = 0;
 	}
 
+	private static InputStream getHTTPInputStream(HttpURLConnection con) throws IOException {
+		Log.debug(con.getContentEncoding());
+		if(con.getContentEncoding() != null && con.getContentEncoding().equalsIgnoreCase("gzip")) {
+			return new GZIPInputStream(con.getInputStream());
+		}
+		try {
+			return con.getInputStream();
+		} catch (IOException e) {
+			return con.getErrorStream();
+		}
+	}
+
 	public final static String get(final String url) throws IOException {
 		Log.info("GET " + url);
 		InputStream is = null;
@@ -160,6 +175,7 @@ public class WebUtils {
 			HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
 			con.setRequestMethod("GET");
 			//con.setRequestProperty("User-Agent", useragent);
+			con.setRequestProperty("Accept-Encoding", "gzip");
 			con.connect();
 			Log.debug("Connected, getting text");
 			if(con.getResponseCode() == 404) {
@@ -167,7 +183,7 @@ public class WebUtils {
 				throw new FileNotFoundException();
 			}
 			//Log.debug("response code: " + con.getResponseCode());
-			is = con.getInputStream();
+			is = getHTTPInputStream(con);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			byte[] buf = new byte[8192];
 			int read;
@@ -216,7 +232,7 @@ public class WebUtils {
 	public interface ProgressListener {
 		public void startDownload(String filename);
 		
-		public void downloadProgress(String filename, double speed, int percent);
+		public void downloadProgress(String name, double speed, int percent, int bytesLeft);
 
 		public void doneDownload(String filename);
 	}

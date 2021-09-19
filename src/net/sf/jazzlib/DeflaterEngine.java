@@ -349,13 +349,16 @@ class DeflaterEngine implements DeflaterConstants {
     if (niceLength > lookahead)
       niceLength = lookahead;
 
-    if (DeflaterConstants.DEBUGGING 
-	&& strstart > 2*WSIZE - MIN_LOOKAHEAD)
-      throw new InternalError("need lookahead");
+    if (DeflaterConstants.DEBUGGING) {
+		if (strstart > 2*WSIZE - MIN_LOOKAHEAD)
+			throw new InternalError("need lookahead");
+	}
     
     do {
-      if (DeflaterConstants.DEBUGGING && curMatch >= strstart)
-	throw new InternalError("future match");
+      if (DeflaterConstants.DEBUGGING) {
+		if (curMatch >= strstart)
+			throw new InternalError("future match");
+	}
       if (window[curMatch + best_len] != scan_end
 	  || window[curMatch + best_len - 1] != scan_end1
 	  || window[curMatch] != window[scan]
@@ -399,8 +402,10 @@ class DeflaterEngine implements DeflaterConstants {
   }
 
   void setDictionary(byte[] buffer, int offset, int length) {
-    if (DeflaterConstants.DEBUGGING && strstart != 1)
-      throw new IllegalStateException("strstart not 1");
+    if (DeflaterConstants.DEBUGGING) {
+		if (strstart != 1)
+			throw new IllegalStateException("strstart not 1");
+	}
     adler.update(buffer, offset, length);
     if (length < MIN_MATCH)
       return;
@@ -551,8 +556,10 @@ class DeflaterEngine implements DeflaterConstants {
 	    prevAvailable = false;
 
 	    /* We are flushing everything */
-	    if (DeflaterConstants.DEBUGGING && !flush)
-	      throw new InternalError("Not flushing, but no lookahead");
+	    if (DeflaterConstants.DEBUGGING) {
+			if (!flush)
+				throw new InternalError("Not flushing, but no lookahead");
+		}
 	    huffman.flushBlock(window, blockStart, strstart - blockStart,
 			       finish);
 	    blockStart = strstart;

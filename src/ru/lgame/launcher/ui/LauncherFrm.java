@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -18,7 +20,7 @@ import ru.lgame.launcher.utils.ui.StackLayout;
  * Окно лаунчера
  * @author Shinovon
  */
-public class LauncherFrm extends JFrame {
+public class LauncherFrm extends JFrame implements WindowListener {
 
 	private static final long serialVersionUID = 5754803808367340968L;
 	
@@ -29,6 +31,8 @@ public class LauncherFrm extends JFrame {
 	JPanel settingsPanel;
 
 	ActionListener settingsListener;
+
+	private Thread repaintThread;
 
 	/**
 	 * Создает окно
@@ -41,6 +45,20 @@ public class LauncherFrm extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(layout = new StackLayout());
 		setContentPane(contentPane);
+		addWindowListener(this);
+		repaintThread = new Thread() {
+			public void run() {
+				try {
+					while(Launcher.running) {
+						repaint();
+						Thread.sleep(1000);
+						Thread.yield();
+					}
+				} catch (Exception e) {
+				}
+			}
+		};
+		repaintThread.start();
 
 		settingsListener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -83,6 +101,43 @@ public class LauncherFrm extends JFrame {
 
 	public void updateAuth() {
 		mainPanel.updateAuth();
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void windowClosing(WindowEvent e) {
+		Launcher.running = false;
+		
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		
 	}
 
 }

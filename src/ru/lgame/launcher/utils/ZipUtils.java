@@ -43,7 +43,6 @@ public final class ZipUtils {
 		currentFile = "";
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void unzip(String zipFile, String outputFolder) throws IOException, InterruptedException {
 		if(Thread.interrupted()) throw new InterruptedException("Thread.interrupted()");
 		Log.info("Unzipping " + zipFile + " to " + outputFolder);

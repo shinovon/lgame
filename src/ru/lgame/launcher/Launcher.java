@@ -48,8 +48,8 @@ import ru.lgame.launcher.utils.logging.Log;
  */
 public class Launcher {
 	
-	public static final String version = "0.3.1";
-	public static final String build_date = "07.09.2021";
+	public static final String version = "0.5";
+	public static final String build_date = "20.09.2021";
 	public static final boolean DEBUG = true;
 	
 	public static final String string_version = version + " (" + build_date + "-01" + " dev)";
@@ -59,6 +59,7 @@ public class Launcher {
 	public static Launcher inst;
 	
 	private static String launcherPath;
+	public static boolean running;
 
 	private ArrayList<Runnable> queuedTasks;
 
@@ -103,6 +104,7 @@ public class Launcher {
 	}
 
 	private void startLauncher() {
+		running = true;
 		try {
 			EventQueue.invokeAndWait(new Runnable() {
 				public void run() {

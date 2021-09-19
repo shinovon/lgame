@@ -39,6 +39,7 @@ public class Log {
 	}
 
 	static void log(String lvl, String sec, String x) {
+		if(x == null) x = "null";
 		x = x.replace("\r", "");
 		String[] arr = x.split("\n");
 		String p = "[" + date() + "] [" + lvl + "]" + (sec != null ? " [" + sec + "]" : "");

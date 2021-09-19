@@ -68,6 +68,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	private boolean offline;
 
 	private JSONObject clientStartJson;
+
+	private float avgspeed;
 	
 	private static Process clientProcess;
 
@@ -416,7 +418,6 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					updateFatalError("Файл дескриптора запуска клиента отсутсвует! Без него игра в оффлайн режиме невозможна!", 0, Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
 				return;
 			}
-			System.out.println(clientStartJson.toString());
 			clientAssetIndex = clientStartJson.getString("asset_index");
 			clientMainClass = clientStartJson.getString("mainclass");
 			clientTweakClasses = clientStartJson.getJSONArray("tweak_classes").toList().toArray(new String[0]);
@@ -664,14 +665,14 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		try {
 			FileUtils.writeString(f2, clientStartJson.toString());
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.error("client start.json write failed", e);
 		}
 		File f = new File(s + "version");
 		if(f.exists()) f.delete();
 		try {
 			FileUtils.writeString(f, "" + clientJson.getInt("update_build"));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.error("client version write failed", e);
 		}
 	}
 	
@@ -682,7 +683,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		try {
 			FileUtils.writeString(f, "" + json.getInt("update_build"));
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.error("modpack version write failed", e);
 		}
 	}
 
@@ -1071,7 +1072,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	@Override
 	public void unzipProgress(String currentFile, int totalPercent, int currentFilePercent) {
-		modpack.setUpdateInfo(null, "Распаковка: " + currentUnzipFile + ": " + currentFile + " (" + totalPercent + "%)", percentI(totalPercent / 100D));
+		uiInfo(null, "Распаковка: " + currentUnzipFile + ": " + currentFile + " (" + totalPercent + "%)", percentI(totalPercent / 100D));
 	}
 
 	@Override
@@ -1083,10 +1084,48 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	public void startDownload(String filename) {
 		
 	}
-
+	
+	int avgcounter;
+	float avgsum;
 	@Override
-	public void downloadProgress(String filename, double speed, int percent) {
-		modpack.setUpdateInfo(null, "Скачивание: " +  filename + " (" + speed + "Mb/s) (" + percent + "%)", percentI(percent / 100D));
+	public void downloadProgress(String filename, double speed, int percent, int bytesLeft) {
+		avgsum += speed;
+		avgcounter++;
+		if(avgcounter == 15) {
+			avgspeed = avgsum / 15;
+			avgsum = avgspeed;
+			avgcounter = 1;
+		}
+		float s = avgspeed;
+		s = Math.round(s * 100) / 100F;
+		// секунды
+		int left = (int)((bytesLeft/1024F/1024F) / s);
+		if(s == 0) left = 0;
+		//Log.debug(s + "mbs left: " + timeStr(left));
+		uiInfo(null, "Скачивание: " +  filename 
+				+ " (" + speed + "Mb/s)"
+				+ " (" + percent + "%)"
+				+ " Осталость приблизительно: " + timeStr(left) + ""
+				, percentI(percent / 100D));
+	}
+
+	private static String timeStrHM(long sec) {
+		sec = sec % 86400 / 60;
+		return timeStr((int) sec);
+	}
+
+	private static String timeStr(int sec) {
+		if (sec <= 0)
+			return "0:00";
+		String s = "" + sec % 60;
+		if (s.length() < 2)
+			s = "0" + s;
+		s = (int) (sec / 60D) + ":" + s;
+		return s;
+	}
+	
+	private void uiInfo(String s1, String s2, int p) {
+		modpack.setUpdateInfo(s1, s2, p);
 	}
 
 	@Override

@@ -8,7 +8,6 @@ import java.net.URL;
 
 import javax.imageio.ImageIO;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import ru.lgame.launcher.ui.ModpackPanel;

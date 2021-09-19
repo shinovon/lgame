@@ -7,13 +7,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.Iterator;
 
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -24,9 +24,6 @@ import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.Modpack;
 import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.utils.logging.Log;
-
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
 
 public class LauncherPane extends JPanel {
 	
@@ -56,7 +53,8 @@ public class LauncherPane extends JPanel {
 		modpacksPanel.setLayout(new BorderLayout(0, 0));
 		
 		scrollPane = new JScrollPane();
-		scrollPane.addMouseWheelListener(new MouseWheelListener() {
+		scrollPane.getVerticalScrollBar().setUnitIncrement(15);
+		/*scrollPane.addMouseWheelListener(new MouseWheelListener() {
 
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
@@ -65,7 +63,7 @@ public class LauncherPane extends JPanel {
 				scrollPane.getVerticalScrollBar().setValue(v + i);
 			}
 			
-		});
+		});*/
 		modpacksPanel.add(scrollPane);
 		
 		list = new JPanel();
