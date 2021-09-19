@@ -257,7 +257,7 @@ public class ModpackPanel extends JPanel {
 		if((descArr == null || lastW != w) && desc != null) descArr = getStringArray(desc, tw, g.getFontMetrics(descFont));
 		if(descArr != null) {
 			int dth = g.getFontMetrics(descFont).getHeight() - 6;
-			for(int i = 0; i < descArr.length; i++) g.drawString(descArr[i], x, ty + (i * (dth + 1)));
+			for(int i = 0; i < descArr.length; i++) if(descArr[i] != null) g.drawString(descArr[i], x, ty + (i * (dth + 1)));
 		}
 		g.setFont(of);
 		if(isStarted()) {

@@ -52,7 +52,7 @@ public class Launcher {
 	public static final String build_date = "20.09.2021";
 	public static final boolean DEBUG = true;
 	
-	public static final String string_version = version + " (" + build_date + "-01" + " dev)";
+	public static final String string_version = version + " (" + build_date + ")";
 	
 	private static final String LAUNCHER_JSON_URL = "http://dl.nnproject.cc/lgame/launcher.json";
 
@@ -468,8 +468,7 @@ public class Launcher {
 	}
 
 	public static String getFrmTitle() {
-		//return "LGame Launcher " + string_version;
-		return "lgame main";
+		return "LGame Launcher " + string_version;
 	}
 
 	@SuppressWarnings("deprecation")
