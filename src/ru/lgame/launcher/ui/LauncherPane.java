@@ -5,10 +5,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.Iterator;
 
+import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -116,7 +119,24 @@ public class LauncherPane extends JPanel {
 		panel_3_1.add(panel);
 		
 		skinImageLabel = new JLabel("");
-		skinImageLabel.setIcon(new ImageIcon(LauncherPane.class.getResource("/defaultskin.png")));
+		Image skin = null;
+		try {
+			if(Launcher.inst.currentAuth() != null) {
+				if(Launcher.inst.currentAuth().getUsername().equalsIgnoreCase("shinovon")) {
+					skin = ImageIO.read(getClass().getResourceAsStream("/Shinovon.png"));
+				}
+			} else {
+				
+			}
+		} catch (Exception e1) {
+		}
+		if(skin == null) {
+			try {
+				skin = ImageIO.read(getClass().getResourceAsStream("/defaultskin.png"));
+			} catch (IOException e1) {
+			}
+		}
+		if(skin != null) skinImageLabel.setIcon(new ImageIcon(skin));
 		panel.add(skinImageLabel);
 		
 		usernameLabel = new JLabel("Добавьте авторизацию");
@@ -173,6 +193,24 @@ public class LauncherPane extends JPanel {
 	}
 	
 	public void updateAuth() {
+		Image skin = null;
+		try {
+			if(Launcher.inst.currentAuth() != null) {
+				if(Launcher.inst.currentAuth().getUsername().equalsIgnoreCase("shinovon")) {
+					skin = ImageIO.read(getClass().getResourceAsStream("/Shinovon.png"));
+				}
+			} else {
+				
+			}
+		} catch (Exception e1) {
+		}
+		if(skin == null) {
+			try {
+				skin = ImageIO.read(getClass().getResourceAsStream("/defaultskin.png"));
+			} catch (IOException e1) {
+			}
+		}
+		if(skin != null) skinImageLabel.setIcon(new ImageIcon(skin));
 		if(Launcher.inst.currentAuth() != null) usernameLabel.setText("Добро пожаловать, " + Launcher.inst.currentAuth().getUsername());
 		else usernameLabel.setText("Добавьте авторизацию");
 	}

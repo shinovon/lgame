@@ -157,10 +157,8 @@ public class WebUtils {
 	}
 
 	private static InputStream getHTTPInputStream(HttpURLConnection con) throws IOException {
-		Log.debug(con.getContentEncoding());
-		if(con.getContentEncoding() != null && con.getContentEncoding().equalsIgnoreCase("gzip")) {
+		if(con.getContentEncoding() != null && con.getContentEncoding().equalsIgnoreCase("gzip"))
 			return new GZIPInputStream(con.getInputStream());
-		}
 		try {
 			return con.getInputStream();
 		} catch (IOException e) {

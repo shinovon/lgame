@@ -252,7 +252,7 @@ public class ModpackPanel extends JPanel {
 		g.setFont(nameFont);
 		g.drawString(modpackName, x, g.getFontMetrics(nameFont).getHeight() / 2 + 5);
 		int ty = g.getFontMetrics(nameFont).getHeight() + 10 + yyy;
-		Font descFont = f1.deriveFont(0, 16);
+		Font descFont = f1.deriveFont(0, 15);
 		g.setFont(descFont);
 		if((descArr == null || lastW != w) && desc != null) descArr = getStringArray(desc, tw, g.getFontMetrics(descFont));
 		if(descArr != null) {
