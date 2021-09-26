@@ -11,10 +11,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.ColorUIResource;
 
+import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.utils.logging.Log;
 import ru.lgame.launcher.utils.ui.StackLayout;
+import java.awt.Color;
 
 /**
  * Окно лаунчера
@@ -42,6 +45,7 @@ public class LauncherFrm extends JFrame implements WindowListener {
 		setUI();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		contentPane = new JPanel();
+		contentPane.setBackground(new Color(35, 36, 40));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(layout = new StackLayout());
 		setContentPane(contentPane);
@@ -92,7 +96,14 @@ public class LauncherFrm extends JFrame implements WindowListener {
 		} catch (Exception e1) {
 			Log.error("setUI()", e1);
 		}
-
+		Color bg = new Color(35, 36, 40);
+		Color fg = new Color(255, 255, 255);
+		UIManager.put("Panel.background", new ColorUIResource(bg));
+		UIManager.put("Button.background", new ColorUIResource(bg));
+		UIManager.put("CheckBox.background", new ColorUIResource(bg));
+		UIManager.put("CheckBox.foreground", new ColorUIResource(fg));
+		UIManager.put("Panel.foreground", new ColorUIResource(fg));
+		UIManager.put("Label.foreground", new ColorUIResource(fg));
 	}
 
 	public LauncherPane mainPane() {

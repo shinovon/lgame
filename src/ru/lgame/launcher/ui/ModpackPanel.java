@@ -18,6 +18,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.UIManager;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -37,6 +38,10 @@ public class ModpackPanel extends JPanel {
 	private static final int ITEM_HEIGHT = 242;
 	private static final int IMAGE_HEIGHT = 240;
 	private static final int MAX_WIDTH = 560;
+
+	private static Font nameFont;
+
+	private static Font descFont;
 
 	private Modpack modpack;
 	
@@ -207,6 +212,7 @@ public class ModpackPanel extends JPanel {
 	}
 	
 	public void paintComponent(Graphics g) {
+		setBackground(new Color(21, 22, 24));
 		super.paintComponent(g);
 		if(g instanceof Graphics2D) {
 			Graphics2D g2d = (Graphics2D) g;
@@ -217,22 +223,8 @@ public class ModpackPanel extends JPanel {
 			//		RenderingHints.KEY_TEXT_ANTIALIASING,
 			//		RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		}
-		g.setColor(Color.BLACK);
+		g.setColor(UIManager.getColor("Label.foreground"));
 		boolean b = true;
-		Font f1;
-		try {
-			f1 = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/font/Montserrat-Regular.ttf"));
-		} catch (Exception e) {
-			Log.warn("Font load failed: " + e.toString());
-			f1 = Font.getFont(Font.SANS_SERIF);
-		}
-		Font f2;
-		try {
-			f2 = Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/font/Montserrat-Bold.ttf"));
-		} catch (Exception e) {
-			Log.warn("Font load failed: " + e.toString());
-			f2 = Font.getFont(Font.SANS_SERIF);
-		}
 		Font f = g.getFont();
 		int yyy = 1;
 		int w = getWidth();
@@ -248,11 +240,9 @@ public class ModpackPanel extends JPanel {
 		int tw = w - x - 12;
 		if(tw > MAX_WIDTH) tw = MAX_WIDTH;
 		Font of = g.getFont();
-		Font nameFont = f2.deriveFont(Font.BOLD, 18);
 		g.setFont(nameFont);
 		g.drawString(modpackName, x, g.getFontMetrics(nameFont).getHeight() / 2 + 5);
 		int ty = g.getFontMetrics(nameFont).getHeight() + 10 + yyy;
-		Font descFont = f1.deriveFont(0, 15);
 		g.setFont(descFont);
 		if((descArr == null || lastW != w) && desc != null) descArr = getStringArray(desc, tw, g.getFontMetrics(descFont));
 		if(descArr != null) {
@@ -292,7 +282,7 @@ public class ModpackPanel extends JPanel {
 			g.setFont(ff);
 			g.drawString(s1, ptx, h - th - th2 - 3);
 			g.setFont(f);
-			g.setColor(Color.BLACK);
+			g.setColor(UIManager.getColor("Label.foreground"));
 			g.drawString(s2, ptx, h - th2 - 1);
 		}
 		lastW = w;
@@ -376,6 +366,21 @@ public class ModpackPanel extends JPanel {
 			}
 		}
 		return v.toArray(new String[0]);
+	}
+	
+	static {
+		try {
+			descFont = Font.createFont(Font.TRUETYPE_FONT, ModpackPanel.class.getResourceAsStream("/font/Montserrat-Regular.ttf")).deriveFont(0, 15);
+		} catch (Exception e) {
+			Log.warn("Font load failed: " + e.toString());
+			descFont = Font.getFont(Font.SANS_SERIF).deriveFont(0, 15);
+		}
+		try {
+			nameFont = Font.createFont(Font.TRUETYPE_FONT, ModpackPanel.class.getResourceAsStream("/font/Montserrat-Bold.ttf")).deriveFont(Font.BOLD, 18);
+		} catch (Exception e) {
+			Log.warn("Font load failed: " + e.toString());
+			nameFont = Font.getFont(Font.SANS_SERIF).deriveFont(Font.BOLD, 18);
+		}
 	}
 
 }
