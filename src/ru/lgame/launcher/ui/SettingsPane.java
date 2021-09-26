@@ -54,6 +54,13 @@ public class SettingsPane extends JPanel {
 		add(panel, BorderLayout.SOUTH);
 		
 		JButton settsBackBtn = new JButton("Назад");
+		settsBackBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Config.set("javapath", textField.getText());
+				Config.set("path", textField_1.getText());
+				Config.saveLater();
+			}
+		});
 		settsBackBtn.addActionListener(frm.settingsListener);
 		panel.add(settsBackBtn);
 		
