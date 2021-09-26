@@ -1,6 +1,7 @@
 package ru.lgame.launcher.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,11 +14,9 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.ColorUIResource;
 
-import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.utils.logging.Log;
 import ru.lgame.launcher.utils.ui.StackLayout;
-import java.awt.Color;
 
 /**
  * Окно лаунчера
@@ -101,9 +100,14 @@ public class LauncherFrm extends JFrame implements WindowListener {
 		UIManager.put("Panel.background", new ColorUIResource(bg));
 		UIManager.put("Button.background", new ColorUIResource(bg));
 		UIManager.put("CheckBox.background", new ColorUIResource(bg));
-		UIManager.put("CheckBox.foreground", new ColorUIResource(fg));
+		UIManager.put("OptionPane.background", new ColorUIResource(bg));
+		UIManager.put("Slider.background", new ColorUIResource(bg));
+		
 		UIManager.put("Panel.foreground", new ColorUIResource(fg));
 		UIManager.put("Label.foreground", new ColorUIResource(fg));
+		UIManager.put("OptionPane.foreground", new ColorUIResource(fg));
+		UIManager.put("OptionPane.messageForeground", new ColorUIResource(fg));
+		UIManager.put("Slider.foreground", new ColorUIResource(fg));
 	}
 
 	public LauncherPane mainPane() {
