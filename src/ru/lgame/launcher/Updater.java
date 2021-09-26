@@ -23,8 +23,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import ru.lgame.launcher.auth.Auth;
+import ru.lgame.launcher.ui.ErrorUI;
 import ru.lgame.launcher.utils.FileUtils;
 import ru.lgame.launcher.utils.LauncherOfflineException;
+import ru.lgame.launcher.utils.StartUtil;
 import ru.lgame.launcher.utils.ZipUtils;
 import ru.lgame.launcher.utils.logging.ClientLog;
 import ru.lgame.launcher.utils.logging.InputStreamCopier;
@@ -70,6 +72,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	private JSONObject clientStartJson;
 
 	private float avgspeed;
+
+	private int downloadFailCount;
 	
 	private static Process clientProcess;
 
@@ -760,7 +764,18 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			else if(dir.equals("temp")) dir = temp + name;
 			else dir = p + dir + name;
 			try {
-				WebUtils.download(url, dir);
+				boolean b = true;
+				while(b) {
+					try {
+						WebUtils.download(url, dir);
+						b = false;
+					} catch(IOException e) {
+						if(downloadFailCount > 2) throw e;
+						Log.warn("download io err: " + e.toString() + ", retrying..");
+						downloadFailCount++;
+						Thread.sleep(500L);
+					}
+				}
 			} catch (Exception e) {
 				updateFatalError("scriptedDownload(): download", e, Errors.UPDATER_SCRIPTEDDOWNLOAD_DOWNLOAD);
 				return false;
@@ -957,40 +972,40 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		} else if(x.contains("AppClassLoader cannot be cast to class java.net.URLClassLoader")) {
 			x = "Возможное решение:\nОшибка несовместимости Forge с версией Java!!\nИспользуйте версию Java 8\n" + x;
 			}
-		Launcher.inst.clientError("Ошибка клиента", s, x);	
+		ErrorUI.clientError("Ошибка клиента", s, x);	
 	}
 
 	private void clientError(String s, Throwable t) {
 		String e = Log.exceptionToString(t);
-		Launcher.inst.clientError("Ошибка клиента", s, s + "\n" + e);	
+		ErrorUI.clientError("Ошибка клиента", s, s + "\n" + e);	
 	}
 
 	private void updateFatalError(String s, Throwable t, int i) {
 		String e = Log.exceptionToString(t);
-		Launcher.inst.showError("Ошибка обновления", s + " (Код ошибки: "  + Errors.toHexString(i) + ")", s + " (Код ошибки: " + Errors.toHexString(i) + ")\n" + e);	
+		ErrorUI.showError("Ошибка обновления", s + " (Код ошибки: "  + Errors.toHexString(i) + ")", s + " (Код ошибки: " + Errors.toHexString(i) + ")\n" + e);	
 		updateFatalError();
 	}
 
 	private void updateFatalError(String s, String s2, int i) {
-		Launcher.inst.showError("Ошибка обновления", s, s + ": " + s2 + " (Код ошибки: " +  Errors.toHexString(i) + ")");
+		ErrorUI.showError("Ошибка обновления", s, s + ": " + s2 + " (Код ошибки: " +  Errors.toHexString(i) + ")");
 		updateFatalError();
 	}
 
 	private void updateFatalError(String s, int i1, int i2) {
 		String e = Log.getTraceString(2);
-		Launcher.inst.showError("Ошибка обновления", s, s + ": " + Errors.toHexString(i1) + " (Код ошибки: " + Errors.toHexString(i2) + ")\n" + e);
+		ErrorUI.showError("Ошибка обновления", s, s + ": " + Errors.toHexString(i1) + " (Код ошибки: " + Errors.toHexString(i2) + ")\n" + e);
 		updateFatalError();
 	}
 
 	private void updateFatalError(String s, String s2) {
-		Launcher.inst.showError("Ошибка обновления", s, s2);
+		ErrorUI.showError("Ошибка обновления", s, s2);
 		updateFatalError();
 	}
 
 	private void fatalError(String s) {
 		Log.error(s);
 		String e = Log.exceptionToString(new Exception());
-		Launcher.inst.showError("Ошибка обновления", s, e);
+		ErrorUI.showError("Ошибка обновления", s, e);
 		updateFatalError();
 	}
 	

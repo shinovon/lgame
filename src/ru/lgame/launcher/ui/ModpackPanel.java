@@ -115,13 +115,11 @@ public class ModpackPanel extends JPanel {
 	}
 	
 	protected void unselected() {
-		Log.debug("unselected: " + id);
 		setBorder(new MatteBorder(1, 0, 0, 0, Color.GRAY));
 	}
 
 	protected void selected() {
-		Log.debug("selected: " + id);
-		setBorder(new MatteBorder(1, 1, 1, 1, Color.BLACK));
+		setBorder(new MatteBorder(1, 1, 1, 1, Color.WHITE));
 		Launcher.inst.frame().mainPane().setSelected(this);
 	}
 
@@ -274,7 +272,8 @@ public class ModpackPanel extends JPanel {
 				int pww = w - px;
 				g.setColor(new Color(57, 57, 57));
 				g.fillRect(px, h - 3, pww - 1, 4);
-				g.setColor(new Color(65, 119, 179));
+				//g.setColor(new Color(65, 119, 179));
+				g.setColor(new Color(135, 44, 221));
 				int pw = (int) ((double)pww*((double)percent/100D));
 				g.fillRect(px, h - 3, pw - 1, 4);
 			}

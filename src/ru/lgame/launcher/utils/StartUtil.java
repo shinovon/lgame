@@ -1,4 +1,4 @@
-package ru.lgame.launcher;
+package ru.lgame.launcher.utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import ru.lgame.launcher.Config;
 import ru.lgame.launcher.utils.logging.Log;
 
 public class StartUtil {

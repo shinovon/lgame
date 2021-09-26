@@ -146,14 +146,14 @@ public class AccountsFrm extends JFrame {
 					AuthStore.add(a);
 					AuthStore.setSelected(a);
 				} catch (Throwable e) {
-					Launcher.inst.showError("Аккаунты", "Не удалось добавить аккаунт", e);
+					ErrorUI.showError("Аккаунты", "Не удалось добавить аккаунт", e);
 				}
 				update();
 			}
 		});
 		
 		JPanel listPanel = new JPanel();
-		listPanel.setPreferredSize(new Dimension(180, 10));
+		listPanel.setPreferredSize(new Dimension(220, 10));
 		contentPane.add(listPanel, BorderLayout.WEST);
 		listPanel.setLayout(new BorderLayout(0, 0));
 		
@@ -181,7 +181,8 @@ public class AccountsFrm extends JFrame {
 		    }
 		});
 		list.setSelectedValue(Launcher.inst.currentAuth(), true);
-		JButton deleteBtn = new JButton("Удалить");
+		JButton deleteBtn = new JButton("-");
+		deleteBtn.setPreferredSize(new Dimension(48, 23));
 		list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if(list.getSelectedValue() != null) {
@@ -196,8 +197,8 @@ public class AccountsFrm extends JFrame {
 		JPanel centerPanel = new JPanel();
 		contentPane.add(centerPanel, BorderLayout.CENTER);
 		
-		JButton addBtn = new JButton("Добавить");
-		addBtn.setPreferredSize(new Dimension(89, 23));
+		JButton addBtn = new JButton("+");
+		addBtn.setPreferredSize(new Dimension(48, 23));
 		addBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(comboBox.getSelectedIndex() == 0) {
@@ -223,7 +224,7 @@ public class AccountsFrm extends JFrame {
 			}
 		});
 		deleteBtn.setEnabled(false);
-		deleteBtn.setPreferredSize(new Dimension(89, 23));
+		deleteBtn.setPreferredSize(new Dimension(48, 23));
 		centerPanel.add(deleteBtn);
 		contentPane.setPreferredSize(new Dimension(450, 300));
 		pack();

@@ -96,18 +96,37 @@ public class LauncherFrm extends JFrame implements WindowListener {
 			Log.error("setUI()", e1);
 		}
 		Color bg = new Color(35, 36, 40);
+		Color dbg = new Color(51, 52, 56);
 		Color fg = new Color(255, 255, 255);
+		UIManager.put("ButtonUI", ButtonUI.class.getName());
 		UIManager.put("Panel.background", new ColorUIResource(bg));
 		UIManager.put("Button.background", new ColorUIResource(bg));
 		UIManager.put("CheckBox.background", new ColorUIResource(bg));
 		UIManager.put("OptionPane.background", new ColorUIResource(bg));
 		UIManager.put("Slider.background", new ColorUIResource(bg));
+		UIManager.put("TextField.background", new ColorUIResource(bg));
+		UIManager.put("List.background", new ColorUIResource(bg));
+		//UIManager.put("ComboBox.background", new ColorUIResource(bg));
+		UIManager.put("PasswordField.background", new ColorUIResource(bg));
+		
+		UIManager.put("TextField.disabledBackground", new ColorUIResource(dbg));
+		UIManager.put("PasswordField.disabledBackground", new ColorUIResource(dbg));
+		//UIManager.put("ComboBox.disabledBackground", new ColorUIResource(dbg));
 		
 		UIManager.put("Panel.foreground", new ColorUIResource(fg));
 		UIManager.put("Label.foreground", new ColorUIResource(fg));
 		UIManager.put("OptionPane.foreground", new ColorUIResource(fg));
 		UIManager.put("OptionPane.messageForeground", new ColorUIResource(fg));
 		UIManager.put("Slider.foreground", new ColorUIResource(fg));
+		UIManager.put("TextField.foreground", new ColorUIResource(fg));
+		UIManager.put("List.foreground", new ColorUIResource(fg));
+		UIManager.put("PasswordField.foreground", new ColorUIResource(fg));
+		UIManager.put("CheckBox.foreground", new ColorUIResource(fg));
+		//UIManager.put("ComboBox.foreground", new ColorUIResource(fg));
+		//UIManager.put("ComboBox.selectionForeground", new ColorUIResource(fg));
+		UIManager.put("Button.foreground", new ColorUIResource(new Color(255, 255, 255)));
+		UIManager.put("Button.disabledText", new ColorUIResource(new Color(225, 25, 255)));
+		UIManager.put("Button.disabledText", new ColorUIResource(new Color(225, 25, 255)));
 	}
 
 	public LauncherPane mainPane() {

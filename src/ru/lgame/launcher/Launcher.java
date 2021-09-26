@@ -1,15 +1,7 @@
 package ru.lgame.launcher;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Image;
-import java.awt.SystemColor;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -19,14 +11,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
-import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
-import javax.swing.border.EmptyBorder;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -36,6 +22,7 @@ import com.mojang.authlib.exceptions.InvalidCredentialsException;
 import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.auth.AuthStore;
 import ru.lgame.launcher.ui.AccountsFrm;
+import ru.lgame.launcher.ui.ErrorUI;
 import ru.lgame.launcher.ui.LauncherFrm;
 import ru.lgame.launcher.ui.LoadingFrm;
 import ru.lgame.launcher.ui.LoggerFrm;
@@ -128,7 +115,7 @@ public class Launcher {
 		try {
 			AuthStore.init();
 		} catch (InvalidCredentialsException e) {
-			showError("Аккаунты", "У одного или нескольких аккаунтов MOJANG просрочился токен!");
+			ErrorUI.showError("Аккаунты", "У одного или нескольких аккаунтов MOJANG просрочился токен!");
 		}
 		loadingFrame.setText("Получение данных о сборках");
 		if(tryLoadModpacksFromServer()) {
@@ -148,7 +135,7 @@ public class Launcher {
 					frame.setVisible(true);
 					accountsFrame = new AccountsFrm();
 				} catch (Throwable e) {
-					showError("Ошибка лаунчера", "Инициализация интерфейса", e);
+					ErrorUI.showError("Ошибка лаунчера", "Инициализация интерфейса", e);
 					System.exit(1);
 				}
 			}
@@ -169,7 +156,7 @@ public class Launcher {
 				if(!f.exists()) f.mkdirs();
 			}
 		} catch (Exception e) {
-			showError("Ошибка", "Ошибка создания директорий", Log.exceptionToString(e));
+			ErrorUI.showError("Ошибка", "Ошибка создания директорий", Log.exceptionToString(e));
 		}
 	}
 
@@ -398,62 +385,6 @@ public class Launcher {
 		return null;
 	}
 
-	@SuppressWarnings("deprecation")
-	public void showError(String title, String text, String trace) {
-		Log.error("showError(): " + trace);
-		JDialog dialog = new JDialog(frame, title, true);
-		dialog.setAlwaysOnTop(true);
-        Container contentPane = dialog.getContentPane();
-        contentPane.setLayout(new BorderLayout());
-        JPanel pane = new JPanel();
-        contentPane.add(pane, BorderLayout.CENTER);
-		pane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		pane.setLayout(new BorderLayout());
-		if(text != null && text.length() > 0) {
-			JTextPane infopane = new JTextPane();
-			infopane.setBackground(SystemColor.menu);
-			infopane.setEditable(false);
-			infopane.setText(text);
-			pane.add(infopane, BorderLayout.NORTH);
-		}
-		if(trace != null) {
-			JScrollPane scrollPane = new JScrollPane();
-			scrollPane.setPreferredSize(new Dimension(600, 200));
-			pane.add(scrollPane, BorderLayout.CENTER);
-			JTextArea textArea = new JTextArea();
-			textArea.setFont(new Font("Consolas", Font.PLAIN, 12));
-			textArea.setEditable(false);
-			textArea.setText(trace);
-			scrollPane.setViewportView(textArea);
-		}
-		JPanel buttonPane = new JPanel();
-		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		contentPane.add(buttonPane, BorderLayout.SOUTH);
-		{
-			JButton okButton = new JButton("OK");
-			okButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					dialog.dispose();
-				}
-			});
-			okButton.setActionCommand("OK");
-			buttonPane.add(okButton);
-			dialog.getRootPane().setDefaultButton(okButton);
-		}
-		dialog.pack();
-        dialog.setResizable(false);
-        dialog.setLocationRelativeTo(frame);
-        dialog.show();
-        dialog.dispose();
-	}
-
-	public void showError(String title, String text) {
-		showError(title, text, (String) null);
-	}
-	
-	public void showError(String title, String text, Throwable e) {
-		showError(title, text, Log.exceptionToString(e));
-	}
 
 	public Auth currentAuth() {
 		return AuthStore.getSelected();
@@ -469,63 +400,6 @@ public class Launcher {
 
 	public static String getFrmTitle() {
 		return "LGame Launcher " + string_version;
-	}
-
-	@SuppressWarnings("deprecation")
-	public void clientError(String title, String s, String trace) {
-		JDialog dialog = new JDialog(frame, title, true);
-		dialog.setAlwaysOnTop(true);
-        Container contentPane = dialog.getContentPane();
-        contentPane.setLayout(new BorderLayout());
-        JPanel pane = new JPanel();
-        contentPane.add(pane, BorderLayout.CENTER);
-		pane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		pane.setLayout(new BorderLayout());
-		if(s != null && s.length() > 0) {
-			JTextPane infopane = new JTextPane();
-			infopane.setBackground(SystemColor.menu);
-			infopane.setEditable(false);
-			infopane.setText(s);
-			pane.add(infopane, BorderLayout.NORTH);
-		}
-		if(trace != null) {
-			JScrollPane scrollPane = new JScrollPane();
-			scrollPane.setPreferredSize(new Dimension(600, 200));
-			pane.add(scrollPane, BorderLayout.CENTER);
-			JTextArea textArea = new JTextArea();
-			textArea.setFont(new Font("Consolas", Font.PLAIN, 12));
-			textArea.setEditable(false);
-			textArea.setText(trace);
-			scrollPane.setViewportView(textArea);
-		}
-		JPanel buttonPane = new JPanel();
-		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		contentPane.add(buttonPane, BorderLayout.SOUTH);
-		{
-			JButton okButton = new JButton("OK");
-			okButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					dialog.dispose();
-				}
-			});
-			okButton.setActionCommand("OK");
-			buttonPane.add(okButton);
-			dialog.getRootPane().setDefaultButton(okButton);
-			JButton logsButton = new JButton("Показать логи");
-			logsButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					showLoggerFrame();
-					dialog.dispose();
-				}
-			});
-			logsButton.setActionCommand("OK");
-			buttonPane.add(logsButton);
-		}
-		dialog.pack();
-        dialog.setResizable(false);
-        dialog.setLocationRelativeTo(frame);
-        dialog.show();
-        dialog.dispose();
 	}
 
 	public LoggerFrm loggerFrame() {
