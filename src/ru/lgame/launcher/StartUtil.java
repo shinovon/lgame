@@ -32,12 +32,16 @@ public class StartUtil {
 		if(p != null && p != "" && p != "  " && p != " ") {
 			p = p.replace("\\", File.separator);
 			p = p.replace("/", File.separator);
+			if(p.endsWith("java.exe")) return p;
 			if(p.endsWith("bin" + File.separator)) return p + exec;
 			if(p.endsWith("bin")) return p + File.separator + exec;
 			if(p.endsWith(File.separator)) return p + "bin" + File.separator + exec;
 			return p + File.separator + "bin" + File.separator + exec;
 		}
-		return System.getProperty("java.home") + File.separator + "bin" + File.separator + exec;
+		String home = System.getProperty("java.home");
+		if(home == null || home == "" || home == " " || home.length() < 2)
+			throw new RuntimeException("invalid java.home value");
+		return home + File.separator + "bin" + File.separator + exec;
 	}
 
 	private static String getJavaPathDir() {
