@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -22,6 +23,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import org.json.JSONObject;
+
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.auth.Auth;
@@ -29,6 +32,7 @@ import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.Fonts;
 import ru.lgame.launcher.ui.frame.LauncherFrm;
 import ru.lgame.launcher.update.Modpack;
+import ru.lgame.launcher.utils.WebUtils;
 import ru.lgame.launcher.utils.logging.Log;
 
 /**
@@ -53,6 +57,10 @@ public class LauncherPane extends JPanel {
 	private JLabel skinImageLabel;
 
 	private JLabel usernameLabel;
+
+	protected boolean skinState;
+
+	protected String skinName;
 
 	public LauncherPane(LauncherFrm frm) {
 		this.setLayout(new BorderLayout(0, 0));
@@ -126,17 +134,7 @@ public class LauncherPane extends JPanel {
 		
 		skinImageLabel = new JLabel("");
 		Image skin = null;
-		try {
-			if(Launcher.inst.currentAuth() != null) {
-				// ыыы
-				if(Launcher.inst.currentAuth().getUsername().equalsIgnoreCase("shinovon")) {
-					skin = ImageIO.read(getClass().getResourceAsStream("/Shinovon.png"));
-				}
-			} else {
-				//TODO
-			}
-		} catch (Exception e1) {
-		}
+		getSkin();
 		if(skin == null) {
 			try {
 				skin = ImageIO.read(getClass().getResourceAsStream("/defaultskin.png"));
@@ -199,25 +197,56 @@ public class LauncherPane extends JPanel {
 		updateAuth();
 	}
 	
-	public void updateAuth() {
-		Image skin = null;
-		try {
-			if(Launcher.inst.currentAuth() != null) {
-				if(Launcher.inst.currentAuth().getUsername().equalsIgnoreCase("shinovon")) {
-					skin = ImageIO.read(getClass().getResourceAsStream("/Shinovon.png"));
+	private void getSkin() {
+		Launcher.inst.queue(new Runnable() {
+			public void run() {
+				boolean d = false;
+				l: {
+				try {
+					if(Launcher.inst.currentAuth() != null) {
+						if(skinState) return;
+						String username = Launcher.inst.currentAuth().getUsername();
+						String s = WebUtils.get("https://api.mojang.com/users/profiles/minecraft/" + username + "?at=" + (System.currentTimeMillis() / 1000L));
+						if(s == null || s == "" || s.length() < 2 || s.charAt(0) != '{') {
+							skinName = username;
+							skinState = true;
+							d = true;
+							break l;
+						}
+						JSONObject profile = new JSONObject(s);
+						String uuid = profile.getString("id").replace("-", "");
+						String url = "https://crafatar.com/avatars/" + uuid + "?overlay&size=24";
+						byte[] b = WebUtils.getBytes(url);
+						Image img = ImageIO.read(new ByteArrayInputStream(b)).getScaledInstance(24, 24, Image.SCALE_DEFAULT);
+						skinImageLabel.setIcon(new ImageIcon(img));
+						skinName = username;
+						skinState = true;
+					} else {
+						d = true;
+					}
+				} catch (Exception e) {
+					Log.error("skin gather failed", e);
+					d = true;
 				}
-			} else {
-				
+				}
+				if(d) {
+					Image skin = null;
+					try {
+						skin = ImageIO.read(getClass().getResourceAsStream("/defaultskin.png"));
+					} catch (IOException e2) {
+					}
+					if(skin != null) skinImageLabel.setIcon(new ImageIcon(skin));
+				}
 			}
-		} catch (Exception e1) {
+		});
+		
+	}
+
+	public void updateAuth() {
+		if(skinState && Launcher.inst.currentAuth() != null && !Launcher.inst.currentAuth().getUsername().equalsIgnoreCase(skinName)) {
+			skinState = false;
 		}
-		if(skin == null) {
-			try {
-				skin = ImageIO.read(getClass().getResourceAsStream("/defaultskin.png"));
-			} catch (IOException e1) {
-			}
-		}
-		if(skin != null) skinImageLabel.setIcon(new ImageIcon(skin));
+		getSkin();
 		if(Launcher.inst.currentAuth() != null) usernameLabel.setText(Text.get("label.account.welcome", "Добро пожаловать") + ", " + Launcher.inst.currentAuth().getUsername());
 		else usernameLabel.setText(Text.get("label.account.no", "Добавьте авторизацию"));
 	}

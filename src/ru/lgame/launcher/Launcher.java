@@ -364,6 +364,16 @@ public class Launcher {
 		} catch (IOException e) {
 		}
 	}
+	
+
+	public void saveImageToCachePng(String url, BufferedImage img) {
+		File f = new File(getCacheDir() + getMD5String(url));
+		if(f.exists()) f.delete();
+		try {
+			ImageIO.write(img, "png", f);
+		} catch (IOException e) {
+		}
+	}
 
 	/**
 	 * Получить картинку из кэша

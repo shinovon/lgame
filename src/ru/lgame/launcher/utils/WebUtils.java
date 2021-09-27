@@ -170,37 +170,7 @@ public class WebUtils {
 	}
 
 	public final static String get(final String url) throws IOException {
-		Log.info("GET " + url);
-		InputStream is = null;
-		try {
-			HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
-			con.setRequestMethod("GET");
-			//con.setRequestProperty("User-Agent", useragent);
-			con.setRequestProperty("Accept-Encoding", "gzip");
-			con.connect();
-			Log.debug("Connected, getting text");
-			if(con.getResponseCode() == 404) {
-				con.disconnect();
-				throw new FileNotFoundException();
-			}
-			//Log.debug("response code: " + con.getResponseCode());
-			is = getHTTPInputStream(con);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			byte[] buf = new byte[8192];
-			int read;
-			while ((read = is.read(buf)) != -1) {
-				baos.write(buf, 0, read);
-			}
-			is.close();
-			con.disconnect();
-			String x = new String(baos.toByteArray(), "UTF-8");
-			baos.close();
-			return x;
-		} catch (IOException e) {
-			throw new IOException(url, e);
-		} finally {
-			if(is != null) is.close();
-		}
+		return new String(getBytes(url), "UTF-8");
 	}
 
 	public static String post(final String url, final Map<String, String> requestMap, final String body)
@@ -236,5 +206,40 @@ public class WebUtils {
 		public void downloadProgress(String name, double speed, int percent, int bytesLeft);
 
 		public void doneDownload(String filename);
+	}
+
+	public static byte[] getBytes(String url) throws IOException {
+		Log.info("GET " + url);
+		InputStream is = null;
+		try {
+			HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+			con.setRequestMethod("GET");
+			//con.setRequestProperty("User-Agent", useragent);
+			con.setRequestProperty("Accept-Encoding", "gzip");
+			con.connect();
+			//Log.debug("Connected, getting text");
+			if(con.getResponseCode() == 404) {
+				con.disconnect();
+				throw new FileNotFoundException();
+			}
+			//Log.debug("response code: " + con.getResponseCode());
+			is = getHTTPInputStream(con);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			byte[] buf = new byte[8192];
+			int read;
+			while ((read = is.read(buf)) != -1) {
+				baos.write(buf, 0, read);
+			}
+			is.close();
+			con.disconnect();
+			byte[] b = baos.toByteArray();
+			baos.close();
+			return b;
+		} catch (IOException e) {
+			throw new IOException(url, e);
+		} finally {
+			if(is != null) is.close();
+		}
+		
 	}
 }
