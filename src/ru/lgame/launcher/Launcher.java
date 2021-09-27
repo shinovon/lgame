@@ -21,6 +21,7 @@ import com.mojang.authlib.exceptions.InvalidCredentialsException;
 
 import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.auth.AuthStore;
+import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.ErrorUI;
 import ru.lgame.launcher.ui.frame.AccountsFrm;
 import ru.lgame.launcher.ui.frame.LauncherFrm;
@@ -100,7 +101,7 @@ public class Launcher {
 					try {
 						loadingFrame = new LoadingFrm();
 						loadingFrame.setVisible(true);
-						loadingFrame.setText("Инициализация");
+						loadingFrame.setText(Text.get("loading.initializing", "Инициализация"));
 						loggerFrame = new LoggerFrm();
 					} catch (Exception e) {
 					}
@@ -117,18 +118,18 @@ public class Launcher {
 		try {
 			AuthStore.init();
 		} catch (InvalidCredentialsException e) {
-			ErrorUI.showError("Аккаунты", "У одного или нескольких аккаунтов MOJANG просрочился токен!");
+			ErrorUI.showError(Text.get("title.account", "Аккаунты"), Text.get("msg.mojangtokenexpired", "У одного или нескольких аккаунтов MOJANG просрочился токен!"));
 		}
-		loadingFrame.setText("Получение данных о сборках");
+		loadingFrame.setText(Text.get("loading.fetchingmodpacks", "Получение данных о сборках"));
 		if(tryLoadModpacksFromServer()) {
 		} else if(loadCachedLauncherJson()) {
 			offline = true;
 		} else {
-			JOptionPane.showMessageDialog(new JPanel(), "Для первого запуска нужно подключение к интернету!");
+			JOptionPane.showMessageDialog(new JPanel(), Text.get("msg.firststart", "Для первого запуска нужно подключение к интернету!"));
 			System.exit(0);
 			return;
 		}
-		loadingFrame.setText("Инициализация интерфейса");
+		loadingFrame.setText(Text.get("loading.initializingui", "Инициализация интерфейса"));
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -137,7 +138,7 @@ public class Launcher {
 					frame.setVisible(true);
 					accountsFrame = new AccountsFrm();
 				} catch (Throwable e) {
-					ErrorUI.showError("Ошибка лаунчера", "Инициализация интерфейса", e);
+					ErrorUI.showError(Text.get("title.launchererror", "Ошибка лаунчера"), Text.get("loading.initializingui", "Инициализация интерфейса"), e);
 					System.exit(1);
 				}
 			}
@@ -158,7 +159,7 @@ public class Launcher {
 				if(!f.exists()) f.mkdirs();
 			}
 		} catch (Exception e) {
-			ErrorUI.showError("Ошибка", "Ошибка создания директорий", Log.exceptionToString(e));
+			ErrorUI.showError(Text.get("title.error", "Ошибка"), Text.get("title.dirs", "Ошибка создания директорий"), Log.exceptionToString(e));
 		}
 	}
 
@@ -241,7 +242,7 @@ public class Launcher {
 			EventQueue.invokeAndWait(new Runnable() {
 				public void run() {
 					try {
-						loadingFrame.setText("Получение данных о сборках");
+						loadingFrame.setText(Text.get("loading.fetchingmodpacks", "Получение данных о сборках"));
 						loadingFrame.setVisible(true);
 					} catch (Exception e) {
 					}

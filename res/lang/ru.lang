@@ -1,0 +1,47 @@
+button.play=Играть
+button.install=Установить
+button.update=Обновить
+button.accounts=Аккаунты
+button.settings=Настройки
+button.refresh=Обновить
+button.back=Назад
+button.ok=OK
+button.showlogger=Показать логи
+button.account.add=Подтвердить
+
+label.account.no=Добавьте авторизацию
+label.account.welcome=Добро пожаловать
+label.settings=Настройки
+label.savedir=Папка для сохранения сборок
+label.javapath=Путь к Java
+label.memory=Выделяемая память (Мегабайты)
+label.username=Ник
+label.password=Пароль
+label.email=Email
+
+check.forceinstall=Переустановить
+
+msg.noaccountchoosen=Выберите аккаунт для игры
+msg.mojangtokenexpired=У одного или нескольких аккаунтов MOJANG просрочился токен!
+msg.firststart=Для первого запуска нужно подключение к интернету
+
+state.started=Запущена
+state.updating=Обновление
+state.updatingclient=Обновление клиента
+state.updatingmodpack=Обновление сборки
+state.downloading=Скачивание
+state.unzipstart=Распаковка архивов
+state.unzipping=Распаковка
+
+loading.initializing=Инициализация
+loading.fetchingmodpacks=Получение данных о сборках
+loading.initializingui=Инициализация интерфейса
+
+title.accounts=Аккаунты
+title.launchererror=Ошибка лаунчера
+title.error=Ошибка
+title.clienterror=Ошибка клиента
+title.updateerror=Ошибка обновления
+
+err.accountadd=Не удалось добавить аккаунт
+err.dirs=Ошибка создания директорий

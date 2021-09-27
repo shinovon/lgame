@@ -25,6 +25,7 @@ import javax.swing.event.ChangeListener;
 
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
+import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.Fonts;
 import ru.lgame.launcher.update.Modpack;
 
@@ -255,7 +256,7 @@ public class MiniModpackPane extends JPanel {
 			g.fillRect(0, rh - 2, w - 1, 3);
 			g.fillRect(w - 4, 0, 3, rh);
 			g.setFont(Fonts.modpackState);
-			g.drawString("Запущена", x, rh - (g.getFontMetrics().getHeight() / 2));
+			g.drawString(Text.get("state.started", "Запущена"), x, rh - (g.getFontMetrics().getHeight() / 2));
 		} else if(isUpdating()) {
 			int percent = this.updatePercent = 75;
 			String s = this.updateText1;

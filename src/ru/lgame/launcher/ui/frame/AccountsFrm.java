@@ -26,6 +26,7 @@ import javax.swing.event.ListSelectionListener;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.auth.AuthStore;
+import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.ErrorUI;
 
 /**
@@ -50,7 +51,7 @@ public class AccountsFrm extends JFrame {
 	 */
 	public AccountsFrm() {
 		setType(Type.UTILITY);
-		setTitle("Аккаунты");
+		setTitle(Text.get("title.accounts", "Аккаунты"));
 		setResizable(false);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -81,7 +82,7 @@ public class AccountsFrm extends JFrame {
 		panel_7.setMaximumSize(new Dimension(140, 32767));
 		panel_3.add(panel_7);
 		
-		JLabel usernameLabel = new JLabel("Ник");
+		JLabel usernameLabel = new JLabel(Text.get("label.username", "Ник"));
 		panel_7.add(usernameLabel);
 		
 		usernameField = new JTextField();
@@ -91,7 +92,7 @@ public class AccountsFrm extends JFrame {
 		usernameField.setPreferredSize(new Dimension(120, 20));
 		usernameField.setColumns(16);
 		
-		JLabel passwordLabel = new JLabel("Пароль");
+		JLabel passwordLabel = new JLabel(Text.get("label.password", "Пароль"));
 		panel_7.add(passwordLabel);
 		
 		passwordField = new JPasswordField();
@@ -109,7 +110,7 @@ public class AccountsFrm extends JFrame {
 		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(comboBox.getSelectedIndex() == 0) {
-					usernameLabel.setText("Ник");
+					usernameLabel.setText(Text.get("label.username", "Ник"));
 					passwordField.setEnabled(false);
 					usernameField.setEnabled(true);
 				} else {
@@ -127,7 +128,7 @@ public class AccountsFrm extends JFrame {
 		JPanel panel_5 = new JPanel();
 		accountPanel.add(panel_5, BorderLayout.SOUTH);
 		
-		JButton confirmBtn = new JButton("Подтвердить");
+		JButton confirmBtn = new JButton(Text.get("button.account.add", "Подтвердить"));
 		panel_5.add(confirmBtn);
 		confirmBtn.setPreferredSize(new Dimension(134, 20));
 		passwordField.setEnabled(false);
@@ -151,7 +152,7 @@ public class AccountsFrm extends JFrame {
 					AuthStore.add(a);
 					AuthStore.setSelected(a);
 				} catch (Throwable e) {
-					ErrorUI.showError("Аккаунты", "Не удалось добавить аккаунт", e);
+					ErrorUI.showError(Text.get("title.accounts", "Аккаунты"), Text.get("err.accountadd", "Не удалось добавить аккаунт"), e);
 				}
 				update();
 			}
@@ -207,11 +208,11 @@ public class AccountsFrm extends JFrame {
 		addBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(comboBox.getSelectedIndex() == 0) {
-					usernameLabel.setText("Ник");
+					usernameLabel.setText(Text.get("label.username", "Ник"));
 					passwordField.setEnabled(false);
 					usernameField.setEnabled(true);
 				} else {
-					usernameLabel.setText("Email");
+					usernameLabel.setText(Text.get("label.email", "Email"));
 					passwordField.setEnabled(true);
 					usernameField.setEnabled(true);
 				}

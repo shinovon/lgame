@@ -26,6 +26,7 @@ import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Errors;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.auth.Auth;
+import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.ErrorUI;
 import ru.lgame.launcher.utils.FileUtils;
 import ru.lgame.launcher.utils.LauncherOfflineException;
@@ -417,7 +418,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		currentInst = this;
 		running = true;
 		updating = true;
-		modpack.setUpdateInfo(repeated ? "Обновление" : "Сбор информации", repeated ? "Проверка правильности установки" : "Проверка установки", 0);
+		modpack.setUpdateInfo(repeated ? Text.get("state.updating") : "Сбор информации", repeated ? "Проверка правильности установки" : "Проверка установки", 0);
 		int modpackState = forceUpdate ? 3 : checkInstalled(modpack) ? -100 : 0;
 		try {
 			modpack.setUpdateInfo(null, "Получение дескриптора запуска клиента", 15);
@@ -501,22 +502,22 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			return;
 		}
 		Log.debug("install state: " + modpackState);
-		modpack.setUpdateInfo("Обновление", "Инициализация системы обновления", 0);
+		modpack.setUpdateInfo(Text.get("state.updating"), "Инициализация системы обновления", 0);
 		// обнова либо старт сборки
 		boolean ret = !repeated;
 		switch(modpackState) {
 		case 0:
 		{
-			modpack.setUpdateInfo("Обновление клиента", "Обновление клиента", 0);
+			modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
 			if(!clientInstalled) installClient();
 			else if(clientNeedsUpdate) updateClient();
-			modpack.setUpdateInfo("Обновление сборки", "Установка сборки", -2);
+			modpack.setUpdateInfo(Text.get("state.updatingmodpack"), Text.get("state.updatingmodpack"), -2);
 			install();
 			break;
 		}
 		case 1:
 		{
-			modpack.setUpdateInfo("", "Запуск клиента", 100);
+			modpack.setUpdateInfo("", Text.get("state.startingclient"), 100);
 			try {
 				startClient();
 			} catch (Exception e) {
@@ -529,33 +530,33 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		case 2:
 		case 3:
 		{
-			modpack.setUpdateInfo("Обновление клиента", "Обновление клиента", 0);
+			modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
 			if(!clientInstalled) installClient();
 			else if(clientNeedsUpdate) updateClient();
-			modpack.setUpdateInfo("Обновление сборки", "Обновление сборки", -2);
+			modpack.setUpdateInfo(Text.get("state.updatingmodpack"), Text.get("state.updatingmodpack"), -2);
 			update();
 			break;
 		}
 		case 4: {
-			modpack.setUpdateInfo("Обновление клиента", "Установка клиента", 0);
+			modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
 			installClient();
 			break;
 		}
 		case 5: {
-			modpack.setUpdateInfo("Обновление клиента", "Обновление клиента", 0);
+			modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
 			updateClient();
 			break;
 		}
 		default:
 		{
-			modpack.setUpdateInfo("", "Обработка ошибки", -2);
+			modpack.setUpdateInfo("", Text.get("state.error"), -2);
 			updateFatalError("default", modpackState, Errors.UPDATER_GETMODPACKSTATE_ILLEGAL_VALUE);
 			ret = false;
 			break;
 		}
 		}
 		if(ret && !failed) {
-			modpack.setUpdateInfo("Обновление", "Повторная инициализация системы обновления", 100);
+			modpack.setUpdateInfo(Text.get("state.updating"), "Повторная инициализация системы обновления", 100);
 			Log.info("Updater repeat");
 			reset();
 			repeated = true;
@@ -728,7 +729,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 
 	private boolean scriptedDownload(JSONArray j, String root, String temp) {
-		modpack.setUpdateInfo(null, "Скачивание", -2);
+		modpack.setUpdateInfo(null, Text.get("state.downloading"), -2);
 		WebUtils.setListener(this);
 		String p = root;
 		String tp = temp;
@@ -738,7 +739,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		for(Iterator<Object> it = j.iterator(); it.hasNext(); ) {
 			JSONObject o = (JSONObject) it.next();
 			String name = o.getString("name");
-			modpack.setUpdateInfo(null, "Скачивание: " + name + " (0%)", percentI());
+			modpack.setUpdateInfo(null, Text.get("state.downloading") + ": " + name + " (0%)", percentI());
 			if(o.has("check")) {
 				JSONObject check = o.getJSONObject("check");
 				String type = check.optString("type");
@@ -793,7 +794,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 	
 	private boolean scriptedUnzip(JSONArray j, String root, String temp) {
-		modpack.setUpdateInfo(null, "Распаковка архивов", -2);
+		modpack.setUpdateInfo(null, Text.get("state.unzipstart"), -2);
 		ZipUtils.setListener(this);
 		String p = root;
 		String tp = temp;
@@ -816,7 +817,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			if(from.equals("temp")) from = temp + name;
 			else from = tp + from + name;
 			currentUnzipFile = name;
-			modpack.setUpdateInfo(null, "Распаковка: " + name + " (0%)", percentI());
+			modpack.setUpdateInfo(null, Text.get("state.unzipping") + ": " + name + " (0%)", percentI());
 			if(!new File(from).exists()) {
 				tasksDone++;
 				continue;
@@ -980,40 +981,40 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		} else if(x.contains("AppClassLoader cannot be cast to class java.net.URLClassLoader")) {
 			x = "Возможное решение:\nОшибка несовместимости Forge с версией Java!!\nИспользуйте версию Java 8\n" + x;
 			}
-		ErrorUI.clientError("Ошибка клиента", s, x);	
+		ErrorUI.clientError(Text.get("title.clienterror", "Ошибка клиента"), s, x);	
 	}
 
 	private void clientError(String s, Throwable t) {
 		String e = Log.exceptionToString(t);
-		ErrorUI.clientError("Ошибка клиента", s, s + "\n" + e);	
+		ErrorUI.clientError(Text.get("title.clienterror", "Ошибка клиента"), s, s + "\n" + e);	
 	}
 
 	private void updateFatalError(String s, Throwable t, int i) {
 		String e = Log.exceptionToString(t);
-		ErrorUI.showError("Ошибка обновления", s + " (Код ошибки: "  + Errors.toHexString(i) + ")", s + " (Код ошибки: " + Errors.toHexString(i) + ")\n" + e);	
+		ErrorUI.showError(Text.get("title.updateerror", "Ошибка обновления"), s + " (Код ошибки: "  + Errors.toHexString(i) + ")", s + " (Код ошибки: " + Errors.toHexString(i) + ")\n" + e);	
 		updateFatalError();
 	}
 
 	private void updateFatalError(String s, String s2, int i) {
-		ErrorUI.showError("Ошибка обновления", s, s + ": " + s2 + " (Код ошибки: " +  Errors.toHexString(i) + ")");
+		ErrorUI.showError(Text.get("title.updateerror", "Ошибка обновления"), s, s + ": " + s2 + " (Код ошибки: " +  Errors.toHexString(i) + ")");
 		updateFatalError();
 	}
 
 	private void updateFatalError(String s, int i1, int i2) {
 		String e = Log.getTraceString(2);
-		ErrorUI.showError("Ошибка обновления", s, s + ": " + Errors.toHexString(i1) + " (Код ошибки: " + Errors.toHexString(i2) + ")\n" + e);
+		ErrorUI.showError(Text.get("title.updateerror", "Ошибка обновления"), s, s + ": " + Errors.toHexString(i1) + " (Код ошибки: " + Errors.toHexString(i2) + ")\n" + e);
 		updateFatalError();
 	}
 
 	private void updateFatalError(String s, String s2) {
-		ErrorUI.showError("Ошибка обновления", s, s2);
+		ErrorUI.showError(Text.get("title.updateerror", "Ошибка обновления"), s, s2);
 		updateFatalError();
 	}
 
 	private void fatalError(String s) {
 		Log.error(s);
 		String e = Log.exceptionToString(new Exception());
-		ErrorUI.showError("Ошибка обновления", s, e);
+		ErrorUI.showError(Text.get("title.updateerror", "Ошибка обновления"), s, e);
 		updateFatalError();
 	}
 	
@@ -1090,17 +1091,17 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	@Override
 	public void startUnzip(String zipFile) {
-		uiInfo(null, "Распаковка: " + currentUnzipFile + " (0%)", percentI(0));
+		uiInfo(null, Text.get("state.unzipping") + ": " + currentUnzipFile + " (0%)", percentI(0));
 	}
 
 	@Override
 	public void unzipProgress(String currentFile, int totalPercent, int currentFilePercent) {
-		uiInfo(null, "Распаковка: " + currentUnzipFile + ": " + currentFile + " (" + totalPercent + "%)", percentI(totalPercent / 100D));
+		uiInfo(null, Text.get("state.unzipping") + ": " + currentUnzipFile + ": " + currentFile + " (" + totalPercent + "%)", percentI(totalPercent / 100D));
 	}
 
 	@Override
 	public void doneUnzip(String zipFile) {
-		uiInfo(null, "Распаковка: " + currentUnzipFile + " (100%)", percentI(0));
+		uiInfo(null, Text.get("state.unzipping") + ": " + currentUnzipFile + " (100%)", percentI(0));
 	}
 
 	@Override
@@ -1127,7 +1128,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		//Log.debug(s + "mbs left: " + timeStr(left));
 		String leftStr = " Осталость приблизительно: " + timeStr(left);
 		if(!Config.getBoolean("downloadLeftTime")) leftStr = "";
-		uiInfo(null, "Скачивание: " +  filename 
+		uiInfo(null, Text.get("state.downloading") + ": " +  filename 
 				+ " (" + speed + "Mb/s)"
 				+ " (" + percent + "%)"
 				+ leftStr

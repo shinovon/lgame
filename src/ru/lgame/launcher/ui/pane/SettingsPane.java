@@ -25,6 +25,7 @@ import javax.swing.event.ChangeListener;
 import li.flor.nativejfilechooser.NativeJFileChooser;
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
+import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.frame.LauncherFrm;
 
 /**
@@ -57,7 +58,7 @@ public class SettingsPane extends JPanel {
 		flowLayout_2.setAlignment(FlowLayout.LEFT);
 		add(panel, BorderLayout.SOUTH);
 		
-		JButton settsBackBtn = new JButton("Назад");
+		JButton settsBackBtn = new JButton(Text.get("button.back", "Назад"));
 		settsBackBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Config.set("javapath", textField.getText());
@@ -68,13 +69,10 @@ public class SettingsPane extends JPanel {
 		settsBackBtn.addActionListener(frm.settingsListener);
 		panel.add(settsBackBtn);
 		
-		JButton btnNewButton = new JButton("покажь логи");
+		JButton btnNewButton = new JButton("logger");
 		panel.add(btnNewButton);
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Config.set("javapath", textField.getText());
-				Config.set("path", textField_1.getText());
-				Config.saveLater();
 				Launcher.inst.showLoggerFrame();
 			}
 		});
@@ -89,7 +87,7 @@ public class SettingsPane extends JPanel {
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		content.add(panel_2, gbc);
 		
-		JLabel lblNewLabel = new JLabel("выделяемая память (MB): ");
+		JLabel lblNewLabel = new JLabel(Text.get("label.memory", "Выделяемая память (Мегабайты)") + ": ");
 		panel_2.add(lblNewLabel);
 		
 		JSpinner spinner = new JSpinner();
@@ -133,7 +131,7 @@ public class SettingsPane extends JPanel {
 		flowLayout_1.setAlignment(FlowLayout.LEFT);
 		content.add(panel_3, gbc.clone());
 		
-		JLabel lblJava = new JLabel("Путь к Java: ");
+		JLabel lblJava = new JLabel(Text.get("label.javapath", "Путь к Java") + ": ");
 		panel_3.add(lblJava);
 		
 		textField = new JTextField();
@@ -184,7 +182,7 @@ public class SettingsPane extends JPanel {
 		flowLayout_5.setAlignment(FlowLayout.LEFT);
 		content.add(panel_5, gbc.clone());
 		
-		JLabel label_1 = new JLabel("Папка для сохранения сборок: ");
+		JLabel label_1 = new JLabel(Text.get("label.savedir", "Папка для сохранения сборок") + ": ");
 		panel_5.add(label_1);
 		
 		textField_1 = new JTextField();
@@ -231,7 +229,7 @@ public class SettingsPane extends JPanel {
 		flowLayout_3.setAlignment(FlowLayout.LEADING);
 		add(panel_4, BorderLayout.NORTH);
 		
-		JLabel label = new JLabel("Настройки");
+		JLabel label = new JLabel(Text.get("label.settings", "Настройки"));
 		panel_4.add(label);
 		setPreferredSize(new Dimension(1000, 600));
 	}

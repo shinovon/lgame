@@ -18,6 +18,7 @@ import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 
 import ru.lgame.launcher.Launcher;
+import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.utils.logging.Log;
 
 /**
@@ -60,23 +61,23 @@ public class ErrorUI {
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(buttonPane, BorderLayout.SOUTH);
 		{
-			JButton okButton = new JButton("OK");
+			JButton okButton = new JButton(Text.get("button.ok", "OK"));
 			okButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					dialog.dispose();
 				}
 			});
-			okButton.setActionCommand("OK");
+			okButton.setActionCommand(Text.get("button.ok", "OK"));
 			buttonPane.add(okButton);
 			dialog.getRootPane().setDefaultButton(okButton);
-			JButton logsButton = new JButton("Показать логи");
+			JButton logsButton = new JButton(Text.get("button.showlogger", "Показать логи"));
 			logsButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					l.showLoggerFrame();
 					dialog.dispose();
 				}
 			});
-			logsButton.setActionCommand("OK");
+			logsButton.setActionCommand(Text.get("button.ok", "OK"));
 			buttonPane.add(logsButton);
 		}
 		dialog.pack();
@@ -119,13 +120,13 @@ public class ErrorUI {
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(buttonPane, BorderLayout.SOUTH);
 		{
-			JButton okButton = new JButton("OK");
+			JButton okButton = new JButton(Text.get("button.ok", "OK"));
 			okButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					dialog.dispose();
 				}
 			});
-			okButton.setActionCommand("OK");
+			okButton.setActionCommand(Text.get("button.ok", "OK"));
 			buttonPane.add(okButton);
 			dialog.getRootPane().setDefaultButton(okButton);
 		}

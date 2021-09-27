@@ -14,6 +14,7 @@ public class Fonts {
 	public static Font modpackUpdateInfo;
 	public static Font label;
 	public static Font username;
+	public static Font loading;
 
 	static {
 		buttonFont = createFontBold(13.5F);
@@ -22,6 +23,7 @@ public class Fonts {
 		modpackState = createFontBold(14);
 		modpackUpdateInfo = createFont(12);
 		username = createFont(11.5f);
+		loading = createFont(12);
 		//label = createFont(11);
 	}
 
