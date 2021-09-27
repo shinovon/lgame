@@ -777,7 +777,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 						WebUtils.download(url, dir);
 						b = false;
 					} catch(IOException e) {
-						if(downloadFailCount > 2) throw e;
+						if(downloadFailCount > Config.getInt("downloadMaxAttempts")) throw e;
 						Log.warn("download io err: " + e.toString() + ", retrying..");
 						downloadFailCount++;
 						Thread.sleep(500L);
@@ -1080,17 +1080,17 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	@Override
 	public void startZip(String zipFile) {
-		
+		uiInfo(null, "Упаковка: " + currentUnzipFile + " (%)", percentI(0));
 	}
 
 	@Override
 	public void doneZip(String zipFile) {
-		
+		uiInfo(null, "Упаковка: " + currentUnzipFile + " (100%)", percentI(0));
 	}
 
 	@Override
 	public void startUnzip(String zipFile) {
-		
+		uiInfo(null, "Распаковка: " + currentUnzipFile + " (0%)", percentI(0));
 	}
 
 	@Override
@@ -1100,12 +1100,12 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	@Override
 	public void doneUnzip(String zipFile) {
-		
+		uiInfo(null, "Распаковка: " + currentUnzipFile + " (100%)", percentI(0));
 	}
 
 	@Override
 	public void startDownload(String filename) {
-		
+		uiInfo(null, "Скачивание: " +  filename + " (0%)", percentI(0));
 	}
 	
 	int avgcounter;
@@ -1125,10 +1125,12 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		int left = (int)((bytesLeft/1024F/1024F) / s);
 		if(s == 0) left = 0;
 		//Log.debug(s + "mbs left: " + timeStr(left));
+		String leftStr = " Осталость приблизительно: " + timeStr(left);
+		if(!Config.getBoolean("downloadLeftTime")) leftStr = "";
 		uiInfo(null, "Скачивание: " +  filename 
 				+ " (" + speed + "Mb/s)"
 				+ " (" + percent + "%)"
-				+ " Осталость приблизительно: " + timeStr(left) + ""
+				+ leftStr
 				, percentI(percent / 100D));
 	}
 

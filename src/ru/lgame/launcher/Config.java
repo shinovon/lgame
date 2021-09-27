@@ -27,6 +27,8 @@ public class Config {
 		set("username", "");
 		set("xmx", "4096");
 		set("xms", "512");
+		set("downloadLeftTime", true);
+		set("downloadMaxAttempts", "2");
 	}
 
 	public synchronized static void loadConfig() {
