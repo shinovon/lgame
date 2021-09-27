@@ -79,6 +79,7 @@ public class LoggerFrm extends JFrame {
 		textArea.setText("LGame Launcher Logger ["+ DateFormat.getDateInstance().format(new Date()) + "]\n");
 		textArea.setForeground(Color.WHITE);
 		textArea.setBackground(Color.BLACK);
+		textArea.setEditable(false);
 		scrollPane.setViewportView(textArea);
 		contentPane.setPreferredSize(new Dimension(540, 320));
 		pack();
