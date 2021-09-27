@@ -23,7 +23,7 @@ public class Config {
 	}
 
 	public static void loadDefaults() {
-		set("path", Launcher.getModpacksDefaultDir());
+		set("path", Launcher.getLibraryDefaultDir());
 		set("username", "");
 		set("xmx", "4096");
 		set("xms", "512");

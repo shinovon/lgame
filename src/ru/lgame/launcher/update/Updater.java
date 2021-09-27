@@ -128,7 +128,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	 * @param m Объект сборки
 	 */
 	public static boolean checkInstalled(Modpack m) {
-		String s = Config.get("path") + m.id() + File.separator;
+		String s = Launcher.getLibraryDir() + m.id() + File.separator;
 		File dir = new File(s);
 		if(!dir.exists()) return false;
 		File f = new File(s + "version");
@@ -151,7 +151,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	 * @throws Exception 
 	 */
 	public static boolean checkModpackIntegrity(Modpack m, JSONObject updateJson) throws Exception {
-		String p = Config.get("path") + m.id() + File.separator;
+		String p = Launcher.getLibraryDir() + m.id() + File.separator;
 		File vvf = new File(p + "version");
 		if(!vvf.exists()) return false;
 		if(updateJson == null) throw new LauncherOfflineException();
@@ -254,7 +254,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 
 	private boolean checkClientNeedUpdate() throws Exception {
-		String p = Config.get("path") + modpack.client() + File.separator;
+		String p = Launcher.getLibraryDir() + modpack.client() + File.separator;
 		File f = new File(p + "client.jar");
 		if(!f.exists()) return true;
 		f = new File(p + "version");
@@ -272,7 +272,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	 * Проверка целостности клиента
 	 */
 	private boolean checkClientIntegrity() throws Exception {
-		String p = Config.get("path") + modpack.client() + File.separator;
+		String p = Launcher.getLibraryDir() + modpack.client() + File.separator;
 		File vvf = new File(p + "client.jar");
 		if(!vvf.exists()) return true;
 		vvf = new File(p + "version");
@@ -393,7 +393,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	 * @throws IOException 
 	 */
 	public static boolean checkUpdatesAvailable(Modpack m, JSONObject updateJson) throws JSONException, IOException {
-		String p = Config.get("path") + m.id() + File.separator;
+		String p = Launcher.getLibraryDir() + m.id() + File.separator;
 		File f = new File(p + "version");
 		if(!f.exists()) return true;
 		if(!FileUtils.getString(f).equalsIgnoreCase("" + updateJson.getInt("update_build"))) return true;
@@ -670,7 +670,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 
 	private void clientVersionFile() {
-		String s = Config.get("path") + modpack.client() + File.separator;
+		String s = Launcher.getLibraryDir() + modpack.client() + File.separator;
 		File f2 = new File(s + "start.json");
 		if(f2.exists()) f2.delete();
 		try {
@@ -688,7 +688,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 	
 	private void modpackVersionFile() {
-		String s = Config.get("path") + modpack.id() + File.separator;
+		String s = Launcher.getLibraryDir() + modpack.id() + File.separator;
 		File f = new File(s + "version");
 		if(f.exists()) f.delete();
 		try {
@@ -943,11 +943,11 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 	
 	public String getClientDir() {
-		return Config.get("path") + modpack.client() + File.separator;
+		return Launcher.getLibraryDir() + modpack.client() + File.separator;
 	}
 	
 	public String getModpackDir() {
-		return Config.get("path") + modpack.id() + File.separator;
+		return Launcher.getLibraryDir() + modpack.id() + File.separator;
 	}
 
 	public String getAssetsDir() {

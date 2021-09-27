@@ -10,7 +10,6 @@ import javax.imageio.ImageIO;
 
 import org.json.JSONObject;
 
-import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.ui.pane.ModpackPanel;
 import ru.lgame.launcher.utils.FileUtils;
@@ -215,11 +214,11 @@ public class Modpack {
 	}
 	
 	public String getClientDir() {
-		return Config.get("path") + client() + File.separator;
+		return Launcher.getLibraryDir() + client() + File.separator;
 	}
 	
 	public String getModpackDir() {
-		return Config.get("path") + id() + File.separator;
+		return Launcher.getLibraryDir() + id() + File.separator;
 	}
 
 }

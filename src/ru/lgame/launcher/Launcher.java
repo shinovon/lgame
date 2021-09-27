@@ -320,13 +320,23 @@ public class Launcher {
 		return getLauncherDir() + "cache" + File.separator;
 	}
 
-	public static String getModpacksDefaultDir() {
+	public static String getLibraryDefaultDir() {
 		String s = System.getProperty("user.home");
 		if(s.endsWith("/") || s.endsWith("\\"))
 			s = s.substring(0, s.length()-1);
 		s += File.separator + ".lgame" + File.separator;
 		return s;
 	}
+
+	public static String getLibraryDir() {
+		String p = Config.get("path");
+		String s = File.separator;
+		p = p.replace("/", s);
+		p = p.replace("\\", s);
+		if(!p.endsWith(s)) p = p + s;
+		return p;
+	}
+
 
 	/**
 	 * Получить папку с временными файлами
