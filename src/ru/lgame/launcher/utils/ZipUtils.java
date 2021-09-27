@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 
 import net.sf.jazzlib.ZipEntry;
+import net.sf.jazzlib.ZipException;
 import net.sf.jazzlib.ZipFile;
 import net.sf.jazzlib.ZipInputStream;
 import net.sf.jazzlib.ZipOutputStream;
@@ -66,43 +67,47 @@ public final class ZipUtils {
 		int processedEntries = 0;
 		ZipEntry ze = zis.getNextEntry();
 		int p = 0;
-		while (ze != null) {
-			p = (int)(((float) processedEntries / (float)totalEntries) * 100F);
-			if(Thread.interrupted()) {
-				zis.closeEntry();
-				zis.close();
-				throw new InterruptedException("Thread.interrupted()");
-			}
-			String fileName = ze.getName();
-			boolean isDir = ze.isDirectory();
-			File newFile = new File(outputFolder + File.separator + fileName);
-			new File(newFile.getParent()).mkdirs();
-			if(!isDir) {
-				done = false;
-				FileOutputStream fos = new FileOutputStream(newFile);
-				currentFile = newFile.getName();
-				if(listener != null) listener.unzipProgress(currentFile, p, 0);
-				int len;
-				while ((len = zis.read(buf)) > 0) {
-					if(Thread.interrupted()) {
-						fos.close();
-						zis.closeEntry();
-						zis.close();
-						throw new InterruptedException("Thread.interrupted()");
-					}
-					fos.write(buf, 0, len);
+		try {
+			while (ze != null) {
+				p = (int)(((float) processedEntries / (float)totalEntries) * 100F);
+				if(Thread.interrupted()) {
+					zis.closeEntry();
+					zis.close();
+					throw new InterruptedException("Thread.interrupted()");
 				}
-				fos.close();
-				done = true;
-			} else {
-				done = false;
-				new File(outputFolder + File.separator + fileName + File.separator).mkdirs();
-				currentFile = newFile.getName() + File.separator;
-				done = true;
+				String fileName = ze.getName();
+				boolean isDir = ze.isDirectory();
+				File newFile = new File(outputFolder + File.separator + fileName);
+				new File(newFile.getParent()).mkdirs();
+				if(!isDir) {
+					done = false;
+					FileOutputStream fos = new FileOutputStream(newFile);
+					currentFile = newFile.getName();
+					if(listener != null) listener.unzipProgress(currentFile, p, 0);
+					int len;
+					while ((len = zis.read(buf)) > 0) {
+						if(Thread.interrupted()) {
+							fos.close();
+							zis.closeEntry();
+							zis.close();
+							throw new InterruptedException("Thread.interrupted()");
+						}
+						fos.write(buf, 0, len);
+					}
+					fos.close();
+					done = true;
+				} else {
+					done = false;
+					new File(outputFolder + File.separator + fileName + File.separator).mkdirs();
+					currentFile = newFile.getName() + File.separator;
+					done = true;
+				}
+				if(listener != null) listener.unzipProgress(currentFile, p, 100);
+				ze = zis.getNextEntry();
+				processedEntries++;
 			}
-			if(listener != null) listener.unzipProgress(currentFile, p, 100);
-			ze = zis.getNextEntry();
-			processedEntries++;
+		} catch (ZipException e) {
+			throw new IOException(currentFile == null ? "" : currentFile, e);
 		}
 		try {
 			zis.closeEntry();
