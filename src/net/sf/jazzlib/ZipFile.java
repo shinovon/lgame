@@ -315,7 +315,7 @@ public class ZipFile implements ZipConstants
   /**
    * Returns an enumeration of all Zip entries in this Zip file.
    */
-  public Enumeration<ZipEntry> entries()
+  public Enumeration<ZipEntry> entries() throws IOException
   {
     try
       {
@@ -323,7 +323,8 @@ public class ZipFile implements ZipConstants
       }
     catch (IOException ioe)
       {
-	return null;
+    throw ioe;
+	//return null;
       }
   }
 

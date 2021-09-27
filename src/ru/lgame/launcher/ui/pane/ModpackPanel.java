@@ -23,9 +23,12 @@ import javax.swing.border.MatteBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
+import ru.lgame.launcher.ui.Fonts;
 import ru.lgame.launcher.update.Modpack;
-import ru.lgame.launcher.utils.logging.Log;
+
+import static ru.lgame.launcher.ui.Fonts.*;
 
 /**
  * Панелька сборки с описанием и картинкой
@@ -38,10 +41,6 @@ public class ModpackPanel extends JPanel {
 	private static final int ITEM_HEIGHT = 242;
 	private static final int IMAGE_HEIGHT = 240;
 	private static final int MAX_WIDTH = 560;
-
-	private static Font nameFont;
-
-	private static Font descFont;
 
 	private Modpack modpack;
 	
@@ -210,7 +209,8 @@ public class ModpackPanel extends JPanel {
 	}
 	
 	public void paintComponent(Graphics g) {
-		setBackground(new Color(21, 22, 24));
+		boolean l = Config.getBoolean("legacyLook");
+		if(!l) setBackground(new Color(21, 22, 24));
 		super.paintComponent(g);
 		if(g instanceof Graphics2D) {
 			Graphics2D g2d = (Graphics2D) g;
@@ -223,7 +223,7 @@ public class ModpackPanel extends JPanel {
 		}
 		g.setColor(UIManager.getColor("Label.foreground"));
 		boolean b = true;
-		Font f = g.getFont();
+		Font f = l ? g.getFont() : modpackUpdateInfo;
 		int yyy = 1;
 		int w = getWidth();
 		int h = getHeight() - 2;
@@ -238,13 +238,13 @@ public class ModpackPanel extends JPanel {
 		int tw = w - x - 12;
 		if(tw > MAX_WIDTH) tw = MAX_WIDTH;
 		Font of = g.getFont();
-		g.setFont(nameFont);
-		g.drawString(modpackName, x, g.getFontMetrics(nameFont).getHeight() / 2 + 5);
-		int ty = g.getFontMetrics(nameFont).getHeight() + 10 + yyy;
-		g.setFont(descFont);
-		if((descArr == null || lastW != w) && desc != null) descArr = getStringArray(desc, tw, g.getFontMetrics(descFont));
+		g.setFont(modpackTitle);
+		g.drawString(modpackName, x, g.getFontMetrics().getHeight() / 2 + 5);
+		int ty = g.getFontMetrics().getHeight() + 10 + yyy;
+		g.setFont(modpackDesc);
+		if((descArr == null || lastW != w) && desc != null) descArr = getStringArray(desc, tw, g.getFontMetrics());
 		if(descArr != null) {
-			int dth = g.getFontMetrics(descFont).getHeight() - 6;
+			int dth = g.getFontMetrics().getHeight() - 6;
 			for(int i = 0; i < descArr.length; i++) if(descArr[i] != null) g.drawString(descArr[i], x, ty + (i * (dth + 1)));
 		}
 		g.setFont(of);
@@ -254,11 +254,10 @@ public class ModpackPanel extends JPanel {
 			g.fillRect(0, 0, 3, h);
 			g.fillRect(0, rh - 2, w - 1, 3);
 			g.fillRect(w - 4, 0, 3, rh);
-			Font ff = g.getFont().deriveFont(12.0F);
-			g.setFont(ff);
-			g.drawString("Запущена", x, rh - (g.getFontMetrics(ff).getHeight() / 2));
-		} else if(isUpdating()) {
-			int percent = this.updatePercent;
+			g.setFont(Fonts.modpackState);
+			g.drawString("Запущена", x, rh - (g.getFontMetrics().getHeight() / 2));
+		} else if(isUpdating() || true) {
+			int percent = this.updatePercent = 75;
 			String s = this.updateText1;
 			String p = this.updateText2;
 			if(s == null) s = "null";
@@ -272,13 +271,12 @@ public class ModpackPanel extends JPanel {
 				int pww = w - px;
 				g.setColor(new Color(57, 57, 57));
 				g.fillRect(px, h - 3, pww - 1, 4);
-				//g.setColor(new Color(65, 119, 179));
-				g.setColor(new Color(135, 44, 221));
+				if(l) g.setColor(new Color(65, 119, 179));
+				else g.setColor(new Color(135, 44, 221));
 				int pw = (int) ((double)pww*((double)percent/100D));
 				g.fillRect(px, h - 3, pw - 1, 4);
 			}
-			Font ff = g.getFont().deriveFont(12.0F);
-			g.setFont(ff);
+			g.setFont(Fonts.modpackState);
 			g.drawString(s1, ptx, h - th - th2 - 3);
 			g.setFont(f);
 			g.setColor(UIManager.getColor("Label.foreground"));
@@ -365,21 +363,6 @@ public class ModpackPanel extends JPanel {
 			}
 		}
 		return v.toArray(new String[0]);
-	}
-	
-	static {
-		try {
-			descFont = Font.createFont(Font.TRUETYPE_FONT, ModpackPanel.class.getResourceAsStream("/font/Montserrat-Regular.ttf")).deriveFont(0, 15);
-		} catch (Exception e) {
-			Log.warn("Font load failed: " + e.toString());
-			descFont = Font.getFont(Font.SANS_SERIF).deriveFont(0, 15);
-		}
-		try {
-			nameFont = Font.createFont(Font.TRUETYPE_FONT, ModpackPanel.class.getResourceAsStream("/font/Montserrat-Bold.ttf")).deriveFont(Font.BOLD, 18);
-		} catch (Exception e) {
-			Log.warn("Font load failed: " + e.toString());
-			nameFont = Font.getFont(Font.SANS_SERIF).deriveFont(Font.BOLD, 18);
-		}
 	}
 
 }

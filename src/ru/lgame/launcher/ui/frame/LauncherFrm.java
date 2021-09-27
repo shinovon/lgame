@@ -14,8 +14,10 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.ColorUIResource;
 
+import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.ui.ButtonUI;
+import ru.lgame.launcher.ui.Fonts;
 import ru.lgame.launcher.ui.pane.LauncherPane;
 import ru.lgame.launcher.ui.pane.SettingsPane;
 import ru.lgame.launcher.utils.logging.Log;
@@ -47,7 +49,7 @@ public class LauncherFrm extends JFrame implements WindowListener {
 		setUI();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		contentPane = new JPanel();
-		contentPane.setBackground(new Color(35, 36, 40));
+		if(!Config.getBoolean("legacyLook")) contentPane.setBackground(new Color(35, 36, 40));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(layout = new StackLayout());
 		setContentPane(contentPane);
@@ -101,35 +103,43 @@ public class LauncherFrm extends JFrame implements WindowListener {
 		Color bg = new Color(35, 36, 40);
 		Color dbg = new Color(51, 52, 56);
 		Color fg = new Color(255, 255, 255);
-		UIManager.put("ButtonUI", ButtonUI.class.getName());
-		UIManager.put("Panel.background", new ColorUIResource(bg));
-		UIManager.put("Button.background", new ColorUIResource(bg));
-		UIManager.put("CheckBox.background", new ColorUIResource(bg));
-		UIManager.put("OptionPane.background", new ColorUIResource(bg));
-		UIManager.put("Slider.background", new ColorUIResource(bg));
-		UIManager.put("TextField.background", new ColorUIResource(bg));
-		UIManager.put("List.background", new ColorUIResource(bg));
-		//UIManager.put("ComboBox.background", new ColorUIResource(bg));
-		UIManager.put("PasswordField.background", new ColorUIResource(bg));
-		
-		UIManager.put("TextField.disabledBackground", new ColorUIResource(dbg));
-		UIManager.put("PasswordField.disabledBackground", new ColorUIResource(dbg));
-		//UIManager.put("ComboBox.disabledBackground", new ColorUIResource(dbg));
-		
-		UIManager.put("Panel.foreground", new ColorUIResource(fg));
-		UIManager.put("Label.foreground", new ColorUIResource(fg));
-		UIManager.put("OptionPane.foreground", new ColorUIResource(fg));
-		UIManager.put("OptionPane.messageForeground", new ColorUIResource(fg));
-		UIManager.put("Slider.foreground", new ColorUIResource(fg));
-		UIManager.put("TextField.foreground", new ColorUIResource(fg));
-		UIManager.put("List.foreground", new ColorUIResource(fg));
-		UIManager.put("PasswordField.foreground", new ColorUIResource(fg));
-		UIManager.put("CheckBox.foreground", new ColorUIResource(fg));
-		//UIManager.put("ComboBox.foreground", new ColorUIResource(fg));
-		//UIManager.put("ComboBox.selectionForeground", new ColorUIResource(fg));
-		UIManager.put("Button.foreground", new ColorUIResource(new Color(255, 255, 255)));
-		UIManager.put("Button.disabledText", new ColorUIResource(new Color(225, 25, 255)));
-		UIManager.put("Button.disabledText", new ColorUIResource(new Color(225, 25, 255)));
+		if(!Config.getBoolean("legacyLook")) {
+			UIManager.put("ButtonUI", ButtonUI.class.getName());
+			if(Fonts.label != null) {
+				UIManager.put("Label.font", Fonts.label);
+				UIManager.put("CheckBox.font", Fonts.label);
+				UIManager.put("Slider.font", Fonts.label);
+				UIManager.put("Panel.font", Fonts.label);
+			}
+			UIManager.put("Panel.background", new ColorUIResource(bg));
+			UIManager.put("Button.background", new ColorUIResource(bg));
+			UIManager.put("CheckBox.background", new ColorUIResource(bg));
+			UIManager.put("OptionPane.background", new ColorUIResource(bg));
+			UIManager.put("Slider.background", new ColorUIResource(bg));
+			UIManager.put("TextField.background", new ColorUIResource(bg));
+			UIManager.put("List.background", new ColorUIResource(bg));
+			//UIManager.put("ComboBox.background", new ColorUIResource(bg));
+			UIManager.put("PasswordField.background", new ColorUIResource(bg));
+			
+			UIManager.put("TextField.disabledBackground", new ColorUIResource(dbg));
+			UIManager.put("PasswordField.disabledBackground", new ColorUIResource(dbg));
+			//UIManager.put("ComboBox.disabledBackground", new ColorUIResource(dbg));
+			
+			UIManager.put("Panel.foreground", new ColorUIResource(fg));
+			UIManager.put("Label.foreground", new ColorUIResource(fg));
+			UIManager.put("OptionPane.foreground", new ColorUIResource(fg));
+			UIManager.put("OptionPane.messageForeground", new ColorUIResource(fg));
+			UIManager.put("Slider.foreground", new ColorUIResource(fg));
+			UIManager.put("TextField.foreground", new ColorUIResource(fg));
+			UIManager.put("List.foreground", new ColorUIResource(fg));
+			UIManager.put("PasswordField.foreground", new ColorUIResource(fg));
+			UIManager.put("CheckBox.foreground", new ColorUIResource(fg));
+			//UIManager.put("ComboBox.foreground", new ColorUIResource(fg));
+			//UIManager.put("ComboBox.selectionForeground", new ColorUIResource(fg));
+			UIManager.put("Button.foreground", new ColorUIResource(new Color(255, 255, 255)));
+			UIManager.put("Button.disabledText", new ColorUIResource(new Color(225, 25, 255)));
+			UIManager.put("Button.disabledText", new ColorUIResource(new Color(225, 25, 255)));
+		}
 	}
 
 	public LauncherPane mainPane() {

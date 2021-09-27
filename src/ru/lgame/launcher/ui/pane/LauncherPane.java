@@ -25,6 +25,7 @@ import javax.swing.JTextField;
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.auth.Auth;
+import ru.lgame.launcher.ui.Fonts;
 import ru.lgame.launcher.ui.frame.LauncherFrm;
 import ru.lgame.launcher.update.Modpack;
 import ru.lgame.launcher.utils.logging.Log;
@@ -126,11 +127,12 @@ public class LauncherPane extends JPanel {
 		Image skin = null;
 		try {
 			if(Launcher.inst.currentAuth() != null) {
+				// ыыы
 				if(Launcher.inst.currentAuth().getUsername().equalsIgnoreCase("shinovon")) {
 					skin = ImageIO.read(getClass().getResourceAsStream("/Shinovon.png"));
 				}
 			} else {
-				
+				//TODO
 			}
 		} catch (Exception e1) {
 		}
@@ -146,7 +148,7 @@ public class LauncherPane extends JPanel {
 		usernameLabel = new JLabel("Добавьте авторизацию");
 		panel_3_1.add(usernameLabel);
 		if(Launcher.inst.currentAuth() != null) usernameLabel.setText("Добро пожаловать, " + Launcher.inst.currentAuth().getUsername());
-		
+		usernameLabel.setFont(Fonts.username);
 		JPanel panel_3 = new JPanel();
 		FlowLayout flowLayout_1 = (FlowLayout) panel_3.getLayout();
 		flowLayout_1.setAlignment(FlowLayout.TRAILING);
