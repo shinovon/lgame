@@ -34,7 +34,7 @@ import static ru.lgame.launcher.ui.Fonts.*;
  * Панелька сборки с описанием и картинкой
  * @author Shinovon
  */
-public class ModpackPanel extends JPanel {
+public class MiniModpackPane extends JPanel {
 	
 	private static final long serialVersionUID = 5622859608833406220L;
 
@@ -64,11 +64,11 @@ public class ModpackPanel extends JPanel {
 	private String updateText2;
 	private int updatePercent = -1;
 
-	public ModpackPanel(String id) {
+	public MiniModpackPane(String id) {
 		this(id, null);
 	}
 
-	public ModpackPanel(String i, ButtonGroup bg) {
+	public MiniModpackPane(String i, ButtonGroup bg) {
 		this.id = i;
 		setBorder(new MatteBorder(0, 0, 1, 0, Color.GRAY));
 		imageLabel = new JLabel();
@@ -149,7 +149,7 @@ public class ModpackPanel extends JPanel {
 	 * @param desc Описание
 	 * @return Самого себя
 	 */
-	public ModpackPanel setInformation(String name, String desc) {
+	public MiniModpackPane setInformation(String name, String desc) {
 		this.modpackName = name;
 		this.desc = desc;
 		this.descArr = null;
@@ -162,7 +162,7 @@ public class ModpackPanel extends JPanel {
 	 * @param img Изображение
 	 * @return Самого себя
 	 */
-	public ModpackPanel setImage(Image img) {
+	public MiniModpackPane setImage(Image img) {
 		this.image = img;
 		this.descArr = null;
 		imageLabel.setIcon(new ImageIcon(image));
@@ -256,7 +256,7 @@ public class ModpackPanel extends JPanel {
 			g.fillRect(w - 4, 0, 3, rh);
 			g.setFont(Fonts.modpackState);
 			g.drawString("Запущена", x, rh - (g.getFontMetrics().getHeight() / 2));
-		} else if(isUpdating() || true) {
+		} else if(isUpdating()) {
 			int percent = this.updatePercent = 75;
 			String s = this.updateText1;
 			String p = this.updateText2;

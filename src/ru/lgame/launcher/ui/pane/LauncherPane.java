@@ -45,7 +45,7 @@ public class LauncherPane extends JPanel {
 
 	private JButton startBtn;
 
-	private ModpackPanel selected;
+	private MiniModpackPane selected;
 
 	private JScrollPane scrollPane;
 
@@ -221,7 +221,7 @@ public class LauncherPane extends JPanel {
 		else usernameLabel.setText("Добавьте авторизацию");
 	}
 
-	public void setSelected(ModpackPanel modpackPanel) {
+	public void setSelected(MiniModpackPane modpackPanel) {
 		selected = modpackPanel;
 		selected();
 	}
@@ -254,7 +254,7 @@ public class LauncherPane extends JPanel {
 	/**
 	 * Добавить сборку в список
 	 */
-	private void addModpack(ModpackPanel sb) {
+	private void addModpack(MiniModpackPane sb) {
 		sb.setButtonGroup(bg);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;

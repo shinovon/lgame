@@ -2,7 +2,7 @@ package ru.lgame.launcher.ui;
 
 import java.awt.Font;
 
-import ru.lgame.launcher.ui.pane.ModpackPanel;
+import ru.lgame.launcher.ui.pane.MiniModpackPane;
 import ru.lgame.launcher.utils.logging.Log;
 
 public class Fonts {
@@ -27,7 +27,7 @@ public class Fonts {
 
 	private static Font createFontBold(float f) {
 		try {
-			return Font.createFont(Font.TRUETYPE_FONT, ModpackPanel.class.getResourceAsStream("/font/Montserrat-Bold.ttf"))
+			return Font.createFont(Font.TRUETYPE_FONT, MiniModpackPane.class.getResourceAsStream("/font/Montserrat-Bold.ttf"))
 					.deriveFont(Font.BOLD, f);
 		} catch (Exception e) {
 			Log.warn("Font load failed: " + e.toString());
@@ -38,7 +38,7 @@ public class Fonts {
 
 	private static Font createFont(float f) {
 		try {
-			return Font.createFont(Font.TRUETYPE_FONT, ModpackPanel.class.getResourceAsStream("/font/Montserrat-Regular.ttf"))
+			return Font.createFont(Font.TRUETYPE_FONT, MiniModpackPane.class.getResourceAsStream("/font/Montserrat-Regular.ttf"))
 					.deriveFont(0, f);
 		} catch (Exception e) {
 			Log.warn("Font load failed: " + e.toString());

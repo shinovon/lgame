@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 import org.json.JSONObject;
 
 import ru.lgame.launcher.Launcher;
-import ru.lgame.launcher.ui.pane.ModpackPanel;
+import ru.lgame.launcher.ui.pane.MiniModpackPane;
 import ru.lgame.launcher.utils.FileUtils;
 import ru.lgame.launcher.utils.LauncherOfflineException;
 import ru.lgame.launcher.utils.WebUtils;
@@ -32,7 +32,7 @@ public class Modpack {
 	private String client_id;
 	private String update_data;
 	private String client_update_data;
-	private ModpackPanel ui;
+	private MiniModpackPane ui;
 	
 	private JSONObject updateJson;
 	private JSONObject clientUpdateJson;
@@ -92,13 +92,13 @@ public class Modpack {
 	/**
 	 * Создает панель, грузит картинку
 	 */
-	public ModpackPanel createPanel() {
+	public MiniModpackPane createPanel() {
 		if(ui != null) {
 			ui.setInformation(name, description);
 			ui.setModpack(this);
 			return ui;
 		}
-		ModpackPanel mp = new ModpackPanel(id);
+		MiniModpackPane mp = new MiniModpackPane(id);
 		mp.setInformation(name, description);
 		mp.setModpack(this);
 		//Launcher.inst.queue(new Runnable() {
