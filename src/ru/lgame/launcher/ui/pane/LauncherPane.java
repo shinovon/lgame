@@ -1,4 +1,4 @@
-package ru.lgame.launcher.ui;
+package ru.lgame.launcher.ui.pane;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -24,8 +24,9 @@ import javax.swing.JTextField;
 
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
-import ru.lgame.launcher.Modpack;
 import ru.lgame.launcher.auth.Auth;
+import ru.lgame.launcher.ui.frame.LauncherFrm;
+import ru.lgame.launcher.update.Modpack;
 import ru.lgame.launcher.utils.logging.Log;
 
 public class LauncherPane extends JPanel {

@@ -12,6 +12,7 @@ import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicButtonUI;
 
+import ru.lgame.launcher.ui.pane.ModpackPanel;
 import ru.lgame.launcher.utils.logging.Log;
 
 public class ButtonUI extends BasicButtonUI {

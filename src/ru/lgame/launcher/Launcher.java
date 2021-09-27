@@ -21,11 +21,13 @@ import com.mojang.authlib.exceptions.InvalidCredentialsException;
 
 import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.auth.AuthStore;
-import ru.lgame.launcher.ui.AccountsFrm;
 import ru.lgame.launcher.ui.ErrorUI;
-import ru.lgame.launcher.ui.LauncherFrm;
-import ru.lgame.launcher.ui.LoadingFrm;
-import ru.lgame.launcher.ui.LoggerFrm;
+import ru.lgame.launcher.ui.frame.AccountsFrm;
+import ru.lgame.launcher.ui.frame.LauncherFrm;
+import ru.lgame.launcher.ui.frame.LoadingFrm;
+import ru.lgame.launcher.ui.frame.LoggerFrm;
+import ru.lgame.launcher.update.Modpack;
+import ru.lgame.launcher.update.Updater;
 import ru.lgame.launcher.utils.FileUtils;
 import ru.lgame.launcher.utils.WebUtils;
 import ru.lgame.launcher.utils.logging.Log;

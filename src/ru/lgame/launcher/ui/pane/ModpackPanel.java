@@ -1,4 +1,4 @@
-package ru.lgame.launcher.ui;
+package ru.lgame.launcher.ui.pane;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -24,7 +24,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import ru.lgame.launcher.Launcher;
-import ru.lgame.launcher.Modpack;
+import ru.lgame.launcher.update.Modpack;
 import ru.lgame.launcher.utils.logging.Log;
 
 /**

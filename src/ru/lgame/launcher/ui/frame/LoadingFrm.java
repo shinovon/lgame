@@ -1,4 +1,4 @@
-package ru.lgame.launcher.ui;
+package ru.lgame.launcher.ui.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

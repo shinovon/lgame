@@ -1,4 +1,4 @@
-package ru.lgame.launcher;
+package ru.lgame.launcher.update;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -10,7 +10,9 @@ import javax.imageio.ImageIO;
 
 import org.json.JSONObject;
 
-import ru.lgame.launcher.ui.ModpackPanel;
+import ru.lgame.launcher.Config;
+import ru.lgame.launcher.Launcher;
+import ru.lgame.launcher.ui.pane.ModpackPanel;
 import ru.lgame.launcher.utils.FileUtils;
 import ru.lgame.launcher.utils.LauncherOfflineException;
 import ru.lgame.launcher.utils.WebUtils;

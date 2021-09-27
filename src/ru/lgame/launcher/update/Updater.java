@@ -1,4 +1,4 @@
-package ru.lgame.launcher;
+package ru.lgame.launcher.update;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -22,6 +22,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import ru.lgame.launcher.Config;
+import ru.lgame.launcher.Errors;
+import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.ui.ErrorUI;
 import ru.lgame.launcher.utils.FileUtils;
@@ -84,13 +87,13 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		this.forceUpdate = b;
 	}
 	
-	static void start(Modpack m, Auth a) {
+	public static void start(Modpack m, Auth a) {
 		if(currentThread != null && currentThread.isAlive()) return;
 		currentThread = new Thread(new Updater(m, a, false));
 		currentThread.start();
 	}
 	
-	static void startForceUpdate(Modpack m, Auth a) {
+	public static void startForceUpdate(Modpack m, Auth a) {
 		if(currentThread != null && currentThread.isAlive()) return;
 		currentThread = new Thread(new Updater(m, a, true));
 		currentThread.start();

@@ -1,4 +1,4 @@
-package ru.lgame.launcher.ui;
+package ru.lgame.launcher.ui.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -15,6 +15,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.ColorUIResource;
 
 import ru.lgame.launcher.Launcher;
+import ru.lgame.launcher.ui.ButtonUI;
+import ru.lgame.launcher.ui.pane.LauncherPane;
+import ru.lgame.launcher.ui.pane.SettingsPane;
 import ru.lgame.launcher.utils.logging.Log;
 import ru.lgame.launcher.utils.ui.StackLayout;
 
@@ -32,7 +35,7 @@ public class LauncherFrm extends JFrame implements WindowListener {
 	boolean settingsShowing;
 	JPanel settingsPanel;
 
-	ActionListener settingsListener;
+	public ActionListener settingsListener;
 
 	private Thread repaintThread;
 

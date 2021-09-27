@@ -1,4 +1,4 @@
-package ru.lgame.launcher.ui;
+package ru.lgame.launcher.ui.pane;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -25,6 +25,7 @@ import javax.swing.event.ChangeListener;
 import li.flor.nativejfilechooser.NativeJFileChooser;
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
+import ru.lgame.launcher.ui.frame.LauncherFrm;
 
 public class SettingsPane extends JPanel {
 

@@ -1,4 +1,4 @@
-package ru.lgame.launcher.ui;
+package ru.lgame.launcher.ui.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -26,6 +26,7 @@ import javax.swing.event.ListSelectionListener;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.auth.AuthStore;
+import ru.lgame.launcher.ui.ErrorUI;
 
 public class AccountsFrm extends JFrame {
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 public class LauncherOfflineException extends RuntimeException {
 
 	public LauncherOfflineException() {
+		super();
 	}
 
 	public LauncherOfflineException(IOException e) {
