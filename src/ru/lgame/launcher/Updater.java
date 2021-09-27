@@ -500,10 +500,10 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		switch(modpackState) {
 		case 0:
 		{
-			modpack.setUpdateInfo("Обновление", "Обновление клиента", 0);
+			modpack.setUpdateInfo("Обновление клиента", "Обновление клиента", 0);
 			if(!clientInstalled) installClient();
 			else if(clientNeedsUpdate) updateClient();
-			modpack.setUpdateInfo("Обновление", "Установка сборки", -2);
+			modpack.setUpdateInfo("Обновление сборки", "Установка сборки", -2);
 			install();
 			break;
 		}
@@ -522,20 +522,20 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		case 2:
 		case 3:
 		{
-			modpack.setUpdateInfo("Обновление", "Обновление клиента", 0);
+			modpack.setUpdateInfo("Обновление клиента", "Обновление клиента", 0);
 			if(!clientInstalled) installClient();
 			else if(clientNeedsUpdate) updateClient();
-			modpack.setUpdateInfo("Обновление", "Обновление сборки", -2);
+			modpack.setUpdateInfo("Обновление сборки", "Обновление сборки", -2);
 			update();
 			break;
 		}
 		case 4: {
-			modpack.setUpdateInfo("Обновление", "Установка клиента", 0);
+			modpack.setUpdateInfo("Обновление клиента", "Установка клиента", 0);
 			installClient();
 			break;
 		}
 		case 5: {
-			modpack.setUpdateInfo("Обновление", "Обновление клиента", 0);
+			modpack.setUpdateInfo("Обновление клиента", "Обновление клиента", 0);
 			updateClient();
 			break;
 		}
@@ -549,7 +549,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		}
 		if(ret && !failed) {
 			modpack.setUpdateInfo("Обновление", "Повторная инициализация системы обновления", 100);
-			Log.debug("Updater repeat");
+			Log.info("Updater repeat");
 			reset();
 			repeated = true;
 			run();
@@ -932,6 +932,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		forceUpdate = false;
 		running = false;
 		failed = false;
+		downloadFailCount = 0;
 	}
 	
 	public String getClientDir() {
