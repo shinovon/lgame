@@ -32,6 +32,8 @@ state.updatingmodpack=Обновление сборки
 state.downloading=Скачивание
 state.unzipstart=Распаковка архивов
 state.unzipping=Распаковка
+state.startingclient=Запуск клиента
+state.error=Обработка ошибки
 
 loading.initializing=Инициализация
 loading.fetchingmodpacks=Получение данных о сборках
