@@ -29,6 +29,9 @@ import ru.lgame.launcher.ui.frame.LauncherFrm;
 import ru.lgame.launcher.update.Modpack;
 import ru.lgame.launcher.utils.logging.Log;
 
+/**
+ * @author Shinovon
+ */
 public class LauncherPane extends JPanel {
 	
 	private static final long serialVersionUID = 208595987287929416L;

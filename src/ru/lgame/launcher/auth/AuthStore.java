@@ -17,6 +17,9 @@ import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.utils.FileUtils;
 import ru.lgame.launcher.utils.logging.Log;
 
+/**
+ * @author Shinovon
+ */
 public final class AuthStore {
 	
 	private static final String secret_key1 = "LGAMEAUTHSTORELG";

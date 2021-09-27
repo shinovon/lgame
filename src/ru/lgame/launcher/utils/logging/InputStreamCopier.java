@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * @author Shinovon
+ */
 public class InputStreamCopier extends Thread {
 	private final InputStream input;
 	private final OutputStream output;

@@ -28,6 +28,10 @@ import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.auth.AuthStore;
 import ru.lgame.launcher.ui.ErrorUI;
 
+/**
+ * окно с аккаунтами
+ * @author Shinovon
+ */
 public class AccountsFrm extends JFrame {
 
 	/**

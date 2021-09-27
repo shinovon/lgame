@@ -2,6 +2,10 @@ package ru.lgame.launcher.utils.logging;
 
 import org.apache.logging.log4j.Logger;
 
+/**
+ * Подмена log4j логов для перехвата логов библиотек
+ * @author Shinovon
+ */
 public class LoggerImpl implements Logger {
 	
 	private String sec;

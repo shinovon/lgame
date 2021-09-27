@@ -12,6 +12,9 @@ import net.sf.jazzlib.ZipInputStream;
 import net.sf.jazzlib.ZipOutputStream;
 import ru.lgame.launcher.utils.logging.Log;
 
+/**
+ * @author Shinovon
+ */
 public final class ZipUtils {
 	private static ProgressListener listener;
 	

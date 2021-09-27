@@ -8,6 +8,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+/**
+ * @author Shinovon
+ */
 public class FileUtils {
 	public static String getString(File file) throws IOException {
 		return getString(file.getAbsolutePath());

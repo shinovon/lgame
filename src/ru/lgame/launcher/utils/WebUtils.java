@@ -20,6 +20,9 @@ import java.util.zip.GZIPInputStream;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.utils.logging.Log;
 
+/**
+ * @author Shinovon
+ */
 public class WebUtils {
 	private static ProgressListener listener;
 	

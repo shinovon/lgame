@@ -15,6 +15,9 @@ import javax.swing.plaf.basic.BasicButtonUI;
 import ru.lgame.launcher.ui.pane.ModpackPanel;
 import ru.lgame.launcher.utils.logging.Log;
 
+/**
+ * @author Shinovon
+ */
 public class ButtonUI extends BasicButtonUI {
 
 	private static Font font;

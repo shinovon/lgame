@@ -20,8 +20,14 @@ import javax.swing.border.EmptyBorder;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.utils.logging.Log;
 
+/**
+ * @author Shinovon
+ */
 public class ErrorUI {
 
+	/**
+	 * @since 0.3
+	 */
 	@SuppressWarnings("deprecation")
 	public static void clientError(String title, String s, String trace) {
 		Launcher l = Launcher.inst;

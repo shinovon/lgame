@@ -27,6 +27,9 @@ import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.ui.frame.LauncherFrm;
 
+/**
+ * @author Shinovon
+ */
 public class SettingsPane extends JPanel {
 
 	private static final long serialVersionUID = -8711782187461079094L;

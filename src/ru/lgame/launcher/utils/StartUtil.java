@@ -10,6 +10,9 @@ import java.util.Set;
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.utils.logging.Log;
 
+/**
+ * @author Shinovon
+ */
 public class StartUtil {
 	public static Process startJarProcess(File dir, Set<File> classpath, String mainClass, List<String> jvmArgs, List<String> appArgs) throws IOException {
 		List<String> cmd = new ArrayList<String>();

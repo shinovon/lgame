@@ -18,6 +18,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 
+/**
+ * @author Shinovon
+ */
 public class LoggerFrm extends JFrame {
 
 	/**

@@ -6,6 +6,10 @@ import java.util.Calendar;
 
 import ru.lgame.launcher.Launcher;
 
+/**
+ * Система логирования
+ * @author Shinovon
+ */
 public class Log {
 	
 	private static StringBuffer buffer = new StringBuffer(7000);

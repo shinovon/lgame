@@ -36,6 +36,10 @@ import ru.lgame.launcher.utils.logging.InputStreamCopier;
 import ru.lgame.launcher.utils.logging.Log;
 import ru.lgame.launcher.utils.WebUtils;
 
+/**
+ * Система обновления
+ * @author Shinovon
+ */
 public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUtils.ProgressListener {
 	
 	private static Updater currentInst;

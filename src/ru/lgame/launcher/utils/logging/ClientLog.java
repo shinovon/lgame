@@ -7,6 +7,9 @@ import java.io.StringWriter;
 
 import ru.lgame.launcher.Launcher;
 
+/**
+ * @author Shinovon
+ */
 public class ClientLog extends PrintStream {
 	
 	private static ClientLog instance;

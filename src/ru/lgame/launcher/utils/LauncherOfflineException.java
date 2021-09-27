@@ -2,6 +2,10 @@ package ru.lgame.launcher.utils;
 
 import java.io.IOException;
 
+/**
+ * @since 0.5
+ * @author Shinovon
+ */
 public class LauncherOfflineException extends RuntimeException {
 
 	public LauncherOfflineException() {
