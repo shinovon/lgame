@@ -571,7 +571,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		tasksDone = 0;
 		updating = true;
 		String p = getClientDir();
-		String t = Launcher.getTempDir();
+		String t = Launcher.getTempDir(modpack.client());
 		JSONObject script = clientJson.getJSONObject("update").getJSONObject("update_scripts").getJSONObject("update_script");
 		JSONArray download = script.getJSONArray("download");
 		JSONArray unzip = script.getJSONArray("unzip");
@@ -603,7 +603,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		String p = getClientDir();
 		File pf = new File(p);
 		if(!pf.exists()) pf.mkdirs();
-		String t = Launcher.getTempDir();
+		String t = Launcher.getTempDir(modpack.client());
 		JSONObject script = clientJson.getJSONObject("update").getJSONObject("update_scripts").getJSONObject("install_script");
 		JSONArray download = script.getJSONArray("download");
 		JSONArray unzip = script.getJSONArray("unzip");
@@ -623,7 +623,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		tasksDone = 0;
 		updating = true;
 		String p = getModpackDir();
-		String t = Launcher.getTempDir();
+		String t = Launcher.getTempDir(modpack.id());
 		JSONObject script = json.getJSONObject("update").getJSONObject("update_scripts").getJSONObject("update_script");
 		JSONArray download = script.getJSONArray("download");
 		JSONArray unzip = script.getJSONArray("unzip");
@@ -648,7 +648,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		String p = getModpackDir();
 		File pf = new File(p);
 		if(!pf.exists()) pf.mkdirs();
-		String t = Launcher.getTempDir();
+		String t = Launcher.getTempDir(modpack.id());
 		JSONObject script = json.getJSONObject("update").getJSONObject("update_scripts").getJSONObject("install_script");
 		JSONArray download = script.optJSONArray("download");
 		JSONArray unzip = script.optJSONArray("unzip");
