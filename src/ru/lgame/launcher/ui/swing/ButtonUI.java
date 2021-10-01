@@ -1,4 +1,4 @@
-package ru.lgame.launcher.ui;
+package ru.lgame.launcher.ui.swing;
 
 import java.awt.Color;
 import java.awt.Dimension;

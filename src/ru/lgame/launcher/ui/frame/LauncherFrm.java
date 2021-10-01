@@ -16,10 +16,10 @@ import javax.swing.plaf.ColorUIResource;
 
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
-import ru.lgame.launcher.ui.ButtonUI;
 import ru.lgame.launcher.ui.Fonts;
 import ru.lgame.launcher.ui.pane.LauncherPane;
 import ru.lgame.launcher.ui.pane.SettingsPane;
+import ru.lgame.launcher.ui.swing.ButtonUI;
 import ru.lgame.launcher.utils.logging.Log;
 import ru.lgame.launcher.utils.ui.StackLayout;
 
