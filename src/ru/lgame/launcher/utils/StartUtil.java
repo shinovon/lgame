@@ -33,21 +33,28 @@ public class StartUtil {
 	private static String getJavaExec() {
 		String p = Config.get("javapath");
 		String exec = "java.exe";
-		if(p != null && p != "" && p != "  " && p != " ") {
+		if(p != null && p != "" && p != "  " && p != " " && p.length() > 3) {
 			p = p.replace("\\", File.separator);
 			p = p.replace("/", File.separator);
 			if(p.endsWith("java.exe")) return p;
 			if(p.endsWith("bin" + File.separator)) return p + exec;
 			if(p.endsWith("bin")) return p + File.separator + exec;
 			if(p.endsWith(File.separator)) return p + "bin" + File.separator + exec;
+			Log.debug("1: " + p);
 			return p + File.separator + "bin" + File.separator + exec;
 		}
 		String home = System.getProperty("java.home");
 		if(home == null || home == "" || home == " " || home.length() < 2)
 			throw new RuntimeException("invalid java.home value");
+		Log.debug("2: " + home);
 		return home + File.separator + "bin" + File.separator + exec;
 	}
 
+	public static String findJavaDir() {
+		String s = System.getProperty("java.home");
+		return s;
+	}
+	
 	private static String getJavaPathDir() {
 		String[] paths = System.getenv("path").split(";");
 		int d = 0;
