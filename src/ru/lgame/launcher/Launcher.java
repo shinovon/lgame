@@ -82,18 +82,14 @@ public class Launcher {
 		}
 	};
 	
-	private Launcher() {
+	public Launcher() {
 		inst = this;
 		queuedTasks = new ArrayList<Runnable>();
 		modpackIds = new ArrayList<String>();
 		modpacks = new ArrayList<Modpack>();
 	}
 
-	public static void main(String[] args) {
-		new Launcher().startLauncher();
-	}
-
-	private void startLauncher() {
+	public void startLauncher() {
 		running = true;
 		try {
 			EventQueue.invokeAndWait(new Runnable() {
