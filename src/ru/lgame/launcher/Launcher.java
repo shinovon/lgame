@@ -350,6 +350,11 @@ public class Launcher {
 		s += File.separator;
 		return s + "lgametemp" + File.separator;
 	}
+	
+
+	public static String getTempDir(String str) {
+		return getTempDir() + str + File.separator;
+	}
 
 	/**
 	 * Сохранить картинку в кэш
