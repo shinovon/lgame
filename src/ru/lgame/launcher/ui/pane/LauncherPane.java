@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Iterator;
@@ -200,36 +201,60 @@ public class LauncherPane extends JPanel {
 	private void getSkin() {
 		Launcher.inst.queue(new Runnable() {
 			public void run() {
-				boolean d = false;
+				boolean fail = false;
 				l: {
 				try {
 					if(Launcher.inst.currentAuth() != null) {
 						if(skinState) return;
-						String username = Launcher.inst.currentAuth().getUsername();
-						String s = WebUtils.get("https://api.mojang.com/users/profiles/minecraft/" + username + "?at=" + (System.currentTimeMillis() / 1000L));
-						if(s == null || s == "" || s.length() < 2 || s.charAt(0) != '{') {
-							skinName = username;
-							skinState = true;
-							d = true;
+						Auth a = Launcher.inst.currentAuth();
+						String uuid = null;
+						String username = a.getUsername();
+						if(a.isMojang()) uuid = a.getMojangUUID();
+						if(uuid == null) {
+							String cv = Launcher.inst.getValueFromCache(username.toLowerCase() + "_uuid");
+							if(cv == null) {
+								String s = WebUtils.get("https://api.mojang.com/users/profiles/minecraft/" + username + "?at=" + (System.currentTimeMillis() / 1000L));
+								if(s == null || s == "" || s.length() < 2 || s.charAt(0) != '{') {
+									skinName = username;
+									skinState = true;
+									fail = true;
+									break l;
+								}
+								JSONObject profile = new JSONObject(s);
+								uuid = profile.getString("id").replace("-", "");
+								Launcher.inst.saveValueToCache(username.toLowerCase() + "_uuid", uuid);
+							} else uuid = cv;
+						}
+						if(uuid == null) {
+							fail = true;
 							break l;
 						}
-						JSONObject profile = new JSONObject(s);
-						String uuid = profile.getString("id").replace("-", "");
 						String url = "https://crafatar.com/avatars/" + uuid + "?overlay&size=24";
-						byte[] b = WebUtils.getBytes(url);
-						Image img = ImageIO.read(new ByteArrayInputStream(b)).getScaledInstance(24, 24, Image.SCALE_DEFAULT);
-						skinImageLabel.setIcon(new ImageIcon(img));
-						skinName = username;
-						skinState = true;
+						Image ci = Launcher.inst.getCachedImage(url);
+						if(ci != null) {
+							skinImageLabel.setIcon(new ImageIcon(ci));
+							skinName = username;
+							skinState = true;
+						}
+						try {
+							byte[] b = WebUtils.getBytes(url);
+							BufferedImage img = (BufferedImage) ImageIO.read(new ByteArrayInputStream(b));
+							Launcher.inst.saveImageToCachePng(url, img);
+							skinImageLabel.setIcon(new ImageIcon(img));
+							skinName = username;
+							skinState = true;
+						} catch (IOException e) {
+							if(ci == null) fail = true;
+						}
 					} else {
-						d = true;
+						fail = true;
 					}
 				} catch (Exception e) {
 					Log.error("skin gather failed", e);
-					d = true;
+					fail = true;
 				}
 				}
-				if(d) {
+				if(fail) {
 					Image skin = null;
 					try {
 						skin = ImageIO.read(getClass().getResourceAsStream("/defaultskin.png"));

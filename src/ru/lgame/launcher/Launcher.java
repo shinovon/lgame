@@ -361,17 +361,18 @@ public class Launcher {
 	 * @param img Изображение
 	 */
 	public void saveImageToCache(String url, BufferedImage img) {
-		File f = new File(getCacheDir() + getMD5String(url));
+		Log.debug("saveImage:" + url);
+		File f = new File(getCacheDir() + "i" + getMD5String(url));
 		if(f.exists()) f.delete();
 		try {
 			ImageIO.write(img, "jpeg", f);
 		} catch (IOException e) {
 		}
 	}
-	
 
 	public void saveImageToCachePng(String url, BufferedImage img) {
-		File f = new File(getCacheDir() + getMD5String(url));
+		Log.debug("saveImagePng:" + url);
+		File f = new File(getCacheDir() + "i" + getMD5String(url));
 		if(f.exists()) f.delete();
 		try {
 			ImageIO.write(img, "png", f);
@@ -385,13 +386,47 @@ public class Launcher {
 	 * @return Кэшированное изображение
 	 */
 	public Image getCachedImage(String url) {
-		File f = new File(getCacheDir() + getMD5String(url));
-		if(!f.exists()) return null;
+		File f = new File(getCacheDir() + "i" + getMD5String(url));
+		if(!f.exists()) {
+			Log.debug("getImage:" + url + "=null");
+			return null;
+		}
 		try {
-			return ImageIO.read(f);
+			Image i = ImageIO.read(f);
+			Log.debug("getImage:" + url + "=" + i.getWidth(null) + "x" + i.getHeight(null));
+			return i;
 		} catch (IOException e) {
 			Log.error("getCachedImage()", e);
 		}
+		Log.debug("getImage:" + url + "=null");
+		return null;
+	}
+	
+	public void saveValueToCache(String name, String value) {
+		Log.debug("saveValue " + name + "=" + value);
+		File f = new File(getCacheDir() + "v" + getMD5String(name));
+		if(f.exists()) f.delete();
+		try {
+			FileUtils.writeString(f, value);
+		} catch (IOException e) {
+			Log.error("saveValueToCache()", e);
+		}
+	}
+	
+	public String getValueFromCache(String name) {
+		File f = new File(getCacheDir() + "v" + getMD5String(name));
+		if(!f.exists()) {
+			Log.debug("getValue:" + name + "=null");
+			return null;
+		}
+		try {
+			String s = FileUtils.getString(f);
+			Log.debug("getValue:" + name + "=" + s);
+			return s;
+		} catch (IOException e) {
+			Log.error("getValueFromCache()", e);
+		}
+		Log.debug("getValue:" + name + "=null");
 		return null;
 	}
 
