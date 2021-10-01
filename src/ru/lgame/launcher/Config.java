@@ -37,7 +37,6 @@ public class Config {
 		} catch (IOException e) {
 			Log.error("Failed to load properties", e);
 		}
-		Log.info(properties.toString());
 	}
 
 	public static void set(String key, boolean value) {
