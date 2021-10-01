@@ -9,8 +9,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -431,8 +434,23 @@ public class Launcher {
 	}
 
 	public void pathChanged() {
-		// TODO Auto-generated method stub
-		
+		// TODO
+	}
+
+	public static void setFrameIcon(JFrame frm) {
+		try {
+			List<Image> images = new Vector<Image>();
+			Class<?> c = Launcher.class;
+			images.add(ImageIO.read(c.getResourceAsStream("/icon128.png")));
+			images.add(ImageIO.read(c.getResourceAsStream("/icon64.png")));
+			images.add(ImageIO.read(c.getResourceAsStream("/icon48.png")));
+			images.add(ImageIO.read(c.getResourceAsStream("/icon32.png")));
+			images.add(ImageIO.read(c.getResourceAsStream("/icon24.png")));
+			images.add(ImageIO.read(c.getResourceAsStream("/icon16.png")));
+			frm.setIconImages(images);
+		} catch (IOException e) {
+			Log.warn("icon load failed", e);
+		}
 	}
 
 }

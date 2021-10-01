@@ -46,7 +46,7 @@ public class LauncherFrm extends JFrame implements WindowListener {
 	 */
 	public LauncherFrm() {
 		setTitle(Launcher.getFrmTitle());
-		setUI();
+		setUI(this);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		contentPane = new JPanel();
 		if(!Config.getBoolean("legacyLook")) contentPane.setBackground(new Color(35, 36, 40));
@@ -93,7 +93,7 @@ public class LauncherFrm extends JFrame implements WindowListener {
 	/**
 	 * Установить LAF на системный
 	 */
-	private static void setUI() {
+	private static void setUI(JFrame frm) {
 		try {
 			String x = UIManager.getSystemLookAndFeelClassName();
 			UIManager.setLookAndFeel(x);
@@ -140,6 +140,7 @@ public class LauncherFrm extends JFrame implements WindowListener {
 			UIManager.put("Button.disabledText", new ColorUIResource(new Color(225, 25, 255)));
 			UIManager.put("Button.disabledText", new ColorUIResource(new Color(225, 25, 255)));
 		}
+		Launcher.setFrameIcon(frm);
 	}
 
 	public LauncherPane mainPane() {

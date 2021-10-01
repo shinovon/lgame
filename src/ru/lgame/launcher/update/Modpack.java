@@ -136,11 +136,13 @@ public class Modpack {
 					Log.error("Failed to load modpack image: " + e);
 				}
 			}
+			/*
 			try {
 				mp.setImage(ImageIO.read(getClass().getResourceAsStream("/noimg.png")));
 			} catch (IOException e) {
 				Log.error("Failed to load modpack default image:" + e);
 			}
+			*/
 		}
 		//	}
 		//});

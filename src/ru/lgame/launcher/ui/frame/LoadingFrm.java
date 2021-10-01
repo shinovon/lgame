@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.ui.Fonts;
 
 import javax.swing.JProgressBar;
@@ -31,6 +32,7 @@ public class LoadingFrm extends JFrame {
 	public LoadingFrm() {
 		super.setAlwaysOnTop(true);
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		Launcher.setFrameIcon(this);
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(35, 36, 40));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
