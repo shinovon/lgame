@@ -33,7 +33,7 @@ public class StartUtil {
 	private static String getJavaExec() {
 		String p = Config.get("javapath");
 		String exec = "java.exe";
-		if(p != null && p != "" && p != "  " && p != " " && p.length() > 3) {
+		if(p != null && p.length() > 3) {
 			p = p.replace("\\", File.separator);
 			p = p.replace("/", File.separator);
 			if(p.endsWith("java.exe")) return p;
@@ -51,17 +51,28 @@ public class StartUtil {
 	}
 
 	public static String findJavaDir() {
-		String s = System.getProperty("java.home");
-		return s;
+		return getJavaPathDir();
 	}
 	
 	private static String getJavaPathDir() {
 		String[] paths = System.getenv("path").split(";");
+		String w = null;
 		int d = 0;
-		for (int i = 0; i < paths.length; i++)
-			if (paths[i].contains("java"))
+		for (int i = 0; i < paths.length; i++) {
+			String o = paths[i];
+			String s = o.toLowerCase();
+			if ((s.contains("java") || s.contains("jre")) && s.endsWith("bin")) {
+				if(s.contains("jdk") && w.contains("jdk")) {
+					if(!o.contains("jre") && w.contains("jre")) {
+						continue;
+					}
+				}
 				d = i;
-		return paths[d];
+				w = o;
+				System.out.println(o);
+			}
+		}
+		return w;
 	}
 
 	private static String constructClassPath(Set<File> classpathList) throws IOException {
