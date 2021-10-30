@@ -45,7 +45,7 @@ public class Launcher {
 	public static final String build_date = "-";
 	public static final boolean DEBUG = true;
 	
-	public static final String string_version = version + "-dev";
+	public static final String string_version = version + "";
 	
 	private static final String LAUNCHER_JSON_URL = "http://dl.nnproject.cc/lgame/launcher.json";
 
