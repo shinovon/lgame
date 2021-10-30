@@ -838,8 +838,12 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		return true;
 	}
 
+	private double percentD(double i) {
+		return percentD() + (i * (1D / (double) totalTasks) * 100D);
+	}
+
 	private int percentI(double i) {
-		return (int) (percentD() + (i * (1D / (double) totalTasks) * 100D));
+		return (int) (percentD(i));
 	}
 	
 	private double percentD() {
@@ -881,6 +885,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				appArgs.add(auth.getMojangAuthToken());
 				appArgs.add("--userProperties");
 				appArgs.add("{}");
+				//appArgs.add("\"" + auth.getMojangUserProperties().replace("\"", "\\\"") + "\"");
 			}
 			appArgs.add("--gameDir");
 			appArgs.add(getModpackDir());
@@ -980,7 +985,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				+ "(8 - самый оптимальный вариант)\n" + x;
 		} else if(x.contains("AppClassLoader cannot be cast to class java.net.URLClassLoader")) {
 			x = "Возможное решение:\nОшибка несовместимости Forge с версией Java!!\nИспользуйте версию Java 8\n" + x;
-			}
+		}
 		ErrorUI.clientError(Text.get("title.clienterror", "Ошибка клиента"), s, x);	
 	}
 
@@ -1081,32 +1086,32 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	@Override
 	public void startZip(String zipFile) {
-		uiInfo(null, "Упаковка: " + currentUnzipFile + " (%)", percentI(0));
+		uiInfo(null, "Упаковка: " + currentUnzipFile + " (%)", percentD(0), null);
 	}
 
 	@Override
 	public void doneZip(String zipFile) {
-		uiInfo(null, "Упаковка: " + currentUnzipFile + " (100%)", percentI(0));
+		uiInfo(null, "Упаковка: " + currentUnzipFile + " (100%)", percentD(1), null);
 	}
 
 	@Override
 	public void startUnzip(String zipFile) {
-		uiInfo(null, Text.get("state.unzipping") + ": " + currentUnzipFile + " (0%)", percentI(0));
+		uiInfo(null, Text.get("state.unzipping") + ": " + currentUnzipFile + " (0%)", percentD(0), null);
 	}
 
 	@Override
 	public void unzipProgress(String currentFile, int totalPercent, int currentFilePercent) {
-		uiInfo(null, Text.get("state.unzipping") + ": " + currentUnzipFile + ": " + currentFile + " (" + totalPercent + "%)", percentI(totalPercent / 100D));
+		uiInfo(null, Text.get("state.unzipping") + ": " + currentUnzipFile + ": " + currentFile + " (" + totalPercent + "%)", percentD(totalPercent / 100D), null);
 	}
 
 	@Override
 	public void doneUnzip(String zipFile) {
-		uiInfo(null, Text.get("state.unzipping") + ": " + currentUnzipFile + " (100%)", percentI(0));
+		uiInfo(null, Text.get("state.unzipping") + ": " + currentUnzipFile + " (100%)", percentD(1), null);
 	}
 
 	@Override
 	public void startDownload(String filename) {
-		uiInfo(null, "Скачивание: " +  filename + " (0%)", percentI(0));
+		uiInfo(null, "Скачивание: " +  filename + " (0%)", percentD(0), null);
 	}
 	
 	int avgcounter;
@@ -1126,13 +1131,13 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		int left = (int)((bytesLeft/1024F/1024F) / s);
 		if(s == 0) left = 0;
 		//Log.debug(s + "mbs left: " + timeStr(left));
-		String leftStr = " Осталость приблизительно: " + timeStr(left);
+		String leftStr = "Ост.: " + timeStr(left);
 		if(!Config.getBoolean("downloadLeftTime")) leftStr = "";
 		uiInfo(null, Text.get("state.downloading") + ": " +  filename 
 				+ " (" + speed + "Mb/s)"
 				+ " (" + percent + "%)"
-				+ leftStr
-				, percentI(percent / 100D));
+				, percentD(percent / 100D),
+				leftStr);
 	}
 
 	private static String timeStrHM(long sec) {
@@ -1150,8 +1155,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		return s;
 	}
 	
-	private void uiInfo(String s1, String s2, int p) {
-		modpack.setUpdateInfo(s1, s2, p);
+	private void uiInfo(String s1, String s2, double p, String time) {
+		modpack.setUpdateInfo(s1, s2, p, time);
 	}
 
 	@Override

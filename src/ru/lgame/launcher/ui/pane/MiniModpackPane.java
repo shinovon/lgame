@@ -63,7 +63,9 @@ public class MiniModpackPane extends JPanel {
 
 	private String updateText1;
 	private String updateText2;
-	private int updatePercent = -1;
+	private double updatePercent = -1;
+
+	private String time;
 
 	public MiniModpackPane(String id) {
 		this(id, null);
@@ -188,16 +190,21 @@ public class MiniModpackPane extends JPanel {
 		return modpack.isStarted();
 	}
 	
-	public synchronized void setUpdateInfo(String s1, String s2, int percent) {
+	public synchronized void setUpdateInfo(String s1, String s2, double p) {
 		if(s1 != null) this.updateText1 = s1;
 		if(s2 != null) this.updateText2 = s2;
-		if(percent >= -1) this.updatePercent = percent;
-		if(percent > 100) this.updatePercent = 100;
+		if(p >= -1) this.updatePercent = p;
+		if(p > 100) this.updatePercent = 100;
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				updateContents();
 			}
 		});
+	}
+
+	public void setUpdateInfo(String s1, String s2, double p, String time) {
+		this.time = time;
+		setUpdateInfo(s1, s2, p);
 	}
 	
 	public void updateContents() {
@@ -258,12 +265,14 @@ public class MiniModpackPane extends JPanel {
 			g.setFont(Fonts.modpackState);
 			g.drawString(Text.get("state.started", "Запущена"), x, rh - (g.getFontMetrics().getHeight() / 2));
 		} else if(isUpdating()) {
-			int percent = this.updatePercent = 75;
+			double percent = this.updatePercent;
 			String s = this.updateText1;
 			String p = this.updateText2;
+			String t = this.time;
 			if(s == null) s = "null";
 			if(p == null) p = "null"; 
-			String s1 = s + (percent >= 0 ? " " + percent + "%" : "");
+			if(t == null) t = "";
+			String s1 = s + (percent >= 0 ? " " + ((int)percent) + "%" : "");
 			String s2 = "" + p;
 			
 			int ptx = x;
@@ -274,7 +283,7 @@ public class MiniModpackPane extends JPanel {
 				g.fillRect(px, h - 3, pww - 1, 4);
 				if(l) g.setColor(new Color(65, 119, 179));
 				else g.setColor(new Color(135, 44, 221));
-				int pw = (int) ((double)pww*((double)percent/100D));
+				int pw = (int) ((double)pww*(percent/100D));
 				g.fillRect(px, h - 3, pw - 1, 4);
 			}
 			g.setFont(Fonts.modpackState);
@@ -282,6 +291,9 @@ public class MiniModpackPane extends JPanel {
 			g.setFont(f);
 			g.setColor(UIManager.getColor("Label.foreground"));
 			g.drawString(s2, ptx, h - th2 - 1);
+
+			g.setColor(UIManager.getColor("Label.foreground"));
+			g.drawString(t, w - g.getFontMetrics().stringWidth(t) - 2, h - th2 - 1);
 		}
 		lastW = w;
 	}

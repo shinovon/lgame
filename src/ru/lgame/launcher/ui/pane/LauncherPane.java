@@ -87,10 +87,6 @@ public class LauncherPane extends JPanel {
 		list = new JPanel();
 		scrollPane.setViewportView(list);
 		list.setLayout(new GridBagLayout());
-        GridBagConstraints gbc2 = new GridBagConstraints();
-        gbc2.gridwidth = GridBagConstraints.REMAINDER;
-        gbc2.weightx = 1;
-        gbc2.weighty = 1;
         bg = new ButtonGroup();
 		
 		JPanel panel_2 = new JPanel();

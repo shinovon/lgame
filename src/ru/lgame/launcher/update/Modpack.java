@@ -168,8 +168,13 @@ public class Modpack {
 		return cachedState = Updater.getModpackState(this);
 	}
 	
-	public void setUpdateInfo(String s1, String s2, int percent) {
-		if(ui != null) ui.setUpdateInfo(s1, s2, percent);
+	public void setUpdateInfo(String s1, String s2, double percent) {
+		if(ui != null) ui.setUpdateInfo(s1, s2, percent, null);
+	}
+
+	public void setUpdateInfo(String s1, String s2, double p, String time) {
+		if(ui != null) ui.setUpdateInfo(s1, s2, p, time);
+		
 	}
 	
 	public JSONObject getUpdateJson() throws IOException {

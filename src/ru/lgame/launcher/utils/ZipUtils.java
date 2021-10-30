@@ -51,7 +51,7 @@ public final class ZipUtils {
 		if(Thread.interrupted()) throw new InterruptedException("Thread.interrupted()");
 		Log.info("Unzipping " + zipFile + " to " + outputFolder);
 		if(listener != null) listener.startUnzip(zipFile);
-		currentFile = "";
+		currentFile = null;
 		done = false;
 		byte[] buf = new byte[4096];
 
@@ -59,15 +59,16 @@ public final class ZipUtils {
 		if(!folder.exists()) {
 			folder.mkdir();
 		}
+		ZipInputStream zis = null;
 		int totalEntries = 0;
-		ZipFile zf = new ZipFile(zipFile);
-		for(Enumeration<? extends ZipEntry> entries = zf.entries(); entries.hasMoreElements(); entries.nextElement()) totalEntries++;
-		zf.close();
-		ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
-		int processedEntries = 0;
-		ZipEntry ze = zis.getNextEntry();
 		int p = 0;
 		try {
+			ZipFile zf = new ZipFile(zipFile);
+			for(Enumeration<? extends ZipEntry> entries = zf.entries(); entries.hasMoreElements(); entries.nextElement()) totalEntries++;
+			zf.close();
+			zis = new ZipInputStream(new FileInputStream(zipFile));
+			int processedEntries = 0;
+			ZipEntry ze = zis.getNextEntry();
 			while (ze != null) {
 				p = (int)(((float) processedEntries / (float)totalEntries) * 100F);
 				if(Thread.interrupted()) {
@@ -107,7 +108,7 @@ public final class ZipUtils {
 				processedEntries++;
 			}
 		} catch (ZipException e) {
-			throw new IOException(currentFile == null ? "" : currentFile, e);
+			throw new IOException(currentFile == null ? "archive: " + f(zipFile) : "currentFile: " + currentFile, e);
 		}
 		try {
 			zis.closeEntry();
@@ -118,6 +119,11 @@ public final class ZipUtils {
 		currentFile = "";
 	}
 	
+	private static String f(String s) {
+		if(s.indexOf(File.separator) == -1) return s;
+		return s.substring(s.lastIndexOf(File.separator) + 1);
+	}
+
 	public interface ProgressListener {
 		public void startZip(String zipFile);
 
