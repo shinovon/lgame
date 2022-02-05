@@ -740,31 +740,37 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			JSONObject o = (JSONObject) it.next();
 			String name = o.getString("name");
 			modpack.setUpdateInfo(null, Text.get("state.downloading") + ": " + name + " (0%)", percentI());
-			if(o.has("check")) {
-				JSONObject check = o.getJSONObject("check");
-				String type = check.optString("type");
-				if(type != null && !type.equals("force")) {
-					try {
-						boolean b = false;
-						if(type.equals("mods")) {
-							if(mods != -1) {
-								if(mods == 1) b = true;
-							} else if((mods = checkMods(modpack, root, json.getJSONObject("integrity_check")) ? 1 : 0) == 1) b = true;
-						} else if(type.equals("libraries")) {
-							if(checkClientLibraries(root)) b = true;
-						} else if(type.equals("natives")) {
-							if(checkClientNatives(root)) b = true;
-						} else if(type.equals("exists")) {
-							if(new File(p + path(check.getString("path"))).exists()) b = true;
-						} else if(type.equals("notexists")) {
-							if(!new File(p + path(check.getString("path"))).exists()) b = true;
+			check: {
+				if(o.has("check")) {
+					JSONObject check = o.getJSONObject("check");
+					String type = check.optString("type");
+					if(type != null && !type.equals("force")) {
+						try {
+							boolean b = false;
+							if(type.equals("mods")) {
+								if(forceUpdate) {
+									b = false;
+									break check;
+								}
+								if(mods != -1) {
+									if(mods == 1) b = true;
+								} else if((mods = checkMods(modpack, root, json.getJSONObject("integrity_check")) ? 1 : 0) == 1) b = true;
+							} else if(type.equals("libraries")) {
+								if(checkClientLibraries(root)) b = true;
+							} else if(type.equals("natives")) {
+								if(checkClientNatives(root)) b = true;
+							} else if(type.equals("exists")) {
+								if(new File(p + path(check.getString("path"))).exists()) b = true;
+							} else if(type.equals("notexists")) {
+								if(!new File(p + path(check.getString("path"))).exists()) b = true;
+							}
+							if(b) {
+								tasksDone++;
+								continue;
+							}
+						} catch (Exception e) {
+							updateFatalError("scriptedDownload(): check", e, Errors.UPDATER_SCRIPTEDDOWNLOAD_CHECK);
 						}
-						if(b) {
-							tasksDone++;
-							continue;
-						}
-					} catch (Exception e) {
-						updateFatalError("scriptedDownload(): check", e, Errors.UPDATER_SCRIPTEDDOWNLOAD_CHECK);
 					}
 				}
 			}
@@ -933,6 +939,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		failed = false;
 		updating = false;
 		clientStarted = true;
+		Launcher.inst.notifyClientStart(this);
 	}
 
 	private void clientStopped() {
@@ -941,6 +948,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		failed = false;
 		updating = false;
 		clientStarted = false;
+		Launcher.inst.notifyClientStop(this);
 	}
 
 	private void reset() {

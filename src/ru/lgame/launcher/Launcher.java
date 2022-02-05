@@ -493,4 +493,12 @@ public class Launcher {
 		}
 	}
 
+	public void notifyClientStart(Updater client) {
+		frame.setVisible(false);
+	}
+
+	public void notifyClientStop(Updater client) {
+		frame.setVisible(true);
+	}
+
 }
