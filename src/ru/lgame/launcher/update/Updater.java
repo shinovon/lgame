@@ -756,6 +756,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 							if(checkClientNatives(root)) b = true;
 						} else if(type.equals("exists")) {
 							if(new File(p + path(check.getString("path"))).exists()) b = true;
+						} else if(type.equals("notexists")) {
+							if(!new File(p + path(check.getString("path"))).exists()) b = true;
 						}
 						if(b) {
 							tasksDone++;
