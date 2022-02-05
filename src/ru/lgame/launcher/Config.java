@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import ru.lgame.launcher.ui.Fonts;
 import ru.lgame.launcher.utils.logging.Log;
 
 /**

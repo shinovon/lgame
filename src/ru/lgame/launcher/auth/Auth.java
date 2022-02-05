@@ -4,8 +4,6 @@ import java.net.Proxy;
 import java.util.Base64;
 import java.util.Map;
 
-import org.json.JSONObject;
-
 import com.mojang.authlib.Agent;
 import com.mojang.authlib.exceptions.InvalidCredentialsException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;

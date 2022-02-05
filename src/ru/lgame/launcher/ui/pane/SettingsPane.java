@@ -58,7 +58,7 @@ public class SettingsPane extends JPanel {
 		flowLayout_2.setAlignment(FlowLayout.LEFT);
 		add(panel, BorderLayout.SOUTH);
 		
-		JButton settsBackBtn = new JButton(Text.get("button.back", "Назад"));
+		JButton settsBackBtn = new JButton(Text.get("button.back"));
 		settsBackBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Config.set("javapath", textField.getText());
@@ -87,7 +87,7 @@ public class SettingsPane extends JPanel {
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		content.add(panel_2, gbc);
 		
-		JLabel lblNewLabel = new JLabel(Text.get("label.memory", "Выделяемая память (Мегабайты)") + ": ");
+		JLabel lblNewLabel = new JLabel(Text.get("label.memory") + ": ");
 		panel_2.add(lblNewLabel);
 		
 		JSpinner spinner = new JSpinner();
@@ -131,7 +131,7 @@ public class SettingsPane extends JPanel {
 		flowLayout_1.setAlignment(FlowLayout.LEFT);
 		content.add(panel_3, gbc.clone());
 		
-		JLabel lblJava = new JLabel(Text.get("label.javapath", "Путь к Java") + ": ");
+		JLabel lblJava = new JLabel(Text.get("label.javapath") + ": ");
 		panel_3.add(lblJava);
 		
 		textField = new JTextField();
@@ -182,7 +182,7 @@ public class SettingsPane extends JPanel {
 		flowLayout_5.setAlignment(FlowLayout.LEFT);
 		content.add(panel_5, gbc.clone());
 		
-		JLabel label_1 = new JLabel(Text.get("label.savedir", "Папка для сохранения сборок") + ": ");
+		JLabel label_1 = new JLabel(Text.get("label.savedir") + ": ");
 		panel_5.add(label_1);
 		
 		textField_1 = new JTextField();
@@ -229,7 +229,7 @@ public class SettingsPane extends JPanel {
 		flowLayout_3.setAlignment(FlowLayout.LEADING);
 		add(panel_4, BorderLayout.NORTH);
 		
-		JLabel label = new JLabel(Text.get("label.settings", "Настройки"));
+		JLabel label = new JLabel(Text.get("label.settings"));
 		panel_4.add(label);
 		setPreferredSize(new Dimension(1000, 600));
 	}

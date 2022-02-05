@@ -57,7 +57,6 @@ public class StartUtil {
 	private static String getJavaPathDir() {
 		String[] paths = System.getenv("path").split(";");
 		String w = null;
-		int d = 0;
 		for (int i = 0; i < paths.length; i++) {
 			String o = paths[i];
 			String s = o.toLowerCase();
@@ -67,7 +66,6 @@ public class StartUtil {
 						continue;
 					}
 				}
-				d = i;
 				w = o;
 				System.out.println(o);
 			}

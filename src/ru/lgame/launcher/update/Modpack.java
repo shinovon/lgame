@@ -39,6 +39,8 @@ public class Modpack {
 	private int cachedState;
 	private JSONObject clientStartJson;
 	private String client_start_data;
+	private String client_libraries_data;
+	private JSONObject clientLibrariesJson;
 	
 	public Modpack(String id) {
 		this.id = id;
@@ -58,6 +60,7 @@ public class Modpack {
 		update_data = o.optString("update_data", null);
 		client_update_data = o.optString("client_update_data", null);
 		client_start_data = client_update_data.replace("/update.json", "/start.json");
+		client_libraries_data = client_update_data.replace("/update.json", "/libraries.json");
 		return this;
 	}
 
@@ -226,6 +229,24 @@ public class Modpack {
 	
 	public String getModpackDir() {
 		return Launcher.getLibraryDir() + id() + File.separator;
+	}
+
+	public JSONObject getClientLibrariesJson() {
+		if(clientLibrariesJson == null) {
+			try {
+				clientLibrariesJson = new JSONObject(WebUtils.get(client_libraries_data));
+			} catch (IOException e) {
+				try {
+					clientLibrariesJson = new JSONObject(FileUtils.getString(getClientDir() + "libraries.json"));
+				} catch (IOException e2) {
+				}
+			}
+		}
+		return clientLibrariesJson;
+	}
+
+	public void setClientLibrariesURL(String url) {
+		client_libraries_data = url;
 	}
 
 }

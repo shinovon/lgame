@@ -101,8 +101,8 @@ public class LauncherPane extends JPanel {
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		bottomPanel.add(panel_3_1, BorderLayout.WEST);
 		
-		JButton refreshBtn = new JButton(Text.get("button.refresh", "Обновить"));
-		refreshBtn.setActionCommand("Обновить");
+		JButton refreshBtn = new JButton(Text.get("button.refresh"));
+		refreshBtn.setActionCommand(Text.get("button.refresh"));
 		refreshBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				refreshModpackList();
@@ -110,11 +110,11 @@ public class LauncherPane extends JPanel {
 		});
 		panel_3_1.add(refreshBtn);
 		
-		JButton settingsBtn = new JButton(Text.get("button.settings", "Настройки"));
+		JButton settingsBtn = new JButton(Text.get("button.settings"));
 		settingsBtn.addActionListener(frm.settingsListener);
 		panel_3_1.add(settingsBtn);
 		
-		JButton accountsBtn = new JButton(Text.get("button.accounts", "Аккаунты"));
+		JButton accountsBtn = new JButton(Text.get("button.accounts"));
 		accountsBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Launcher.inst.showAccountsFrame();
@@ -141,16 +141,16 @@ public class LauncherPane extends JPanel {
 		if(skin != null) skinImageLabel.setIcon(new ImageIcon(skin));
 		panel.add(skinImageLabel);
 		
-		usernameLabel = new JLabel(Text.get("label.account.no", "Добавьте авторизацию"));
+		usernameLabel = new JLabel(Text.get("label.account.no"));
 		panel_3_1.add(usernameLabel);
-		if(Launcher.inst.currentAuth() != null) usernameLabel.setText(Text.get("label.account.welcome", "Добро пожаловать") + ", " + Launcher.inst.currentAuth().getUsername());
+		if(Launcher.inst.currentAuth() != null) usernameLabel.setText(Text.get("label.account.welcome") + ", " + Launcher.inst.currentAuth().getUsername());
 		usernameLabel.setFont(Fonts.username);
 		JPanel panel_3 = new JPanel();
 		FlowLayout flowLayout_1 = (FlowLayout) panel_3.getLayout();
 		flowLayout_1.setAlignment(FlowLayout.TRAILING);
 		bottomPanel.add(panel_3);
 		
-		JCheckBox forceUpdateCheck = new JCheckBox(Text.get("check.forceinstall", "Переустановить"));
+		JCheckBox forceUpdateCheck = new JCheckBox(Text.get("check.forceinstall"));
 		panel_3.add(forceUpdateCheck);
 		
 		//usernameField = new JTextField();
@@ -159,7 +159,7 @@ public class LauncherPane extends JPanel {
 		//usernameField.setText(Config.get("username"));
 		//usernameField.setColumns(15);
 		
-		startBtn = new JButton(Text.get("button.play", "Играть"));
+		startBtn = new JButton(Text.get("button.play"));
 		panel_3.add(startBtn);
 		startBtn.setEnabled(false);
 		startBtn.addActionListener(new ActionListener() {
@@ -185,7 +185,7 @@ public class LauncherPane extends JPanel {
 						Launcher.inst.runForceUpdate(Auth.fromUsername(usernameField.getText()), selected.getModpack());
 					else Launcher.inst.run(Auth.fromUsername(usernameField.getText()), selected.getModpack());
 				} else {
-					JOptionPane.showMessageDialog(frm, Text.get("msg.noaccountchoosen", "Выберите аккаунт для игры"), "", JOptionPane.WARNING_MESSAGE);
+					JOptionPane.showMessageDialog(frm, Text.get("msg.noaccount"), "", JOptionPane.WARNING_MESSAGE);
 				}
 			}
 		});
@@ -268,8 +268,8 @@ public class LauncherPane extends JPanel {
 			skinState = false;
 		}
 		getSkin();
-		if(Launcher.inst.currentAuth() != null) usernameLabel.setText(Text.get("label.account.welcome", "Добро пожаловать") + ", " + Launcher.inst.currentAuth().getUsername());
-		else usernameLabel.setText(Text.get("label.account.no", "Добавьте авторизацию"));
+		if(Launcher.inst.currentAuth() != null) usernameLabel.setText(Text.get("label.account.welcome") + ", " + Launcher.inst.currentAuth().getUsername());
+		else usernameLabel.setText(Text.get("label.account.no"));
 	}
 
 	public void setSelected(MiniModpackPane modpackPanel) {
@@ -279,15 +279,15 @@ public class LauncherPane extends JPanel {
 	
 	private void selected() {
 		int i = selected.getModpack().getState();
-		if(i == 0) startBtn.setText(Text.get("button.install", "Установить"));
-		else if(i == 1) startBtn.setText(Text.get("button.play", "Играть"));
-		else if(i == 2 || i == 3) startBtn.setText(Text.get("button.update", "Обновить"));
+		if(i == 0) startBtn.setText(Text.get("button.install"));
+		else if(i == 1) startBtn.setText(Text.get("button.play"));
+		else if(i == 2 || i == 3) startBtn.setText(Text.get("button.update"));
 		startBtn.setEnabled(true);
 	}
 	
 	private void unselected() {
 		startBtn.setEnabled(false);
-		startBtn.setText(Text.get("button.play", "Играть"));
+		startBtn.setText(Text.get("button.play"));
 	}
 	
 	/**

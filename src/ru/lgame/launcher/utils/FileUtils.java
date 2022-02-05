@@ -3,7 +3,9 @@ package ru.lgame.launcher.utils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -25,6 +27,21 @@ public class FileUtils {
 	    Path targetPath = Paths.get(file.toString());
 	    byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
 	    Files.write(targetPath, bytes, StandardOpenOption.CREATE);
+	}
+
+	public static void deleteDirectoryRecursion(Path path) throws IOException {
+		deleteDirectoryContents(path);
+		Files.delete(path);
+	}
+	
+	public static void deleteDirectoryContents(Path path) throws IOException {
+		if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+			try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) {
+				for (Path entry : entries) {
+					deleteDirectoryRecursion(entry);
+				}
+			}
+		}
 	}
 }
 

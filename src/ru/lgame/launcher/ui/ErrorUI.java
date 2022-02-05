@@ -61,23 +61,23 @@ public class ErrorUI {
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(buttonPane, BorderLayout.SOUTH);
 		{
-			JButton okButton = new JButton(Text.get("button.ok", "OK"));
+			JButton okButton = new JButton(Text.get("button.ok"));
 			okButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					dialog.dispose();
 				}
 			});
-			okButton.setActionCommand(Text.get("button.ok", "OK"));
+			okButton.setActionCommand(Text.get("button.ok"));
 			buttonPane.add(okButton);
 			dialog.getRootPane().setDefaultButton(okButton);
-			JButton logsButton = new JButton(Text.get("button.showlogger", "Показать логи"));
+			JButton logsButton = new JButton(Text.get("button.showlogger"));
 			logsButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					l.showLoggerFrame();
 					dialog.dispose();
 				}
 			});
-			logsButton.setActionCommand(Text.get("button.ok", "OK"));
+			logsButton.setActionCommand(Text.get("button.ok"));
 			buttonPane.add(logsButton);
 		}
 		dialog.pack();
@@ -121,13 +121,13 @@ public class ErrorUI {
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		contentPane.add(buttonPane, BorderLayout.SOUTH);
 		{
-			JButton okButton = new JButton(Text.get("button.ok", "OK"));
+			JButton okButton = new JButton(Text.get("button.ok"));
 			okButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					dialog.dispose();
 				}
 			});
-			okButton.setActionCommand(Text.get("button.ok", "OK"));
+			okButton.setActionCommand(Text.get("button.ok"));
 			buttonPane.add(okButton);
 			dialog.getRootPane().setDefaultButton(okButton);
 		}

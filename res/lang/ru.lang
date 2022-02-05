@@ -8,8 +8,10 @@ button.back=Назад
 button.ok=OK
 button.showlogger=Показать логи
 button.account.add=Подтвердить
+button.account.cracked=По нику
+button.account.mojang=Mojang
 
-label.account.no=Добавьте авторизацию
+label.account.no=Добавьте способ входа
 label.account.welcome=Добро пожаловать
 label.settings=Настройки
 label.savedir=Папка для сохранения сборок
@@ -21,9 +23,9 @@ label.email=Email
 
 check.forceinstall=Переустановить
 
-msg.noaccountchoosen=Выберите аккаунт для игры
+msg.noaccount=Выберите способ входа для игры
 msg.mojangtokenexpired=У одного или нескольких аккаунтов MOJANG просрочился токен!
-msg.firststart=Для первого запуска нужно подключение к интернету
+msg.firststart=Для первого запуска нужно подключение к интернету!
 
 state.started=Запущена
 state.updating=Обновление

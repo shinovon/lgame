@@ -2,16 +2,10 @@ package ru.lgame.launcher.update;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,6 +23,7 @@ import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.ErrorUI;
 import ru.lgame.launcher.utils.FileUtils;
+import ru.lgame.launcher.utils.HashUtils;
 import ru.lgame.launcher.utils.LauncherOfflineException;
 import ru.lgame.launcher.utils.StartUtil;
 import ru.lgame.launcher.utils.ZipUtils;
@@ -82,6 +77,12 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	private float avgspeed;
 
 	private int downloadFailCount;
+
+	private String[] clientExtraArgs;
+
+	private boolean clientNewLibraries;
+
+	private JSONObject clientLibrariesJson;
 	
 	private static Process clientProcess;
 
@@ -164,7 +165,10 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				JSONObject o = (JSONObject) i.next();
 				if(o.getString("type").equals("exists")) {
 					String d = path(o.getString("path"));
-					if(!new File(p + d).exists()) return false;
+					if(!new File(p + d).exists()) {
+						Log.debug("not exists " + p + d);
+						return false;
+					}
 				}
 			}
 		}
@@ -194,16 +198,16 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				Log.info("not exists: " + file);
 				if(removeAll) {
 					try {
-						deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
+						FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
 					} catch (Exception e) {
 					}
 				}
 				return false;
 			}
 			try {
-				if (!hash(filep, digest).equalsIgnoreCase(hash)) {
+				if (!HashUtils.getFileChecksum(filep, digest).equalsIgnoreCase(hash)) {
 					Log.info("wrong checksum: " + s);
-					if(removeAll) deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
+					if(removeAll) FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
 					else {
 						try {
 							new File(filep).delete();
@@ -223,17 +227,19 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		if(mods != null)
 		for (File f : mods) {
 			String n = f.getName().toLowerCase();
-			for(String s: blacklist) if(n.contains(s.toLowerCase())) {
-				Log.info("blacklisted mod: " + n);
-				if(deleteBlacklisted) f.delete();
-				else {
-					if(removeAll) deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
-					return false;
+			for(String s: blacklist) {
+				if(n.contains(s.toLowerCase())) {
+					Log.info("blacklisted mod: " + n);
+					if(deleteBlacklisted) f.delete();
+					else {
+						if(removeAll) FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
+						return false;
+					}
 				}
 			}
 			if(!ignoreExcessMods && !names.contains(n)) {
 				Log.info("Excess mod: " + n);
-				if(removeAll) deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
+				if(removeAll) FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
 				else try {
 					new File(p + n).delete();
 				} catch (Exception e) {
@@ -267,17 +273,25 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		}
 		return !checkClientIntegrity();
 	}
+	
+	private boolean checkClientJar(String p) throws Exception {
+		File f = new File(p + "client.jar");
+		if(!f.exists()) return false;
+		if(!HashUtils.getFileChecksum(f.toString(), "SHA-1").equalsIgnoreCase(clientJson.getJSONObject("integrity_check").getString("client_sha1")))
+			return false;
+		return true;
+	}
 
 
 	/**
 	 * Проверка целостности клиента
 	 */
 	private boolean checkClientIntegrity() throws Exception {
+		Log.debug("check client");
 		String p = Launcher.getLibraryDir() + modpack.client() + File.separator;
-		File vvf = new File(p + "client.jar");
-		if(!vvf.exists()) return true;
-		vvf = new File(p + "version");
-		if(!vvf.exists()) return false;
+		File f = new File(p + "version");
+		if(!f.exists()) return false;
+		if(!checkClientJar(p)) return false;
 		JSONObject j = clientJson.getJSONObject("integrity_check");
 		if(j.has("dirs")) {
 			JSONArray a = j.getJSONArray("dirs");
@@ -291,12 +305,41 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			}
 		}
 		
-		if(clientJson.has("libraries")) {
+		if(j.has("libraries")) {
+			Log.debug("check libraries");
 			if(!checkClientLibraries(p)) return false;
 		}
 
-		if(clientJson.has("natives")) {
+		if(j.has("natives")) {
+			Log.debug("natives check");
 			return checkClientNatives(p);
+		}
+		return true;
+	}
+	
+	private boolean checkClientLibrary(String p, JSONObject j) throws Exception {
+		String s = j.getString("name");
+		String sha1 = j.getString("sha1");
+		long size = j.getLong("size");
+		String path = p + "libraries" + File.separator + path(j.getString("path"));
+		File file = new File(path);
+		if (!file.exists()) {
+			Log.info("not exists: " + s);
+			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
+			return false;
+		}
+		long l = org.apache.commons.io.FileUtils.sizeOf(file);
+		if(l != size) {
+			Log.info("wrong size: " + s + " " + l + " " + size + " " + path);
+			file.delete();
+			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
+			return false;
+		}
+		if (!HashUtils.getFileChecksum(path, "SHA-1").equalsIgnoreCase(sha1)) {
+			file.delete();
+			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
+			Log.info("wrong checksum: " + s);
+			return false;
 		}
 		return true;
 	}
@@ -305,7 +348,25 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	 * Проверка библиотек клиента
 	 */
 	private boolean checkClientLibraries(String p) throws Exception {
-		JSONObject md = clientJson.getJSONObject("libraries");
+		JSONObject md = clientJson.getJSONObject("integrity_check").getJSONObject("libraries");
+		System.out.println(md);
+		if(md.optBoolean("new_libraries")) {
+			System.out.println("new libraries check");
+			clientNewLibraries = true;
+			if(clientLibrariesJson == null) {
+				modpack.setClientLibrariesURL(md.getString("url"));
+				clientLibrariesJson = modpack.getClientLibrariesJson();
+			}
+			if(!new File(p + "libraries" + File.separator).exists()) return false;
+			// XXX
+			JSONArray libraries = clientLibrariesJson.getJSONArray("libraries");
+			for (Object o: libraries) {
+				if(!checkClientLibrary(p, (JSONObject) o))
+					return false;
+			}
+			return true;
+		}
+		if(!new File(p + "libraries" + File.separator).exists()) return false;
 		String digest = clientJson.getString("checksum_algorithm");
 		ArrayList<String> names = new ArrayList<String>();
 		JSONObject ck = md.getJSONObject("checksums");
@@ -316,11 +377,11 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			File file = new File(filep);
 			if (!file.exists()) {
 				Log.info("not exists: " + s);
-				deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
+				FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 				return false;
 			}
-			if (!hash(filep, digest).equalsIgnoreCase(hash)) {
-				deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
+			if (!HashUtils.getFileChecksum(filep, digest).equalsIgnoreCase(hash)) {
+				FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 				Log.info("wrong checksum: " + s);
 				return false;
 			}
@@ -343,22 +404,22 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	 * Проверка нативных библиотек клиента
 	 */
 	private boolean checkClientNatives(String p) throws Exception {
-		JSONObject md = clientJson.getJSONObject("natives");
-		String digest = clientJson.getString("checksum_algorithm");
+		JSONObject md = clientJson.getJSONObject("integrity_check").getJSONObject("natives");
+		String digest = md.getString("checksum_algorithm");
 		ArrayList<String> names = new ArrayList<String>();
 		JSONObject ck = md.getJSONObject("checksums");
 		for (String s : ck.keySet()) {
-			names.add(s);
+			names.add(s.toLowerCase());
 			String hash = ck.getString(s);
-			String filep = p + "libraries" + File.separator + s;
+			String filep = p + "natives" + File.separator + s;
 			File file = new File(filep);
 			if (!file.exists()) {
 				Log.info("not exists: " + s);
-				deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
+				FileUtils.deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
 				return false;
 			}
-			if (!hash(filep, digest).equalsIgnoreCase(hash)) {
-				deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
+			if (!HashUtils.getFileChecksum(filep, digest).equalsIgnoreCase(hash)) {
+				FileUtils.deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
 				Log.info("wrong checksum: " + s);
 				return false;
 			}
@@ -374,7 +435,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				return false;
 			}
 		}
-		return false;
+		return true;
 	}
 
 	private boolean checkClientInstalled() {
@@ -433,6 +494,14 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			clientAssetIndex = clientStartJson.getString("asset_index");
 			clientMainClass = clientStartJson.getString("mainclass");
 			clientTweakClasses = clientStartJson.getJSONArray("tweak_classes").toList().toArray(new String[0]);
+			if(clientStartJson.has("extra_args")) {
+				clientExtraArgs = clientStartJson.getJSONArray("extra_args").toList().toArray(new String[0]);
+			}
+			try {
+				if(clientJson.getJSONObject("integrity_check").getJSONObject("libraries").optBoolean("new_libraries"))
+					clientNewLibraries = true;
+			} catch (NullPointerException e) {
+			}
 			modpack.setUpdateInfo(null, "Скачивание конфигурации сборки", 33);
 			json = modpack.getUpdateJson(true);
 			modpack.setUpdateInfo(null, "Скачивание конфигурации клиента", 67);
@@ -509,8 +578,10 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		case 0:
 		{
 			modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
-			if(!clientInstalled) installClient();
-			else if(clientNeedsUpdate) updateClient();
+			boolean client = true;
+			if(!clientInstalled) client = installClient();
+			else if(clientNeedsUpdate) client = updateClient();
+			if(!client) return;
 			modpack.setUpdateInfo(Text.get("state.updatingmodpack"), Text.get("state.updatingmodpack"), -2);
 			install();
 			break;
@@ -566,7 +637,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		reset();
 	}
 
-	private void updateClient() {
+	private boolean updateClient() {
 		totalTasks = 0;
 		tasksDone = 0;
 		updating = true;
@@ -578,25 +649,29 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		JSONArray preremove = script.optJSONArray("pre_remove_dirs");
 		JSONArray post = script.optJSONArray("post_update");
 		totalTasks += download.length();
+		if(clientNewLibraries) {
+			totalTasks += clientLibrariesJson.getJSONArray("libraries").length();
+		}
 		totalTasks += unzip.length();
 		if(preremove == null || scriptedRemoveDirs(preremove, p, t)) {
 			if(download == null || scriptedDownload(download, p, t)) {
 				if(unzip == null || scriptedUnzip(unzip, p, t)) {
 					if(post != null) scriptedPost(post, p, t);
 					clientVersionFile();
-					return;
+					return true;
 				} else {
 					updateFatalError();
-					return;
+					return false;
 				}
 			} else {
 				updateFatalError();
-				return;
+				return false;
 			}
 		}
+		return false;
 	}
 
-	private void installClient() {
+	private boolean installClient() {
 		totalTasks = 0;
 		tasksDone = 0;
 		updating = true;
@@ -610,12 +685,20 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		JSONArray post = script.optJSONArray("post_install");
 		totalTasks += download.length();
 		totalTasks += unzip.length();
+		boolean fail = false;
 		if(download == null || scriptedDownload(download, p, t)) {
 			if(unzip == null || scriptedUnzip(unzip, p, t)) {
 				if(post != null) scriptedPost(post, p, t);
 				clientVersionFile();
-			} else updateFatalError();
-		} else updateFatalError();
+			} else {
+				fail = true;
+				updateFatalError();
+			}
+		} else {
+			fail = true;
+			updateFatalError();
+		}
+		return !fail;
 	}
 
 	private void update() {
@@ -706,8 +789,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				if(o.has("remove")) {
 					String s = o.getString("remove");
 					if(s.equals("temp")) {
-						deleteDirectoryContents(Paths.get(temp));
-					} else deleteDirectoryRecursion(Paths.get(root, s));
+						FileUtils.deleteDirectoryContents(Paths.get(temp));
+					} else FileUtils.deleteDirectoryRecursion(Paths.get(root, s));
 				}
 			} catch (Exception e) {
 			}
@@ -719,8 +802,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			try {
 				String s = (String) it.next();
 				if(s.equals("temp")) {
-					deleteDirectoryContents(Paths.get(temp));
-				} else deleteDirectoryRecursion(Paths.get(root, s));
+					FileUtils.deleteDirectoryContents(Paths.get(temp));
+				} else FileUtils.deleteDirectoryRecursion(Paths.get(root, s));
 			} catch (Exception e) {
 				break;
 			}
@@ -763,6 +846,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 								if(new File(p + path(check.getString("path"))).exists()) b = true;
 							} else if(type.equals("notexists")) {
 								if(!new File(p + path(check.getString("path"))).exists()) b = true;
+							} else if(type.equals("client")) {
+								if(checkClientJar(p)) b = true;
 							}
 							if(b) {
 								tasksDone++;
@@ -774,12 +859,41 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					}
 				}
 			}
-			String url = o.getString("url");
-			String dir = path(o.getString("dir"));
-			if(dir.equals(File.separator)) dir = root + name;
-			else if(dir.equals("temp")) dir = temp + name;
-			else dir = p + dir + name;
 			try {
+				if(o.optBoolean("new_libraries")) {
+					clientNewLibraries = true;
+					if(clientLibrariesJson == null) {
+						modpack.setClientLibrariesURL(o.getString("url"));
+						clientLibrariesJson = modpack.getClientLibrariesJson();
+					}
+					// XXX
+					JSONArray libraries = clientLibrariesJson.getJSONArray("libraries");
+					for (Object i: libraries) {
+						JSONObject k = (JSONObject) i;
+						String path = k.getString("path");
+						String url = k.getString("url");
+						String dir = p + "libraries" + File.separator + path(path);
+						modpack.setUpdateInfo(null, Text.get("state.downloading") + ": " + path.substring(path.lastIndexOf("/") + 1) + " (0%)", percentI());
+						if(!checkClientLibrary(p, k)) {
+							try {
+								WebUtils.download(url, dir);
+							} catch(IOException e) {
+								if(downloadFailCount > Config.getInt("downloadMaxAttempts")) throw e;
+								Log.warn("download io err: " + e.toString() + ", retrying..");
+								downloadFailCount++;
+								Thread.sleep(500L);
+							}
+						}
+						tasksDone++;
+					}
+					tasksDone++;
+					return true;
+				}
+				String url = o.getString("url");
+				String dir = path(o.getString("dir"));
+				if(dir.equals(File.separator)) dir = root + name;
+				else if(dir.equals("temp")) dir = temp + name;
+				else dir = p + dir + name;
 				boolean b = true;
 				while(b) {
 					try {
@@ -901,9 +1015,16 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			appArgs.add(getAssetsDir());
 			appArgs.add("--assetIndex");
 			appArgs.add(clientAssetIndex);
-			for (String tw : clientTweakClasses) {
-				appArgs.add("--tweakClass");
-				appArgs.add(tw);
+			if(clientTweakClasses != null) {
+				for (String tw : clientTweakClasses) {
+					appArgs.add("--tweakClass");
+					appArgs.add(tw);
+				}
+			}
+			if(clientExtraArgs != null) {
+				for (String s : clientExtraArgs) {
+					appArgs.add(s);
+				}
 			}
 			appArgs.add("--modpackid");
 			appArgs.add(modpack.id());
@@ -979,6 +1100,19 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 
 	public File[] getClientLibariesFiles() {
+		if(clientNewLibraries) {
+			if(clientLibrariesJson == null) {
+				clientLibrariesJson = modpack.getClientLibrariesJson();
+			}
+			JSONArray libraries = clientLibrariesJson.getJSONArray("libraries");
+			ArrayList<File> list = new ArrayList<File>();
+			for (Object i: libraries) {
+				JSONObject k = (JSONObject) i;
+				list.add(new File(getClientDir() + "libraries" + File.separator + path(k.getString("path"))));
+			}
+			// XXX
+			return list.toArray(new File[0]);
+		}
 		return new File(getClientDir() + "libraries" + File.separator).listFiles((file) -> file.isDirectory() || file.getName().toLowerCase().endsWith(".jar"));
 	}
 
@@ -1052,48 +1186,6 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	private static String path(String s) {
 		return s.replace("/", File.separator);
 	}
-
-	public static String hash(String f, String digest) throws IOException, NoSuchAlgorithmException {
-		File file = new File(f);
-		MessageDigest shaDigest = MessageDigest.getInstance(digest);
-		String shaChecksum = getFileChecksum(shaDigest, file);
-		return shaChecksum;
-	}
-	
-	private static String getFileChecksum(MessageDigest digest, File file) throws IOException {
-		FileInputStream fis = new FileInputStream(file);
-		byte[] byteArray = new byte[1024];
-		int bytesCount = 0;
-
-		while ((bytesCount = fis.read(byteArray)) != -1) {
-			digest.update(byteArray, 0, bytesCount);
-		}
-
-		fis.close();
-		byte[] bytes = digest.digest();
-		StringBuilder sb = new StringBuilder();
-
-		for (int i = 0; i < bytes.length; i++) {
-			sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-		}
-
-		return sb.toString();
-	}
-
-	private static void deleteDirectoryRecursion(Path path) throws IOException {
-		deleteDirectoryContents(path);
-		Files.delete(path);
-	}
-	private static void deleteDirectoryContents(Path path) throws IOException {
-		if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
-			try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) {
-				for (Path entry : entries) {
-					deleteDirectoryRecursion(entry);
-				}
-			}
-		}
-	}
-
 	@Override
 	public void startZip(String zipFile) {
 		uiInfo(null, "Упаковка: " + currentUnzipFile + " (%)", percentD(0), null);

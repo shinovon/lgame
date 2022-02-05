@@ -33,9 +33,8 @@ public class Fonts {
 					.deriveFont(Font.BOLD, f);
 		} catch (Exception e) {
 			Log.warn("Font load failed: " + e.toString());
-			return Font.getFont(Font.SANS_SERIF)
-					.deriveFont(Font.BOLD, f);
 		}
+		return new Font(Font.SANS_SERIF, Font.BOLD, (int) f);
 	}
 
 	private static Font createFont(float f) {
@@ -44,8 +43,7 @@ public class Fonts {
 					.deriveFont(0, f);
 		} catch (Exception e) {
 			Log.warn("Font load failed: " + e.toString());
-			return Font.getFont(Font.SANS_SERIF)
-					.deriveFont(0, f);
 		}
+		return new Font(Font.SANS_SERIF, 0, (int) f);
 	}
 }

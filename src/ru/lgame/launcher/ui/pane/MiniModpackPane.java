@@ -263,7 +263,7 @@ public class MiniModpackPane extends JPanel {
 			g.fillRect(0, rh - 2, w - 1, 3);
 			g.fillRect(w - 4, 0, 3, rh);
 			g.setFont(Fonts.modpackState);
-			g.drawString(Text.get("state.started", "Запущена"), x, rh - (g.getFontMetrics().getHeight() / 2));
+			g.drawString(Text.get("state.started"), x, rh - (g.getFontMetrics().getHeight() / 2));
 		} else if(isUpdating()) {
 			double percent = this.updatePercent;
 			String s = this.updateText1;

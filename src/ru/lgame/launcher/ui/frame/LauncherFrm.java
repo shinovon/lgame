@@ -100,6 +100,7 @@ public class LauncherFrm extends JFrame implements WindowListener {
 		} catch (Exception e1) {
 			Log.error("setUI()", e1);
 		}
+		
 		Color bg = new Color(35, 36, 40);
 		Color dbg = new Color(51, 52, 56);
 		Color fg = new Color(255, 255, 255);

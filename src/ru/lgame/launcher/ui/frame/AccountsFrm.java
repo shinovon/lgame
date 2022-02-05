@@ -51,7 +51,7 @@ public class AccountsFrm extends JFrame {
 	 */
 	public AccountsFrm() {
 		setType(Type.UTILITY);
-		setTitle(Text.get("title.accounts", "Аккаунты"));
+		setTitle(Text.get("title.accounts"));
 		setResizable(false);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
@@ -82,7 +82,7 @@ public class AccountsFrm extends JFrame {
 		panel_7.setMaximumSize(new Dimension(140, 32767));
 		panel_3.add(panel_7);
 		
-		JLabel usernameLabel = new JLabel(Text.get("label.username", "Ник"));
+		JLabel usernameLabel = new JLabel(Text.get("label.username"));
 		panel_7.add(usernameLabel);
 		
 		usernameField = new JTextField();
@@ -92,7 +92,7 @@ public class AccountsFrm extends JFrame {
 		usernameField.setPreferredSize(new Dimension(120, 20));
 		usernameField.setColumns(16);
 		
-		JLabel passwordLabel = new JLabel(Text.get("label.password", "Пароль"));
+		JLabel passwordLabel = new JLabel(Text.get("label.password"));
 		panel_7.add(passwordLabel);
 		
 		passwordField = new JPasswordField();
@@ -110,7 +110,7 @@ public class AccountsFrm extends JFrame {
 		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(comboBox.getSelectedIndex() == 0) {
-					usernameLabel.setText(Text.get("label.username", "Ник"));
+					usernameLabel.setText(Text.get("label.username"));
 					passwordField.setEnabled(false);
 					usernameField.setEnabled(true);
 				} else {
@@ -123,12 +123,12 @@ public class AccountsFrm extends JFrame {
 		});
 		panel_4.add(comboBox);
 		comboBox.setPreferredSize(new Dimension(134, 20));
-		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"По нику", "Mojang"}));
+		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {Text.get("button.account.cracked"), Text.get("button.account.mojang")}));
 		
 		JPanel panel_5 = new JPanel();
 		accountPanel.add(panel_5, BorderLayout.SOUTH);
 		
-		JButton confirmBtn = new JButton(Text.get("button.account.add", "Подтвердить"));
+		JButton confirmBtn = new JButton(Text.get("button.account.add"));
 		panel_5.add(confirmBtn);
 		confirmBtn.setPreferredSize(new Dimension(134, 20));
 		passwordField.setEnabled(false);
@@ -152,7 +152,7 @@ public class AccountsFrm extends JFrame {
 					AuthStore.add(a);
 					AuthStore.setSelected(a);
 				} catch (Throwable e) {
-					ErrorUI.showError(Text.get("title.accounts", "Аккаунты"), Text.get("err.accountadd", "Не удалось добавить аккаунт"), e);
+					ErrorUI.showError(Text.get("title.accounts"), Text.get("err.accountadd"), e);
 				}
 				update();
 			}
@@ -208,11 +208,11 @@ public class AccountsFrm extends JFrame {
 		addBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(comboBox.getSelectedIndex() == 0) {
-					usernameLabel.setText(Text.get("label.username", "Ник"));
+					usernameLabel.setText(Text.get("label.username"));
 					passwordField.setEnabled(false);
 					usernameField.setEnabled(true);
 				} else {
-					usernameLabel.setText(Text.get("label.email", "Email"));
+					usernameLabel.setText(Text.get("label.email"));
 					passwordField.setEnabled(true);
 					usernameField.setEnabled(true);
 				}

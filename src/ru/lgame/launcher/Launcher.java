@@ -5,8 +5,6 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +33,8 @@ import ru.lgame.launcher.update.Updater;
 import ru.lgame.launcher.utils.FileUtils;
 import ru.lgame.launcher.utils.WebUtils;
 import ru.lgame.launcher.utils.logging.Log;
+
+import static ru.lgame.launcher.utils.HashUtils.getMD5String;
 
 /**
  * @author Shinovon
@@ -100,7 +100,7 @@ public class Launcher {
 					try {
 						loadingFrame = new LoadingFrm();
 						loadingFrame.setVisible(true);
-						loadingFrame.setText(Text.get("loading.initializing", "Инициализация"));
+						loadingFrame.setText(Text.get("loading.initializing"));
 						loggerFrame = new LoggerFrm();
 					} catch (Exception e) {
 					}
@@ -117,23 +117,23 @@ public class Launcher {
 		try {
 			AuthStore.init();
 		} catch (InvalidCredentialsException e) {
-			ErrorUI.showError(Text.get("title.account", "Аккаунты"), Text.get("msg.mojangtokenexpired", "У одного или нескольких аккаунтов MOJANG просрочился токен!"));
+			ErrorUI.showError(Text.get("title.accounts"), Text.get("msg.mojangtokenexpired"));
 		}
-		loadingFrame.setText(Text.get("loading.fetchingmodpacks", "Получение данных о сборках"));
+		loadingFrame.setText(Text.get("loading.fetchingmodpacks"));
 		try {
 			if(tryLoadModpacksFromServer()) {
 			} else if(loadCachedLauncherJson()) {
 				offline = true;
 			} else {
-				JOptionPane.showMessageDialog(new JPanel(), Text.get("msg.firststart", "Для первого запуска нужно подключение к интернету!"));
+				JOptionPane.showMessageDialog(new JPanel(), Text.get("msg.firststart"));
 				System.exit(0);
 				return;
 			}
 		} catch (Exception e) {
-			ErrorUI.showError(Text.get("title.launchererror", "Ошибка лаунчера"), Text.get("loading.fetchingmodpacks", "Получение данных о сборках"), e);
+			ErrorUI.showError(Text.get("title.launchererror"), Text.get("loading.fetchingmodpacks"), e);
 			return;
 		}
-		loadingFrame.setText(Text.get("loading.initializingui", "Инициализация интерфейса"));
+		loadingFrame.setText(Text.get("loading.initializingui"));
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -142,7 +142,7 @@ public class Launcher {
 					frame.setVisible(true);
 					accountsFrame = new AccountsFrm();
 				} catch (Throwable e) {
-					ErrorUI.showError(Text.get("title.launchererror", "Ошибка лаунчера"), Text.get("loading.initializingui", "Инициализация интерфейса"), e);
+					ErrorUI.showError(Text.get("title.launchererror"), Text.get("loading.initializingui"), e);
 					System.exit(1);
 				}
 			}
@@ -163,7 +163,7 @@ public class Launcher {
 				if(!f.exists()) f.mkdirs();
 			}
 		} catch (Exception e) {
-			ErrorUI.showError(Text.get("title.error", "Ошибка"), Text.get("title.dirs", "Ошибка создания директорий"), Log.exceptionToString(e));
+			ErrorUI.showError(Text.get("title.error"), Text.get("err.dirs"), Log.exceptionToString(e));
 		}
 	}
 
@@ -246,7 +246,7 @@ public class Launcher {
 			EventQueue.invokeAndWait(new Runnable() {
 				public void run() {
 					try {
-						loadingFrame.setText(Text.get("loading.fetchingmodpacks", "Получение данных о сборках"));
+						loadingFrame.setText(Text.get("loading.fetchingmodpacks"));
 						loadingFrame.setVisible(true);
 					} catch (Exception e) {
 					}
@@ -434,24 +434,6 @@ public class Launcher {
 		Log.debug("getValue:" + name + "=null");
 		return null;
 	}
-
-	/**
-	 * MD5 хэш
-	 */
-	public static String getMD5String(String x) {
-		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			byte[] array = md.digest(x.getBytes());
-			StringBuffer sb = new StringBuffer();
-			for (int i = 0; i < array.length; ++i) {
-				sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
-			}
-			return sb.toString();
-		} catch (NoSuchAlgorithmException e) {
-		}
-		return null;
-	}
-
 
 	public Auth currentAuth() {
 		return AuthStore.getSelected();
