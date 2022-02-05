@@ -41,7 +41,7 @@ import static ru.lgame.launcher.utils.HashUtils.getMD5String;
  */
 public class Launcher {
 	
-	public static final String version = "0.6";
+	public static final String version = "0.6.1";
 	public static final String build_date = "-";
 	public static final boolean DEBUG = true;
 	

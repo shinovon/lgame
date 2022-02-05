@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -195,7 +194,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			String filep = p + "mods" + File.separator + s;
 			File file = new File(filep);
 			if (!file.exists()) {
-				Log.info("not exists: " + file);
+				Log.debug("not exists: " + file);
 				if(removeAll) {
 					try {
 						FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
@@ -206,7 +205,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			}
 			try {
 				if (!HashUtils.getFileChecksum(filep, digest).equalsIgnoreCase(hash)) {
-					Log.info("wrong checksum: " + s);
+					Log.debug("wrong checksum: " + s);
 					if(removeAll) FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
 					else {
 						try {
@@ -229,7 +228,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			String n = f.getName().toLowerCase();
 			for(String s: blacklist) {
 				if(n.contains(s.toLowerCase())) {
-					Log.info("blacklisted mod: " + n);
+					Log.debug("blacklisted mod: " + n);
 					if(deleteBlacklisted) f.delete();
 					else {
 						if(removeAll) FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
@@ -238,7 +237,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				}
 			}
 			if(!ignoreExcessMods && !names.contains(n)) {
-				Log.info("Excess mod: " + n);
+				Log.debug("Excess mod: " + n);
 				if(removeAll) FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
 				else try {
 					new File(p + n).delete();
@@ -324,13 +323,13 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		String path = p + "libraries" + File.separator + path(j.getString("path"));
 		File file = new File(path);
 		if (!file.exists()) {
-			Log.info("not exists: " + s);
+			Log.debug("not exists: " + s);
 			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 			return false;
 		}
 		long l = org.apache.commons.io.FileUtils.sizeOf(file);
 		if(l != size) {
-			Log.info("wrong size: " + s + " " + l + " " + size + " " + path);
+			Log.debug("wrong size: " + s + " " + l + " " + size + " " + path);
 			file.delete();
 			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 			return false;
@@ -338,7 +337,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		if (!HashUtils.getFileChecksum(path, "SHA-1").equalsIgnoreCase(sha1)) {
 			file.delete();
 			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
-			Log.info("wrong checksum: " + s);
+			Log.debug("wrong checksum: " + s);
 			return false;
 		}
 		return true;
@@ -358,7 +357,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				clientLibrariesJson = modpack.getClientLibrariesJson();
 			}
 			if(!new File(p + "libraries" + File.separator).exists()) return false;
-			// XXX
+			
 			JSONArray libraries = clientLibrariesJson.getJSONArray("libraries");
 			for (Object o: libraries) {
 				if(!checkClientLibrary(p, (JSONObject) o))
@@ -367,22 +366,22 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			return true;
 		}
 		if(!new File(p + "libraries" + File.separator).exists()) return false;
-		String digest = clientJson.getString("checksum_algorithm");
+		String digest = md.optString("checksum_algorithm", "SHA-1");
 		ArrayList<String> names = new ArrayList<String>();
 		JSONObject ck = md.getJSONObject("checksums");
 		for (String s : ck.keySet()) {
-			names.add(s);
+			names.add(s.toLowerCase());
 			String hash = ck.getString(s);
 			String filep = p + "libraries" + File.separator + s;
 			File file = new File(filep);
 			if (!file.exists()) {
-				Log.info("not exists: " + s);
+				Log.debug("not exists: " + s);
 				FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 				return false;
 			}
 			if (!HashUtils.getFileChecksum(filep, digest).equalsIgnoreCase(hash)) {
 				FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
-				Log.info("wrong checksum: " + s);
+				Log.debug("wrong checksum: " + s);
 				return false;
 			}
 		}
@@ -393,7 +392,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			if(f.isDirectory()) continue;
 			String n = f.getName().toLowerCase();
 			if(!names.contains(n)) {
-				Log.info("Excess jar libary: " + n);
+				Log.debug("Excess jar library: " + n);
 				return false;
 			}
 		}
@@ -414,13 +413,13 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			String filep = p + "natives" + File.separator + s;
 			File file = new File(filep);
 			if (!file.exists()) {
-				Log.info("not exists: " + s);
+				Log.debug("not exists: " + s);
 				FileUtils.deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
 				return false;
 			}
 			if (!HashUtils.getFileChecksum(filep, digest).equalsIgnoreCase(hash)) {
 				FileUtils.deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
-				Log.info("wrong checksum: " + s);
+				Log.debug("wrong checksum: " + s);
 				return false;
 			}
 		}
@@ -431,7 +430,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			if(f.isDirectory()) continue;
 			String n = f.getName().toLowerCase();
 			if(!names.contains(n)) {
-				Log.info("Excess dynamic libary: " + n);
+				Log.debug("Excess dynamic library: " + n);
 				return false;
 			}
 		}
@@ -866,7 +865,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 						modpack.setClientLibrariesURL(o.getString("url"));
 						clientLibrariesJson = modpack.getClientLibrariesJson();
 					}
-					// XXX
+					
 					JSONArray libraries = clientLibrariesJson.getJSONArray("libraries");
 					for (Object i: libraries) {
 						JSONObject k = (JSONObject) i;
@@ -1110,7 +1109,6 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				JSONObject k = (JSONObject) i;
 				list.add(new File(getClientDir() + "libraries" + File.separator + path(k.getString("path"))));
 			}
-			// XXX
 			return list.toArray(new File[0]);
 		}
 		return new File(getClientDir() + "libraries" + File.separator).listFiles((file) -> file.isDirectory() || file.getName().toLowerCase().endsWith(".jar"));
