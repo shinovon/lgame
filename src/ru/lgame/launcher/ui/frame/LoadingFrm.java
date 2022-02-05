@@ -31,7 +31,7 @@ public class LoadingFrm extends JFrame {
 
 	public LoadingFrm() {
 		super.setAlwaysOnTop(true);
-		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		Launcher.setFrameIcon(this);
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(35, 36, 40));

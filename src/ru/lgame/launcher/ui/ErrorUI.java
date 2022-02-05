@@ -101,6 +101,7 @@ public class ErrorUI {
 		pane.setLayout(new BorderLayout());
 		if(text != null && text.length() > 0) {
 			JTextPane infopane = new JTextPane();
+	        infopane.setPreferredSize(new Dimension(10, 40));
 			infopane.setBackground(SystemColor.menu);
 			infopane.setEditable(false);
 			infopane.setText(text);

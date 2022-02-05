@@ -120,12 +120,17 @@ public class Launcher {
 			ErrorUI.showError(Text.get("title.account", "Аккаунты"), Text.get("msg.mojangtokenexpired", "У одного или нескольких аккаунтов MOJANG просрочился токен!"));
 		}
 		loadingFrame.setText(Text.get("loading.fetchingmodpacks", "Получение данных о сборках"));
-		if(tryLoadModpacksFromServer()) {
-		} else if(loadCachedLauncherJson()) {
-			offline = true;
-		} else {
-			JOptionPane.showMessageDialog(new JPanel(), Text.get("msg.firststart", "Для первого запуска нужно подключение к интернету!"));
-			System.exit(0);
+		try {
+			if(tryLoadModpacksFromServer()) {
+			} else if(loadCachedLauncherJson()) {
+				offline = true;
+			} else {
+				JOptionPane.showMessageDialog(new JPanel(), Text.get("msg.firststart", "Для первого запуска нужно подключение к интернету!"));
+				System.exit(0);
+				return;
+			}
+		} catch (Exception e) {
+			ErrorUI.showError(Text.get("title.launchererror", "Ошибка лаунчера"), Text.get("loading.fetchingmodpacks", "Получение данных о сборках"), e);
 			return;
 		}
 		loadingFrame.setText(Text.get("loading.initializingui", "Инициализация интерфейса"));
