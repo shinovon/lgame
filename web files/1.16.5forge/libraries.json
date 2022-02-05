@@ -1,0 +1,453 @@
+{
+	"id": "1.16.5forge",
+	"libraries": [
+		{
+			"sha1": "5511caf8bee7d8a75b5c33130b1b265c69665570",
+			"path": "net/minecraftforge/forge/1.16.5-36.2.22/forge-1.16.5-36.2.22-launcher.jar",
+			"size": 212299,
+			"name": "net.minecraftforge:forge:1.16.5-36.2.22",
+			"url": "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.16.5-36.2.22/forge-1.16.5-36.2.22-launcher.jar"
+		},
+		{
+			"sha1": "a99500cf6eea30535eeac6be73899d048f8d12a8",
+			"path": "org/ow2/asm/asm/9.1/asm-9.1.jar",
+			"size": 121790,
+			"name": "org.ow2.asm:asm:9.1",
+			"url": "https://maven.minecraftforge.net/org/ow2/asm/asm/9.1/asm-9.1.jar"
+		},
+		{
+			"sha1": "8b971b182eb5cf100b9e8d4119152d83e00e0fdd",
+			"path": "org/ow2/asm/asm-commons/9.1/asm-commons-9.1.jar",
+			"size": 72641,
+			"name": "org.ow2.asm:asm-commons:9.1",
+			"url": "https://maven.minecraftforge.net/org/ow2/asm/asm-commons/9.1/asm-commons-9.1.jar"
+		},
+		{
+			"sha1": "c333f2a855069cb8eb17a40a3eb8b1b67755d0eb",
+			"path": "org/ow2/asm/asm-tree/9.1/asm-tree-9.1.jar",
+			"size": 52662,
+			"name": "org.ow2.asm:asm-tree:9.1",
+			"url": "https://maven.minecraftforge.net/org/ow2/asm/asm-tree/9.1/asm-tree-9.1.jar"
+		},
+		{
+			"sha1": "36464a45d871779f3383a8a9aba2b26562a86729",
+			"path": "org/ow2/asm/asm-util/9.1/asm-util-9.1.jar",
+			"size": 84679,
+			"name": "org.ow2.asm:asm-util:9.1",
+			"url": "https://maven.minecraftforge.net/org/ow2/asm/asm-util/9.1/asm-util-9.1.jar"
+		},
+		{
+			"sha1": "4f61b83b81d8b659958f4bcc48907e93ecea55a0",
+			"path": "org/ow2/asm/asm-analysis/9.1/asm-analysis-9.1.jar",
+			"size": 34257,
+			"name": "org.ow2.asm:asm-analysis:9.1",
+			"url": "https://maven.minecraftforge.net/org/ow2/asm/asm-analysis/9.1/asm-analysis-9.1.jar"
+		},
+		{
+			"sha1": "bb848f57758808692b9108df61c909c0a961ba81",
+			"path": "cpw/mods/modlauncher/8.0.9/modlauncher-8.0.9.jar",
+			"size": 126196,
+			"name": "cpw.mods:modlauncher:8.0.9",
+			"url": "https://maven.minecraftforge.net/cpw/mods/modlauncher/8.0.9/modlauncher-8.0.9.jar"
+		},
+		{
+			"sha1": "e49222512ea6cabdd8b49761cef1d5a207b1f0d9",
+			"path": "cpw/mods/grossjava9hacks/1.3.3/grossjava9hacks-1.3.3.jar",
+			"size": 2113,
+			"name": "cpw.mods:grossjava9hacks:1.3.3",
+			"url": "https://maven.minecraftforge.net/cpw/mods/grossjava9hacks/1.3.3/grossjava9hacks-1.3.3.jar"
+		},
+		{
+			"sha1": "6d23c1b9cb0607fddc38d09730796f68db96f546",
+			"path": "net/minecraftforge/accesstransformers/3.0.1/accesstransformers-3.0.1.jar",
+			"size": 76586,
+			"name": "net.minecraftforge:accesstransformers:3.0.1",
+			"url": "https://maven.minecraftforge.net/net/minecraftforge/accesstransformers/3.0.1/accesstransformers-3.0.1.jar"
+		},
+		{
+			"sha1": "428664f05d2b7f7b7610204b5aa7c1763f62011a",
+			"path": "org/antlr/antlr4-runtime/4.9.1/antlr4-runtime-4.9.1.jar",
+			"size": 337868,
+			"name": "org.antlr:antlr4-runtime:4.9.1",
+			"url": "https://maven.minecraftforge.net/org/antlr/antlr4-runtime/4.9.1/antlr4-runtime-4.9.1.jar"
+		},
+		{
+			"sha1": "260e34800723e4c098c4e247cf2b900535e01b6d",
+			"path": "net/minecraftforge/eventbus/4.0.0/eventbus-4.0.0.jar",
+			"size": 42873,
+			"name": "net.minecraftforge:eventbus:4.0.0",
+			"url": "https://maven.minecraftforge.net/net/minecraftforge/eventbus/4.0.0/eventbus-4.0.0.jar"
+		},
+		{
+			"sha1": "0c6ca4e4e4a0343701407c760e642537b613b543",
+			"path": "net/minecraftforge/forgespi/3.2.0/forgespi-3.2.0.jar",
+			"size": 20172,
+			"name": "net.minecraftforge:forgespi:3.2.0",
+			"url": "https://maven.minecraftforge.net/net/minecraftforge/forgespi/3.2.0/forgespi-3.2.0.jar"
+		},
+		{
+			"sha1": "d6d761379c841e2610abebcbf70ed20b65f728f0",
+			"path": "net/minecraftforge/coremods/4.0.6/coremods-4.0.6.jar",
+			"size": 25453,
+			"name": "net.minecraftforge:coremods:4.0.6",
+			"url": "https://maven.minecraftforge.net/net/minecraftforge/coremods/4.0.6/coremods-4.0.6.jar"
+		},
+		{
+			"sha1": "54d7a0a5e8fdb71b973025caa46f341ae5904f39",
+			"path": "net/minecraftforge/unsafe/0.2.0/unsafe-0.2.0.jar",
+			"size": 2834,
+			"name": "net.minecraftforge:unsafe:0.2.0",
+			"url": "https://maven.minecraftforge.net/net/minecraftforge/unsafe/0.2.0/unsafe-0.2.0.jar"
+		},
+		{
+			"sha1": "c601bfeaeb2c0abe7aaa901b0bbe6d1beff49281",
+			"path": "com/electronwill/night-config/core/3.6.3/core-3.6.3.jar",
+			"size": 199091,
+			"name": "com.electronwill.night-config:core:3.6.3",
+			"url": "https://maven.minecraftforge.net/com/electronwill/night-config/core/3.6.3/core-3.6.3.jar"
+		},
+		{
+			"sha1": "2b05b4d606c517da4d1a7b6d2b97d751c92887d7",
+			"path": "com/electronwill/night-config/toml/3.6.3/toml-3.6.3.jar",
+			"size": 31288,
+			"name": "com.electronwill.night-config:toml:3.6.3",
+			"url": "https://maven.minecraftforge.net/com/electronwill/night-config/toml/3.6.3/toml-3.6.3.jar"
+		},
+		{
+			"sha1": "de2bd909cb9f8eaa741bd03df4a1bd3f6eb593c7",
+			"path": "org/jline/jline/3.12.1/jline-3.12.1.jar",
+			"size": 732926,
+			"name": "org.jline:jline:3.12.1",
+			"url": "https://maven.minecraftforge.net/org/jline/jline/3.12.1/jline-3.12.1.jar"
+		},
+		{
+			"sha1": "f8ff8032903882376e8d000c51e3e16d20fc7df7",
+			"path": "org/apache/maven/maven-artifact/3.6.3/maven-artifact-3.6.3.jar",
+			"size": 57824,
+			"name": "org.apache.maven:maven-artifact:3.6.3",
+			"url": "https://maven.minecraftforge.net/org/apache/maven/maven-artifact/3.6.3/maven-artifact-3.6.3.jar"
+		},
+		{
+			"sha1": "98f84f353457629e81cc6827224871b1a8faa7af",
+			"path": "net/jodah/typetools/0.8.3/typetools-0.8.3.jar",
+			"size": 15425,
+			"name": "net.jodah:typetools:0.8.3",
+			"url": "https://maven.minecraftforge.net/net/jodah/typetools/0.8.3/typetools-0.8.3.jar"
+		},
+		{
+			"sha1": "4a5aa7e55a29391c6f66e0b259d5189aa11e45d0",
+			"path": "org/apache/logging/log4j/log4j-api/2.15.0/log4j-api-2.15.0.jar",
+			"size": 301804,
+			"name": "org.apache.logging.log4j:log4j-api:2.15.0",
+			"url": "https://libraries.minecraft.net/org/apache/logging/log4j/log4j-api/2.15.0/log4j-api-2.15.0.jar"
+		},
+		{
+			"sha1": "ba55c13d7ac2fd44df9cc8074455719a33f375b9",
+			"path": "org/apache/logging/log4j/log4j-core/2.15.0/log4j-core-2.15.0.jar",
+			"size": 1789769,
+			"name": "org.apache.logging.log4j:log4j-core:2.15.0",
+			"url": "https://libraries.minecraft.net/org/apache/logging/log4j/log4j-core/2.15.0/log4j-core-2.15.0.jar"
+		},
+		{
+			"sha1": "88f72ad364bfc3a7cf43186fc17212f2b4bb8d97",
+			"path": "org/apache/logging/log4j/log4j-slf4j18-impl/2.15.0/log4j-slf4j18-impl-2.15.0.jar",
+			"size": 21223,
+			"name": "org.apache.logging.log4j:log4j-slf4j18-impl:2.15.0",
+			"url": "https://libraries.minecraft.net/org/apache/logging/log4j/log4j-slf4j18-impl/2.15.0/log4j-slf4j18-impl-2.15.0.jar"
+		},
+		{
+			"sha1": "96d02cd3b384ff015a8fef4223bcb4ccf1717c95",
+			"path": "net/minecrell/terminalconsoleappender/1.2.0/terminalconsoleappender-1.2.0.jar",
+			"size": 15977,
+			"name": "net.minecrell:terminalconsoleappender:1.2.0",
+			"url": "https://maven.minecraftforge.net/net/minecrell/terminalconsoleappender/1.2.0/terminalconsoleappender-1.2.0.jar"
+		},
+		{
+			"sha1": "4fdac2fbe92dfad86aa6e9301736f6b4342a3f5c",
+			"path": "net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar",
+			"size": 78146,
+			"name": "net.sf.jopt-simple:jopt-simple:5.0.4",
+			"url": "https://libraries.minecraft.net/net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar"
+		},
+		{
+			"sha1": "04ec7d77d9ab32596ca0b78bb123956734767e3a",
+			"path": "org/spongepowered/mixin/0.8.4/mixin-0.8.4.jar",
+			"size": 1069391,
+			"name": "org.spongepowered:mixin:0.8.4",
+			"url": "https://maven.minecraftforge.net/org/spongepowered/mixin/0.8.4/mixin-0.8.4.jar"
+		},
+		{
+			"sha1": "1817deb38a5a8811148dca0d23161d92bdbd6184",
+			"path": "net/minecraftforge/nashorn-core-compat/15.1.1.1/nashorn-core-compat-15.1.1.1.jar",
+			"size": 2194057,
+			"name": "net.minecraftforge:nashorn-core-compat:15.1.1.1",
+			"url": "https://maven.minecraftforge.net/net/minecraftforge/nashorn-core-compat/15.1.1.1/nashorn-core-compat-15.1.1.1.jar"
+		},
+		{
+			"sha1": "9fe20d651ee47764b4494fd96914554d3c08c723",
+			"path": "net/minecraftforge/forge/1.16.5-36.2.22/forge-1.16.5-36.2.22-universal.jar",
+			"size": 2480605,
+			"name": "net.minecraftforge:forge:1.16.5-36.2.22:universal",
+			"url": "https://files.minecraftforge.net/maven/net/minecraftforge/forge/1.16.5-36.2.22/forge-1.16.5-36.2.22-universal.jar"
+		},
+		{
+			"sha1": "045d6edac8fe1b004e159c49704b5b729f551079",
+			"path": "net/minecraft/client/1.16.5-20210115.111550/client-1.16.5-20210115.111550-slim.jar",
+			"size": 9118806,
+			"name": "net.minecraft:client:1.16.5-20210115.111550:slim",
+			"url": "https://tlauncherrepo.com/repo//libraries/net/minecraft/client/1.16.5-20210115.111550/client-1.16.5-20210115.111550-slim.jar"
+		},
+		{
+			"sha1": "4aef4168f94d97bc73bf510213b2518942f931d1",
+			"path": "net/minecraft/client/1.16.5-20210115.111550/client-1.16.5-20210115.111550-extra.jar",
+			"size": 8428369,
+			"name": "net.minecraft:client:1.16.5-20210115.111550:extra",
+			"url": "https://tlauncherrepo.com/repo//libraries/net/minecraft/client/1.16.5-20210115.111550/client-1.16.5-20210115.111550-extra.jar"
+		},
+		{
+			"sha1": "65b8836e582983fd770ddf1db68b07d58009bd0a",
+			"path": "net/minecraftforge/forge/1.16.5-36.2.22/forge-1.16.5-36.2.22-client.jar",
+			"size": 4213746,
+			"name": "net.minecraftforge:forge:1.16.5-36.2.22:client",
+			"url": "https://tlauncherrepo.com/repo//libraries/net/minecraftforge/forge/1.16.5-36.2.22/forge-1.16.5-36.2.22-client.jar"
+		},
+		{
+			"sha1": "d9b33978c401c8a45d8140a51c6f8580a3b549b2",
+			"path": "net/minecraft/client/1.16.5-20210115.111550/client-1.16.5-20210115.111550-srg.jar",
+			"size": 11352644,
+			"name": "net.minecraft:client:1.16.5-20210115.111550:srg",
+			"url": "https://tlauncherrepo.com/repo//libraries/net/minecraft/client/1.16.5-20210115.111550/client-1.16.5-20210115.111550-srg.jar"
+		},
+		{
+			"sha1": "eb8bb7b66fa0e2152b1b40b3856e82f7619439ee",
+			"path": "com/mojang/patchy/1.3.9/patchy-1.3.9.jar",
+			"size": 23581,
+			"name": "com.mojang:patchy:1.3.9",
+			"url": "https://libraries.minecraft.net/com/mojang/patchy/1.3.9/patchy-1.3.9.jar"
+		},
+		{
+			"sha1": "9ddf7b048a8d701be231c0f4f95fd986198fd2d8",
+			"path": "oshi-project/oshi-core/1.1/oshi-core-1.1.jar",
+			"size": 30973,
+			"name": "oshi-project:oshi-core:1.1",
+			"url": "https://libraries.minecraft.net/oshi-project/oshi-core/1.1/oshi-core-1.1.jar"
+		},
+		{
+			"sha1": "cb208278274bf12ebdb56c61bd7407e6f774d65a",
+			"path": "net/java/dev/jna/jna/4.4.0/jna-4.4.0.jar",
+			"size": 1091208,
+			"name": "net.java.dev.jna:jna:4.4.0",
+			"url": "https://libraries.minecraft.net/net/java/dev/jna/jna/4.4.0/jna-4.4.0.jar"
+		},
+		{
+			"sha1": "e3f70017be8100d3d6923f50b3d2ee17714e9c13",
+			"path": "net/java/dev/jna/platform/3.4.0/platform-3.4.0.jar",
+			"size": 913436,
+			"name": "net.java.dev.jna:platform:3.4.0",
+			"url": "https://libraries.minecraft.net/net/java/dev/jna/platform/3.4.0/platform-3.4.0.jar"
+		},
+		{
+			"sha1": "72c7519b6d91f7a1f993bd44a99fe95d67211b27",
+			"path": "com/ibm/icu/icu4j/66.1/icu4j-66.1.jar",
+			"size": 12935630,
+			"name": "com.ibm.icu:icu4j:66.1",
+			"url": "https://libraries.minecraft.net/com/ibm/icu/icu4j/66.1/icu4j-66.1.jar"
+		},
+		{
+			"sha1": "6aa6453aa99a52a5cd91749da1af6ab70e082ab3",
+			"path": "com/mojang/javabridge/1.0.22/javabridge-1.0.22.jar",
+			"size": 5111,
+			"name": "com.mojang:javabridge:1.0.22",
+			"url": "https://libraries.minecraft.net/com/mojang/javabridge/1.0.22/javabridge-1.0.22.jar"
+		},
+		{
+			"sha1": "cdd846cfc4e0f7eefafc02c0f5dce32b9303aa2a",
+			"path": "net/sf/jopt-simple/jopt-simple/5.0.3/jopt-simple-5.0.3.jar",
+			"size": 78175,
+			"name": "net.sf.jopt-simple:jopt-simple:5.0.3",
+			"url": "https://libraries.minecraft.net/net/sf/jopt-simple/jopt-simple/5.0.3/jopt-simple-5.0.3.jar"
+		},
+		{
+			"sha1": "d0626cd3108294d1d58c05859add27b4ef21f83b",
+			"path": "io/netty/netty-all/4.1.25.Final/netty-all-4.1.25.Final.jar",
+			"size": 3823147,
+			"name": "io.netty:netty-all:4.1.25.Final",
+			"url": "https://libraries.minecraft.net/io/netty/netty-all/4.1.25.Final/netty-all-4.1.25.Final.jar"
+		},
+		{
+			"sha1": "3a3d111be1be1b745edfa7d91678a12d7ed38709",
+			"path": "com/google/guava/guava/21.0/guava-21.0.jar",
+			"size": 2521113,
+			"name": "com.google.guava:guava:21.0",
+			"url": "https://libraries.minecraft.net/com/google/guava/guava/21.0/guava-21.0.jar"
+		},
+		{
+			"sha1": "6c6c702c89bfff3cd9e80b04d668c5e190d588c6",
+			"path": "org/apache/commons/commons-lang3/3.5/commons-lang3-3.5.jar",
+			"size": 479881,
+			"name": "org.apache.commons:commons-lang3:3.5",
+			"url": "https://libraries.minecraft.net/org/apache/commons/commons-lang3/3.5/commons-lang3-3.5.jar"
+		},
+		{
+			"sha1": "2852e6e05fbb95076fc091f6d1780f1f8fe35e0f",
+			"path": "commons-io/commons-io/2.5/commons-io-2.5.jar",
+			"size": 208700,
+			"name": "commons-io:commons-io:2.5",
+			"url": "https://libraries.minecraft.net/commons-io/commons-io/2.5/commons-io-2.5.jar"
+		},
+		{
+			"sha1": "4b95f4897fa13f2cd904aee711aeafc0c5295cd8",
+			"path": "commons-codec/commons-codec/1.10/commons-codec-1.10.jar",
+			"size": 284184,
+			"name": "commons-codec:commons-codec:1.10",
+			"url": "https://libraries.minecraft.net/commons-codec/commons-codec/1.10/commons-codec-1.10.jar"
+		},
+		{
+			"sha1": "39c7796b469a600f72380316f6b1f11db6c2c7c4",
+			"path": "net/java/jinput/jinput/2.0.5/jinput-2.0.5.jar",
+			"size": 208338,
+			"name": "net.java.jinput:jinput:2.0.5",
+			"url": "https://libraries.minecraft.net/net/java/jinput/jinput/2.0.5/jinput-2.0.5.jar"
+		},
+		{
+			"sha1": "e12fe1fda814bd348c1579329c86943d2cd3c6a6",
+			"path": "net/java/jutils/jutils/1.0.0/jutils-1.0.0.jar",
+			"size": 7508,
+			"name": "net.java.jutils:jutils:1.0.0",
+			"url": "https://libraries.minecraft.net/net/java/jutils/jutils/1.0.0/jutils-1.0.0.jar"
+		},
+		{
+			"sha1": "c6b7dc51dd44379cc751b7504816006e9be4b1e6",
+			"path": "com/mojang/brigadier/1.0.17/brigadier-1.0.17.jar",
+			"size": 77392,
+			"name": "com.mojang:brigadier:1.0.17",
+			"url": "https://libraries.minecraft.net/com/mojang/brigadier/1.0.17/brigadier-1.0.17.jar"
+		},
+		{
+			"sha1": "ebd6690f33871ccee9b6132c6480668ee2e35020",
+			"path": "com/mojang/datafixerupper/4.0.26/datafixerupper-4.0.26.jar",
+			"size": 673183,
+			"name": "com.mojang:datafixerupper:4.0.26",
+			"url": "https://libraries.minecraft.net/com/mojang/datafixerupper/4.0.26/datafixerupper-4.0.26.jar"
+		},
+		{
+			"sha1": "c4ba5371a29ac9b2ad6129b1d39ea38750043eff",
+			"path": "com/google/code/gson/gson/2.8.0/gson-2.8.0.jar",
+			"size": 231952,
+			"name": "com.google.code.gson:gson:2.8.0",
+			"url": "https://libraries.minecraft.net/com/google/code/gson/gson/2.8.0/gson-2.8.0.jar"
+		},
+		{
+			"sha1": "ad54da276bf59983d02d5ed16fc14541354c71fd",
+			"path": "com/mojang/authlib/2.1.28/authlib-2.1.28.jar",
+			"size": 76328,
+			"name": "com.mojang:authlib:2.1.28",
+			"url": "https://libraries.minecraft.net/com/mojang/authlib/2.1.28/authlib-2.1.28.jar"
+		},
+		{
+			"sha1": "a698750c16740fd5b3871425f4cb3bbaa87f529d",
+			"path": "org/apache/commons/commons-compress/1.8.1/commons-compress-1.8.1.jar",
+			"size": 365552,
+			"name": "org.apache.commons:commons-compress:1.8.1",
+			"url": "https://libraries.minecraft.net/org/apache/commons/commons-compress/1.8.1/commons-compress-1.8.1.jar"
+		},
+		{
+			"sha1": "18f4247ff4572a074444572cee34647c43e7c9c7",
+			"path": "org/apache/httpcomponents/httpclient/4.3.3/httpclient-4.3.3.jar",
+			"size": 589512,
+			"name": "org.apache.httpcomponents:httpclient:4.3.3",
+			"url": "https://libraries.minecraft.net/org/apache/httpcomponents/httpclient/4.3.3/httpclient-4.3.3.jar"
+		},
+		{
+			"sha1": "f6f66e966c70a83ffbdb6f17a0919eaf7c8aca7f",
+			"path": "commons-logging/commons-logging/1.1.3/commons-logging-1.1.3.jar",
+			"size": 62050,
+			"name": "commons-logging:commons-logging:1.1.3",
+			"url": "https://libraries.minecraft.net/commons-logging/commons-logging/1.1.3/commons-logging-1.1.3.jar"
+		},
+		{
+			"sha1": "31fbbff1ddbf98f3aa7377c94d33b0447c646b6e",
+			"path": "org/apache/httpcomponents/httpcore/4.3.2/httpcore-4.3.2.jar",
+			"size": 282269,
+			"name": "org.apache.httpcomponents:httpcore:4.3.2",
+			"url": "https://libraries.minecraft.net/org/apache/httpcomponents/httpcore/4.3.2/httpcore-4.3.2.jar"
+		},
+		{
+			"sha1": "5ad88f325e424f8dbc2be5459e21ea5cab3864e9",
+			"path": "it/unimi/dsi/fastutil/8.2.1/fastutil-8.2.1.jar",
+			"size": 18800417,
+			"name": "it.unimi.dsi:fastutil:8.2.1",
+			"url": "https://libraries.minecraft.net/it/unimi/dsi/fastutil/8.2.1/fastutil-8.2.1.jar"
+		},
+		{
+			"sha1": "e801d13612e22cad62a3f4f3fe7fdbe6334a8e72",
+			"path": "org/apache/logging/log4j/log4j-api/2.8.1/log4j-api-2.8.1.jar",
+			"size": 228859,
+			"name": "org.apache.logging.log4j:log4j-api:2.8.1",
+			"url": "https://libraries.minecraft.net/org/apache/logging/log4j/log4j-api/2.8.1/log4j-api-2.8.1.jar"
+		},
+		{
+			"sha1": "4ac28ff2f1ddf05dae3043a190451e8c46b73c31",
+			"path": "org/apache/logging/log4j/log4j-core/2.8.1/log4j-core-2.8.1.jar",
+			"size": 1402925,
+			"name": "org.apache.logging.log4j:log4j-core:2.8.1",
+			"url": "https://libraries.minecraft.net/org/apache/logging/log4j/log4j-core/2.8.1/log4j-core-2.8.1.jar"
+		},
+		{
+			"sha1": "8ad6294407e15780b43e84929c40e4c5e997972e",
+			"path": "org/lwjgl/lwjgl/3.2.2/lwjgl-3.2.2.jar",
+			"size": 321900,
+			"name": "org.lwjgl:lwjgl:3.2.2",
+			"url": "https://libraries.minecraft.net/org/lwjgl/lwjgl/3.2.2/lwjgl-3.2.2.jar"
+		},
+		{
+			"sha1": "ee8e57a79300f78294576d87c4a587f8c99402e2",
+			"path": "org/lwjgl/lwjgl-jemalloc/3.2.2/lwjgl-jemalloc-3.2.2.jar",
+			"size": 34848,
+			"name": "org.lwjgl:lwjgl-jemalloc:3.2.2",
+			"url": "https://libraries.minecraft.net/org/lwjgl/lwjgl-jemalloc/3.2.2/lwjgl-jemalloc-3.2.2.jar"
+		},
+		{
+			"sha1": "2b772a102b0a11ee5f2109a5b136f4dc7c630827",
+			"path": "org/lwjgl/lwjgl-openal/3.2.2/lwjgl-openal-3.2.2.jar",
+			"size": 80012,
+			"name": "org.lwjgl:lwjgl-openal:3.2.2",
+			"url": "https://libraries.minecraft.net/org/lwjgl/lwjgl-openal/3.2.2/lwjgl-openal-3.2.2.jar"
+		},
+		{
+			"sha1": "6ac5bb88b44c43ea195a570aab059f63da004cd8",
+			"path": "org/lwjgl/lwjgl-opengl/3.2.2/lwjgl-opengl-3.2.2.jar",
+			"size": 929780,
+			"name": "org.lwjgl:lwjgl-opengl:3.2.2",
+			"url": "https://libraries.minecraft.net/org/lwjgl/lwjgl-opengl/3.2.2/lwjgl-opengl-3.2.2.jar"
+		},
+		{
+			"sha1": "d3ad4df38e400b8afba1de63f84338809399df5b",
+			"path": "org/lwjgl/lwjgl-glfw/3.2.2/lwjgl-glfw-3.2.2.jar",
+			"size": 108907,
+			"name": "org.lwjgl:lwjgl-glfw:3.2.2",
+			"url": "https://libraries.minecraft.net/org/lwjgl/lwjgl-glfw/3.2.2/lwjgl-glfw-3.2.2.jar"
+		},
+		{
+			"sha1": "3b8e6ebc5851dd3d17e37e5cadce2eff2a429f0f",
+			"path": "org/lwjgl/lwjgl-stb/3.2.2/lwjgl-stb-3.2.2.jar",
+			"size": 104469,
+			"name": "org.lwjgl:lwjgl-stb:3.2.2",
+			"url": "https://libraries.minecraft.net/org/lwjgl/lwjgl-stb/3.2.2/lwjgl-stb-3.2.2.jar"
+		},
+		{
+			"sha1": "fcbe606c8f8da6f8f9a05e2c540eb1ee8632b0e9",
+			"path": "org/lwjgl/lwjgl-tinyfd/3.2.2/lwjgl-tinyfd-3.2.2.jar",
+			"size": 7092,
+			"name": "org.lwjgl:lwjgl-tinyfd:3.2.2",
+			"url": "https://libraries.minecraft.net/org/lwjgl/lwjgl-tinyfd/3.2.2/lwjgl-tinyfd-3.2.2.jar"
+		},
+		{
+			"sha1": "f378f889797edd7df8d32272c06ca80a1b6b0f58",
+			"path": "com/mojang/text2speech/1.11.3/text2speech-1.11.3.jar",
+			"size": 13164,
+			"name": "com.mojang:text2speech:1.11.3",
+			"url": "https://libraries.minecraft.net/com/mojang/text2speech/1.11.3/text2speech-1.11.3.jar"
+		}
+	]
+}

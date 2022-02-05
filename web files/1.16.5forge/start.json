@@ -1,0 +1,21 @@
+{
+	"asset_index": "1.16",
+	"mainclass": "cpw.mods.modlauncher.Launcher",
+	"tweak_classes": [],
+	"extra_args": [
+		"--launchTarget",
+		"fmlclient",
+		"--fml.forgeVersion",
+		"36.2.22",
+		"--fml.mcVersion",
+		"1.16.5",
+		"--fml.forgeGroup",
+		"net.minecraftforge",
+		"--fml.mcpVersion",
+		"20210115.111550",
+		"--version",
+		"Forge 1.16.5",
+		"--versionType",
+		"modified"
+	]
+}

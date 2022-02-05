@@ -1,0 +1,133 @@
+{
+	"id": "1.16.5forge",
+	"date": "05.02.2021",
+	"format": 4,
+	"update_build": 1,
+	"asset_index": "1.16",
+	"integrity_check": {
+		"client_sha1": "37fd3c903861eeff3bc24b71eed48f828b5269c8",
+		"dirs": [
+			{"type": "exists", "path": "assets/"}
+		],
+		"natives": {
+			"checksum_algorithm": "SHA-1",
+			"checksums": {
+				"OpenAL.dll": "dc8f7a5704164fe3dff3631c326bab7159a9358d",
+				"glfw.dll": "9d95a8f52cbd48ab87937714eb4fd2129ed10f0a",
+				"SAPIWrapper_x64.dll": "c4a293116e7531d950db2d5ea737e61a9912b61d",
+				"glfw32.dll": "b9a18c65931b474a453cca5b20903220975f0fc9",
+				"jemalloc32.dll": "0d3c5c4d18d9a60501bce1f586684cd2fc5c466f",
+				"OpenAL32.dll": "aa3fa9446b7c1264e2b463bb53946718e4f8ce82",
+				"lwjgl.dll": "d01410449d2402a952e9a6063699f1868196883f",
+				"lwjgl_opengl32.dll": "2e0fe073b23ab972af00025097efcfcb446d927f",
+				"lwjgl32.dll": "a7aa4fbaa375fd39c4cb8eabeef45b44d5848bcb",
+				"jemalloc.dll": "8a6eb00b934da6c97b0dc9d2dc321843076c8987",
+				"lwjgl_tinyfd32.dll": "079540a19727772f056cd80535e9645a674190b4",
+				"lwjgl_tinyfd.dll": "ec0fd8007afba6697d5b3b8249b5be27096a0ce8",
+				"SAPIWrapper_x86.dll": "70e85ab3f880a7c3d5f0a9aae0f65661cb8af5a6",
+				"lwjgl_stb32.dll": "1c28819763f77cbb4593a95b1cbb0999f136695d",
+				"lwjgl_opengl.dll": "8e9836dd0d1691356db654aa02533ad80e9bf52c",
+				"lwjgl_stb.dll": "8b047fb3f6c31946fe33157e7912ac31595cd3b8"
+			}
+		},
+		"libraries": {
+			"url": "http://dl.nnproject.cc/lgame/1.16.5forge/libraries.json",
+			"new_libraries": true
+		}
+	},
+	"update": {
+		"updates_check": {"type": "update_build"},
+		"update_scripts": {
+			"install_script": {
+				"download": [
+					{
+						"url": "https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar", 
+						"name": "client.jar", 
+						"dir": "/"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/1.16.5forge/libraries.json",
+						"name": "libraries.json",
+						"new_libraries": true
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/1.16.5forge/natives.zip", 
+						"name": "natives.zip", 
+						"dir": "temp"
+					},
+					{
+						"url": "http://dl.nnproject.cc/lgame/1.16.5forge/assets.zip", 
+						"name": "assets.zip", 
+						"dir": "temp"
+					}
+				],
+				"unzip": [
+					{
+						"name": "natives.zip", 
+						"path": "/natives/", 
+						"from": "temp"
+					},
+					{
+						"name": "assets.zip", 
+						"path": "/assets/", 
+						"from": "temp"
+					}
+				],
+				"post_install": [
+					{"remove": "temp"}
+				]
+			},
+			"update_script": {
+				"pre_remove_dirs": [
+					"temp",
+					"scripts"
+				],
+				"download": [
+					{
+						"check": {"type": "client"}, 
+						"url": "https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar", 
+						"name": "client.jar", 
+						"dir": "/"
+					},
+					{
+						"check": {"type": "libaries"},
+						"url": "http://dl.nnproject.cc/lgame/1.16.5forge/libraries.json",
+						"name": "libraries.json",
+						"new_libraries": true
+					},
+					{
+						"check": {"type": "natives"},
+						"url": "http://dl.nnproject.cc/lgame/1.16.5forge/natives.zip",
+						"name": "natives.zip",
+						"dir": "temp"
+					},
+					{
+						"check": {"type": "exists", "path": "/assets"},
+						"url": "http://dl.nnproject.cc/lgame/1.16.5forge/assets.zip",
+						"name": "assets.zip",
+						"dir": "temp"
+					}
+				],
+				"unzip": [
+					{
+						"name": "natives.zip", 
+						"path": "/natives/", 
+						"from": "temp"
+					},
+					{
+						"name": "assets.zip", 
+						"path": "/assets/", 
+						"from": "assets"
+					}
+				],
+				"post_install": [
+					{"remove": "temp"}
+				]
+			}
+		},
+	},
+	"run": {
+		"mainclass": "cpw.mods.modlauncher.Launcher",
+		"tweak_classes": []
+	}
+}
