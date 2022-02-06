@@ -348,9 +348,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	 */
 	private boolean checkClientLibraries(String p) throws Exception {
 		JSONObject md = clientJson.getJSONObject("integrity_check").getJSONObject("libraries");
-		System.out.println(md);
 		if(md.optBoolean("new_libraries")) {
-			System.out.println("new libraries check");
 			clientNewLibraries = true;
 			if(clientLibrariesJson == null) {
 				modpack.setClientLibrariesURL(md.getString("url"));

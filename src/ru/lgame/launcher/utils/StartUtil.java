@@ -67,7 +67,6 @@ public class StartUtil {
 					}
 				}
 				w = o;
-				System.out.println(o);
 			}
 		}
 		return w;

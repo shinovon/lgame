@@ -53,6 +53,7 @@ public class Launcher {
 	
 	private static String launcherPath;
 	public static boolean running;
+	public static boolean starter;
 
 	private ArrayList<Runnable> queuedTasks;
 
@@ -470,7 +471,7 @@ public class Launcher {
 			images.add(ImageIO.read(c.getResourceAsStream("/icon24.png")));
 			images.add(ImageIO.read(c.getResourceAsStream("/icon16.png")));
 			frm.setIconImages(images);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Log.warn("icon load failed", e);
 		}
 	}
