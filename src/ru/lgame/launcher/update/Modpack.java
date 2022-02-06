@@ -32,15 +32,17 @@ public class Modpack {
 	private String client_id;
 	private String update_data;
 	private String client_update_data;
+	private String client_start_data;
+	private String client_libraries_data;
+	private String type;
 	private MiniModpackPane ui;
 	
 	private JSONObject updateJson;
 	private JSONObject clientUpdateJson;
-	private int cachedState;
 	private JSONObject clientStartJson;
-	private String client_start_data;
-	private String client_libraries_data;
 	private JSONObject clientLibrariesJson;
+	
+	private int cachedState;
 	
 	public Modpack(String id) {
 		this.id = id;
@@ -52,7 +54,6 @@ public class Modpack {
 		clientUpdateJson = null;
 		name = o.optString("name", id);
 		category = o.optString("category");
-		description = o.optString("category");
 		image = o.optString("img", null);
 		description = o.optString("description");
 		last_version = o.optString("last_version");
@@ -61,6 +62,7 @@ public class Modpack {
 		client_update_data = o.optString("client_update_data", null);
 		client_start_data = client_update_data.replace("/update.json", "/start.json");
 		client_libraries_data = client_update_data.replace("/update.json", "/libraries.json");
+		type = o.optString("type");
 		return this;
 	}
 
@@ -90,6 +92,10 @@ public class Modpack {
 
 	public String client() {
 		return client_id;
+	}
+
+	public String getType() {
+		return type;
 	}
 
 	/**

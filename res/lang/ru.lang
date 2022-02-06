@@ -10,6 +10,8 @@ button.showlogger=Показать логи
 button.account.add=Подтвердить
 button.account.cracked=По нику
 button.account.mojang=Mojang
+button.showlogger=Показать логи
+button.openlibrarydir=Открыть папку со сборками
 
 label.account.no=Добавьте способ входа
 label.account.welcome=Добро пожаловать
@@ -20,6 +22,8 @@ label.memory=Выделяемая память (Мегабайты)
 label.username=Ник
 label.password=Пароль
 label.email=Email
+label.javapathnote=(оставьте пустым для автоматического определения)
+label.localizedmodpack=Перевод
 
 check.forceinstall=Переустановить
 

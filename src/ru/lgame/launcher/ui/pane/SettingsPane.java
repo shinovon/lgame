@@ -5,8 +5,11 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.InputMethodEvent;
 import java.awt.event.InputMethodListener;
 import java.io.File;
@@ -55,8 +58,18 @@ public class SettingsPane extends JPanel {
 		
 		JPanel panel = new JPanel();
 		FlowLayout flowLayout_2 = (FlowLayout) panel.getLayout();
-		flowLayout_2.setAlignment(FlowLayout.LEFT);
+		flowLayout_2.setAlignment(FlowLayout.RIGHT);
 		add(panel, BorderLayout.SOUTH);
+		
+		JButton openDirBtn = new JButton(Text.get("button.openlibrarydir"));
+		openDirBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		panel.add(openDirBtn);
+		
+		JButton btnNewButton = new JButton(Text.get("button.showlogger"));
+		panel.add(btnNewButton);
 		
 		JButton settsBackBtn = new JButton(Text.get("button.back"));
 		settsBackBtn.addActionListener(new ActionListener() {
@@ -68,32 +81,81 @@ public class SettingsPane extends JPanel {
 		});
 		settsBackBtn.addActionListener(frm.settingsListener);
 		panel.add(settsBackBtn);
-		
-		JButton btnNewButton = new JButton("logger");
-		panel.add(btnNewButton);
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Launcher.inst.showLoggerFrame();
 			}
 		});
-		
+
+		JPanel pane = new JPanel();
+		add(pane, BorderLayout.CENTER);
+		pane.setLayout(null);
 		JPanel content = new JPanel();
-		add(content, BorderLayout.CENTER);
+		pane.add(content);
+		addComponentListener(new ComponentListener() {
+
+			@Override
+			public void componentResized(ComponentEvent e) {
+				Rectangle r = content.getBounds();
+				content.setBounds((pane.getWidth() - r.width) / 2, (pane.getHeight() - r.height) / 2, r.width, r.height);
+			}
+
+			@Override
+			public void componentMoved(ComponentEvent e) {
+				Rectangle r = content.getBounds();
+				content.setBounds((pane.getWidth() - r.width) / 2, (pane.getHeight() - r.height) / 2, r.width, r.height);
+			}
+
+			@Override
+			public void componentShown(ComponentEvent e) {
+			}
+
+			@Override
+			public void componentHidden(ComponentEvent e) {
+			}
+			
+		});
+		content.setBounds(187, 69, 610, 400);
+		Rectangle r = content.getBounds();
+		if(true && true) {
+			content.setBounds((pane.getWidth() - r.width) / 2, (pane.getHeight() - r.height) / 2, r.width, r.height);
+		}
 		content.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = gbc();
 		
 		JPanel panel_2 = new JPanel();
 		FlowLayout flowLayout = (FlowLayout) panel_2.getLayout();
+		flowLayout.setVgap(0);
+		flowLayout.setHgap(0);
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		content.add(panel_2, gbc);
 		
-		JLabel lblNewLabel = new JLabel(Text.get("label.memory") + ": ");
-		panel_2.add(lblNewLabel);
+		JPanel panel_9 = new JPanel();
+		panel_9.setPreferredSize(new Dimension(610, 32));
+		panel_2.add(panel_9);
+		JSlider slider = new JSlider();
+		panel_9.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panel_11 = new JPanel();
+		FlowLayout flowLayout_7 = (FlowLayout) panel_11.getLayout();
+		flowLayout_7.setHgap(0);
+		flowLayout_7.setAlignment(FlowLayout.RIGHT);
+		panel_9.add(panel_11);
 		
 		JSpinner spinner = new JSpinner();
-		panel_2.add(spinner);
-		JSlider slider = new JSlider();
+		panel_11.add(spinner);
 		spinner.setModel(new SpinnerNumberModel(Config.getInt("xmx"), 512, max, 512));
+		
+		JPanel panel_13 = new JPanel();
+		panel_11.add(panel_13);
+		
+		JPanel panel_12 = new JPanel();
+		FlowLayout flowLayout_6 = (FlowLayout) panel_12.getLayout();
+		flowLayout_6.setVgap(10);
+		panel_9.add(panel_12, BorderLayout.WEST);
+		
+		JLabel lblNewLabel = new JLabel(Text.get("label.memory") + ": ");
+		panel_12.add(lblNewLabel);
 		spinner.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if((Integer)spinner.getValue() == 0) return;
@@ -149,6 +211,10 @@ public class SettingsPane extends JPanel {
 				Config.saveLater();
 			}
 		});
+		
+		JPanel panel_8 = new JPanel();
+		panel_8.setPreferredSize(new Dimension(143, 10));
+		panel_3.add(panel_8);
 		textField.setText(Config.get("javapath"));
 		panel_3.add(textField);
 		textField.setColumns(40);
@@ -173,9 +239,14 @@ public class SettingsPane extends JPanel {
 			}
 		});
 		panel_3.add(btnNewButton_1);
-		
-		JLabel lblNewLabel_1 = new JLabel("(оставьте пустым для автоматического определения)");
-		panel_3.add(lblNewLabel_1);
+		JPanel panel_l3 = new JPanel();
+		panel_l3.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		content.add(panel_l3, gbc.clone());
+		JLabel lblNewLabel_1 = new JLabel(Text.get("label.javapathnote"));
+		panel_l3.add(lblNewLabel_1);
+		JPanel pl3 = new JPanel();
+		pl3.setPreferredSize(new Dimension(50, 10));
+		panel_l3.add(pl3);
 
 		JPanel panel_5 = new JPanel();
 		FlowLayout flowLayout_5 = (FlowLayout) panel_5.getLayout();
@@ -202,6 +273,10 @@ public class SettingsPane extends JPanel {
 				Config.saveLater();
 			}
 		});
+		
+		JPanel panel_10 = new JPanel();
+		panel_10.setPreferredSize(new Dimension(50, 10));
+		panel_5.add(panel_10);
 		textField_1.setText(Config.get("path"));
 		textField_1.setColumns(40);
 		panel_5.add(textField_1);
@@ -232,6 +307,12 @@ public class SettingsPane extends JPanel {
 		JLabel label = new JLabel(Text.get("label.settings"));
 		panel_4.add(label);
 		setPreferredSize(new Dimension(1000, 600));
+		
+		JPanel panel_1 = new JPanel();
+		add(panel_1, BorderLayout.WEST);
+		
+		JPanel panel_6 = new JPanel();
+		add(panel_6, BorderLayout.EAST);
 	}
 
 	private GridBagConstraints gbc() {
@@ -241,5 +322,4 @@ public class SettingsPane extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 		return gbc;
 	}
-
 }
