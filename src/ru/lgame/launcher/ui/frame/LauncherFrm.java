@@ -84,6 +84,7 @@ public class LauncherFrm extends JFrame implements WindowListener {
 		
 		layout.showComponent(mainPanel, this);
 		contentPane.setPreferredSize(new Dimension(1000, 600));
+		setMinimumSize(new Dimension(900, 580));
 		
 		pack();
 		setLocationRelativeTo(null);
