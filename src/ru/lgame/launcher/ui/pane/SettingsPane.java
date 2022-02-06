@@ -13,6 +13,7 @@ import java.awt.event.ComponentListener;
 import java.awt.event.InputMethodEvent;
 import java.awt.event.InputMethodListener;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -64,6 +65,10 @@ public class SettingsPane extends JPanel {
 		JButton openDirBtn = new JButton(Text.get("button.openlibrarydir"));
 		openDirBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				try {
+					Runtime.getRuntime().exec("explorer \""+textField_1.getText()+"\"");
+				} catch (IOException e1) {
+				}
 			}
 		});
 		panel.add(openDirBtn);
