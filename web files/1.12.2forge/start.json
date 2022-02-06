@@ -1,5 +1,0 @@
-{
-	"asset_index": "1.12",
-	"mainclass": "net.minecraft.launchwrapper.Launch",
-	"tweak_classes": ["net.minecraftforge.fml.common.launcher.FMLTweaker"]
-}
