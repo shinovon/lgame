@@ -1,6 +1,7 @@
 package ru.lgame.launcher.ui.pane;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -44,8 +45,8 @@ import ru.lgame.launcher.ui.frame.LauncherFrm;
 public class SettingsPane extends JPanel {
 
 	private static final long serialVersionUID = -8711782187461079094L;
-	private JTextField textField;
-	private JTextField textField_1;
+	private JTextField javaPathField;
+	private JTextField libraryPathField;
 
 	/**
 	 * Create the panel.
@@ -72,7 +73,7 @@ public class SettingsPane extends JPanel {
 		openDirBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Runtime.getRuntime().exec("explorer \""+textField_1.getText()+"\"");
+					Runtime.getRuntime().exec("explorer \""+libraryPathField.getText()+"\"");
 				} catch (IOException e1) {
 				}
 			}
@@ -155,8 +156,8 @@ public class SettingsPane extends JPanel {
 		JButton settsBackBtn = new JButton(Text.get("button.back"));
 		settsBackBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Config.set("javapath", textField.getText());
-				Config.set("path", textField_1.getText());
+				Config.set("javapath", javaPathField.getText());
+				Config.set("path", libraryPathField.getText());
 				Config.saveLater();
 			}
 		});
@@ -277,18 +278,19 @@ public class SettingsPane extends JPanel {
 		JLabel lblJava = new JLabel(Text.get("label.javapath") + ": ");
 		panel_3.add(lblJava);
 		
-		textField = new JTextField();
-		textField.addInputMethodListener(new InputMethodListener() {
+		javaPathField = new JTextField();
+		javaPathField.setCaretColor(new Color(-1));
+		javaPathField.addInputMethodListener(new InputMethodListener() {
 			public void caretPositionChanged(InputMethodEvent arg0) {
 			}
 			public void inputMethodTextChanged(InputMethodEvent arg0) {
-				Config.set("javapath", textField.getText());
+				Config.set("javapath", javaPathField.getText());
 				Config.saveLater();
 			}
 		});
-		textField.addActionListener(new ActionListener() {
+		javaPathField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Config.set("javapath", textField.getText());
+				Config.set("javapath", javaPathField.getText());
 				Config.saveLater();
 			}
 		});
@@ -296,9 +298,9 @@ public class SettingsPane extends JPanel {
 		JPanel panel_8 = new JPanel();
 		panel_8.setPreferredSize(new Dimension(143, 10));
 		panel_3.add(panel_8);
-		textField.setText(Config.get("javapath"));
-		panel_3.add(textField);
-		textField.setColumns(40);
+		javaPathField.setText(Config.get("javapath"));
+		panel_3.add(javaPathField);
+		javaPathField.setColumns(40);
 		
 		JButton btnNewButton_1 = new JButton("...");
 		btnNewButton_1.addActionListener(new ActionListener() {
@@ -314,7 +316,7 @@ public class SettingsPane extends JPanel {
 					if(f != null) {
 						String s = f.toString();
 						Config.set("javapath", s);
-						textField.setText(s);
+						javaPathField.setText(s);
 					}
 				}
 			}
@@ -337,19 +339,20 @@ public class SettingsPane extends JPanel {
 		JLabel label_1 = new JLabel(Text.get("label.savedir") + ": ");
 		panel_5.add(label_1);
 		
-		textField_1 = new JTextField();
-		textField_1.addInputMethodListener(new InputMethodListener() {
+		libraryPathField = new JTextField();
+		libraryPathField.setCaretColor(new Color(-1));
+		libraryPathField.addInputMethodListener(new InputMethodListener() {
 			public void caretPositionChanged(InputMethodEvent event) {
 			}
 			public void inputMethodTextChanged(InputMethodEvent event) {
-				Config.set("path", textField_1.getText());
+				Config.set("path", libraryPathField.getText());
 				Launcher.inst.pathChanged();
 				Config.saveLater();
 			}
 		});
-		textField_1.addActionListener(new ActionListener() {
+		libraryPathField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Config.set("path", textField_1.getText());
+				Config.set("path", libraryPathField.getText());
 				Launcher.inst.pathChanged();
 				Config.saveLater();
 			}
@@ -358,9 +361,9 @@ public class SettingsPane extends JPanel {
 		JPanel panel_10 = new JPanel();
 		panel_10.setPreferredSize(new Dimension(50, 10));
 		panel_5.add(panel_10);
-		textField_1.setText(Config.get("path"));
-		textField_1.setColumns(40);
-		panel_5.add(textField_1);
+		libraryPathField.setText(Config.get("path"));
+		libraryPathField.setColumns(40);
+		panel_5.add(libraryPathField);
 		
 		JButton button = new JButton("...");
 		button.addActionListener(new ActionListener() {
@@ -373,7 +376,7 @@ public class SettingsPane extends JPanel {
 						String s = f.toString();
 						Config.set("path", s);
 						Launcher.inst.pathChanged();
-						textField_1.setText(s);
+						libraryPathField.setText(s);
 					}
 				}
 			}

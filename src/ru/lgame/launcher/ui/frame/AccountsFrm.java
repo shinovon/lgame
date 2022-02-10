@@ -28,6 +28,7 @@ import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.auth.AuthStore;
 import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.ErrorUI;
+import java.awt.Color;
 
 /**
  * окно с аккаунтами
@@ -86,6 +87,7 @@ public class AccountsFrm extends JFrame {
 		panel_7.add(usernameLabel);
 		
 		usernameField = new JTextField();
+		usernameField.setCaretColor(new Color(-1));
 		panel_7.add(usernameField);
 		usernameField.setMaximumSize(new Dimension(300, 2147483647));
 		usernameField.setMinimumSize(new Dimension(120, 20));
@@ -96,6 +98,7 @@ public class AccountsFrm extends JFrame {
 		panel_7.add(passwordLabel);
 		
 		passwordField = new JPasswordField();
+		passwordField.setCaretColor(new Color(-1));
 		panel_7.add(passwordField);
 		passwordField.setPreferredSize(new Dimension(120, 20));
 		passwordField.setMinimumSize(new Dimension(120, 20));

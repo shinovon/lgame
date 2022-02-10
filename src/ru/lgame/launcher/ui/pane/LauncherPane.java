@@ -108,7 +108,7 @@ public class LauncherPane extends JPanel {
 				refreshModpackList();
 			}
 		});
-		panel_3_1.add(refreshBtn);
+		//panel_3_1.add(refreshBtn);
 		
 		JButton settingsBtn = new JButton(Text.get("button.settings"));
 		settingsBtn.addActionListener(frm.settingsListener);
