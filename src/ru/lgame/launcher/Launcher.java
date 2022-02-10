@@ -41,7 +41,7 @@ import static ru.lgame.launcher.utils.HashUtils.getMD5String;
  */
 public class Launcher {
 	
-	public static final String version = "0.6.3";
+	public static final String version = "0.6.4";
 	public static final String build_date = "-";
 	public static final boolean DEBUG = true;
 	
@@ -141,6 +141,7 @@ public class Launcher {
 				try {
 					frame = new LauncherFrm();
 					loadingFrame.setVisible(false);
+					loadingFrame.disableExitOnClose();
 					frame.setVisible(true);
 					accountsFrame = new AccountsFrm();
 				} catch (Throwable e) {
