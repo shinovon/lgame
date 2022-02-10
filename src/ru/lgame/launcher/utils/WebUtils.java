@@ -1,21 +1,17 @@
 package ru.lgame.launcher.utils;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.security.MessageDigest;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import ru.lgame.launcher.Launcher;
@@ -230,29 +226,6 @@ public class WebUtils {
 
 	public final static String get(final String url) throws IOException {
 		return new String(getBytes(url), "UTF-8");
-	}
-
-	public static String post(final String url, final Map<String, String> requestMap, final String body)
-			throws IOException {
-		HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
-		con.setRequestMethod("POST");
-		//con.setRequestProperty("User-Agent", useragent);
-		if(requestMap != null) requestMap.forEach(con::setRequestProperty);
-		con.setDoOutput(true);
-		con.setDoInput(true);
-		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-		wr.writeBytes(body);
-		wr.flush();
-		wr.close();
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		StringBuilder response = new StringBuilder();
-		String inputLine;
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine).append("\n");
-		}
-		in.close();
-		con.disconnect();
-		return response.toString();
 	}
 
 	public static String getс(String url) throws IOException {

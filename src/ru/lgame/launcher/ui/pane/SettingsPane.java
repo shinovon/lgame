@@ -1,8 +1,10 @@
 package ru.lgame.launcher.ui.pane;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Rectangle;
@@ -16,13 +18,17 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -71,6 +77,76 @@ public class SettingsPane extends JPanel {
 				}
 			}
 		});
+		
+		JLabel lblNewLabel_2 = new JLabel("LGame Launcher " + Launcher.string_version + " (testers build)");
+		panel.add(lblNewLabel_2);
+		
+		JButton btnNewButton_2 = new JButton("Команда разработки LGame Launcher");
+		panel.add(btnNewButton_2);
+		btnNewButton_2.addActionListener(new ActionListener() {
+			@SuppressWarnings("deprecation")
+			public void actionPerformed(ActionEvent e) {
+				final String[] c = new String[] {
+						"Люди связанные с разработкой LGame Launcher:",
+						"",
+						"Арман Д. (@shinovon)",
+						"  Лид разработчик, Дизайн, Идея",
+						"Вадим Д. (@vadim_drobot_03)",
+						"  Глава LGame Studio",
+						"Иван Ж. (@algorithmlx)",
+						"  Тестирование, Помощь в разработке",
+						"Александр К. (@h4x4d)",
+						"  Дизайн, Тестирование",
+						"Hollow H. (@hollowhorizon)",
+						"  Помощь в разработке, просто хороший человек :)",
+						"Remuru T. (@slime79)",
+						"  Тестирование",
+						"Тимур С. (@timursagitov)",
+						"  Тестирование",
+				};
+				String s = "";
+				for(String x: c) {
+					s += x + "\n";
+				}
+				Launcher l = Launcher.inst;
+				JDialog dialog = new JDialog(l.frame(), "", true);
+				dialog.setAlwaysOnTop(true);
+		        Container contentPane = dialog.getContentPane();
+		        contentPane.setLayout(new BorderLayout());
+		        JPanel pane = new JPanel();
+		        contentPane.add(pane, BorderLayout.CENTER);
+				pane.setBorder(new EmptyBorder(5, 5, 5, 5));
+				pane.setLayout(new BorderLayout());
+					JScrollPane scrollPane = new JScrollPane();
+					scrollPane.setPreferredSize(new Dimension(600, 300));
+					pane.add(scrollPane, BorderLayout.CENTER);
+					JTextArea textArea = new JTextArea();
+					textArea.setFont(new Font("Consolas", Font.PLAIN, 12));
+					textArea.setEditable(false);
+					textArea.setText(s);
+					scrollPane.setViewportView(textArea);
+				JPanel buttonPane = new JPanel();
+				buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+				contentPane.add(buttonPane, BorderLayout.SOUTH);
+				{
+					JButton okButton = new JButton(Text.get("button.ok"));
+					okButton.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							dialog.dispose();
+						}
+					});
+					okButton.setActionCommand(Text.get("button.ok"));
+					buttonPane.add(okButton);
+					dialog.getRootPane().setDefaultButton(okButton);
+				}
+				dialog.pack();
+		        dialog.setResizable(false);
+		        dialog.setLocationRelativeTo(l.frame());
+		        dialog.show();
+		        dialog.dispose();
+			}
+		});
+		btnNewButton_2.setPreferredSize(new Dimension(300, 23));
 		panel.add(openDirBtn);
 		
 		JButton btnNewButton = new JButton(Text.get("button.showlogger"));

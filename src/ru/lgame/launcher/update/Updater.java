@@ -495,8 +495,10 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				clientExtraArgs = clientStartJson.getJSONArray("extra_args").toList().toArray(new String[0]);
 			}
 			try {
-				if(clientJson.getJSONObject("integrity_check").getJSONObject("libraries").optBoolean("new_libraries"))
+				if(clientJson.getJSONObject("integrity_check").getJSONObject("libraries").optBoolean("new_libraries")) {
 					clientNewLibraries = true;
+					Log.debug("client uses new libraries");
+				}
 			} catch (NullPointerException e) {
 			}
 			modpack.setUpdateInfo(null, "Скачивание конфигурации сборки", 33);
@@ -682,6 +684,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		JSONArray post = script.optJSONArray("post_install");
 		totalTasks += download.length();
 		totalTasks += unzip.length();
+		if(clientNewLibraries) {
+			totalTasks += clientLibrariesJson.getJSONArray("libraries").length();
+		}
 		boolean fail = false;
 		if(download == null || scriptedDownload(download, p, t)) {
 			if(unzip == null || scriptedUnzip(unzip, p, t)) {
@@ -837,6 +842,10 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 								} else if((mods = checkMods(modpack, root, json.getJSONObject("integrity_check")) ? 1 : 0) == 1) b = true;
 							} else if(type.equals("libraries")) {
 								if(checkClientLibraries(root)) b = true;
+
+								if(b && clientNewLibraries) {
+									tasksDone+=clientLibrariesJson.getJSONArray("libraries").length();
+								}
 							} else if(type.equals("natives")) {
 								if(checkClientNatives(root)) b = true;
 							} else if(type.equals("exists")) {

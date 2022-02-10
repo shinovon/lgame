@@ -30,11 +30,13 @@ public class FileUtils {
 	}
 
 	public static void deleteDirectoryRecursion(Path path) throws IOException {
+		if(!Files.exists(path)) return;
 		deleteDirectoryContents(path);
 		Files.delete(path);
 	}
 	
 	public static void deleteDirectoryContents(Path path) throws IOException {
+		if(!Files.exists(path)) return;
 		if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
 			try (DirectoryStream<Path> entries = Files.newDirectoryStream(path)) {
 				for (Path entry : entries) {

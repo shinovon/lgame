@@ -27,7 +27,7 @@ public class Config {
 		set("username", "");
 		set("xmx", "4096");
 		set("xms", "512");
-		set("downloadLeftTime", true);
+		set("downloadLeftTime", false);
 		set("downloadMaxAttempts", "2");
 	}
 
