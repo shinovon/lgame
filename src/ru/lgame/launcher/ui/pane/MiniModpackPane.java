@@ -67,6 +67,8 @@ public class MiniModpackPane extends JPanel {
 
 	private String time;
 
+	private boolean selected;
+
 	public MiniModpackPane(String id) {
 		this(id, null);
 	}
@@ -117,10 +119,12 @@ public class MiniModpackPane extends JPanel {
 	}
 	
 	protected void unselected() {
-		setBorder(new MatteBorder(1, 0, 0, 0, Color.GRAY));
+		selected = false;
+		setBorder(new MatteBorder(0, 0, 1, 0, Color.GRAY));
 	}
 
 	protected void selected() {
+		selected = true;
 		setBorder(new MatteBorder(1, 1, 1, 1, Color.WHITE));
 		Launcher.inst.frame().mainPane().setSelected(this);
 	}
@@ -208,6 +212,11 @@ public class MiniModpackPane extends JPanel {
 	}
 	
 	public void updateContents() {
+		if(selected) {
+			setBorder(new MatteBorder(1, 1, 1, 1, Color.WHITE));
+		} else {
+			setBorder(new MatteBorder(0, 0, 1, 0, Color.GRAY));
+		}
 		//removeAll();
 		//add(imageLabel);
 		//add(new JLabel(sborkaName));

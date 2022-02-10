@@ -329,7 +329,8 @@ public class Launcher {
 	}
 
 	public static String getLibraryDefaultDir() {
-		String s = System.getProperty("user.home");
+		String s = System.getenv("APPDATA");
+		if(s == null) s = System.getProperty("user.home");
 		if(s.endsWith("/") || s.endsWith("\\"))
 			s = s.substring(0, s.length()-1);
 		s += File.separator + ".lgame" + File.separator;
