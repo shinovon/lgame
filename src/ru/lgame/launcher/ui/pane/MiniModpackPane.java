@@ -52,13 +52,9 @@ public class MiniModpackPane extends JPanel {
 	private String version;
 
 	private String[] descArr;
-
 	private Image image;
-
 	private JRadioButton radioButton;
-
 	private JLabel imageLabel;
-
 	private int lastW;
 
 	private String updateText1;
@@ -66,7 +62,6 @@ public class MiniModpackPane extends JPanel {
 	private double updatePercent = -1;
 
 	private String time;
-
 	private boolean selected;
 
 	public MiniModpackPane(String id) {
@@ -108,7 +103,7 @@ public class MiniModpackPane extends JPanel {
 			}
 			
 		});
-		setInformation(id, id);
+		setInformation(id, id, null);
 	}
 	
 	/**
@@ -156,10 +151,11 @@ public class MiniModpackPane extends JPanel {
 	 * @param desc Описание
 	 * @return Самого себя
 	 */
-	public MiniModpackPane setInformation(String name, String desc) {
+	public MiniModpackPane setInformation(String name, String desc, String cat) {
 		this.modpackName = name;
 		this.desc = desc;
 		this.descArr = null;
+		this.category = cat;
 		updateContents();
 		return this;
 	}
@@ -257,7 +253,17 @@ public class MiniModpackPane extends JPanel {
 		Font of = g.getFont();
 		g.setFont(modpackTitle);
 		g.drawString(modpackName, x, g.getFontMetrics().getHeight() / 2 + 5);
-		int ty = g.getFontMetrics().getHeight() + 10 + yyy;
+		int ty = g.getFontMetrics().getHeight() + yyy;
+		if(category != null) {
+			g.setFont(modpackCategory);
+			int cth = g.getFontMetrics(modpackCategory).getHeight();
+			g.setColor(new Color(0xcccccc));
+			g.drawString(category, x, g.getFontMetrics().getHeight() / 2 + ty - 2);
+			g.setColor(UIManager.getColor("Label.foreground"));
+			ty += cth + 4;
+		} else {
+			ty += 10;
+		}
 		g.setFont(modpackDesc);
 		if((descArr == null || lastW != w) && desc != null) descArr = getStringArray(desc, tw, g.getFontMetrics());
 		if(descArr != null) {

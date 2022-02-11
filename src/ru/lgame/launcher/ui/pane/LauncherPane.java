@@ -11,6 +11,9 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -332,6 +335,16 @@ public class LauncherPane extends JPanel {
 	 */
 	private void addModpacks() {
 		Iterator<Modpack> i = Launcher.inst.getModpacks();
+		ArrayList<Modpack> list = new ArrayList<Modpack>();
+		while (i.hasNext()) {
+			list.add(i.next());
+		}
+		Collections.sort(list, new Comparator<Modpack>() {
+			public int compare(Modpack o1, Modpack o2) {
+				return -o1.getReleaseDate().compareTo(o2.getReleaseDate());
+			}
+		});
+		i = list.iterator();
 		while(i.hasNext()) {
 			addModpack(i.next().createPanel());
 			try {

@@ -5,6 +5,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 
@@ -35,6 +38,7 @@ public class Modpack {
 	private String client_start_data;
 	private String client_libraries_data;
 	private String type;
+	private Date releaseDate;
 	private MiniModpackPane ui;
 	
 	private JSONObject updateJson;
@@ -59,6 +63,7 @@ public class Modpack {
 		last_version = o.optString("last_version");
 		client_id = o.optString("client", null);
 		update_data = o.optString("update_data", null);
+		releaseDate = parseDate(o.optString("release_date", null));
 		client_update_data = o.optString("client_update_data", null);
 		client_start_data = client_update_data.replace("/update.json", "/start.json");
 		client_libraries_data = client_update_data.replace("/update.json", "/libraries.json");
@@ -98,17 +103,21 @@ public class Modpack {
 		return type;
 	}
 
+	public Date getReleaseDate() {
+		return releaseDate;
+	}
+
 	/**
 	 * Создает панель, грузит картинку
 	 */
 	public MiniModpackPane createPanel() {
 		if(ui != null) {
-			ui.setInformation(name, description);
+			ui.setInformation(name, description, category);
 			ui.setModpack(this);
 			return ui;
 		}
 		MiniModpackPane mp = new MiniModpackPane(id);
-		mp.setInformation(name, description);
+		mp.setInformation(name, description, category);
 		mp.setModpack(this);
 		//Launcher.inst.queue(new Runnable() {
 		//	public void run() {
@@ -253,6 +262,16 @@ public class Modpack {
 
 	public void setClientLibrariesURL(String url) {
 		client_libraries_data = url;
+	}
+
+	private static Date parseDate(String str) {
+		if(str == null) {
+			str = "1.1.2020";
+		}
+		String[] s = str.split("\\.", 3);
+		Calendar cal = Calendar.getInstance();
+		cal.set(Integer.parseInt(s[2]), Integer.parseInt(s[1]), Integer.parseInt(s[0]));
+		return cal.getTime();
 	}
 
 }

@@ -9,6 +9,7 @@ public class Fonts {
 
 	public static Font buttonFont;
 	public static Font modpackDesc;
+	public static Font modpackCategory;
 	public static Font modpackTitle;
 	public static Font modpackState;
 	public static Font modpackUpdateInfo;
@@ -19,6 +20,7 @@ public class Fonts {
 	static {
 		buttonFont = createFontBold(13.5F);
 		modpackDesc = createFont(15);
+		modpackCategory = createFont(14);
 		modpackTitle = createFontBold(18);
 		modpackState = createFontBold(14);
 		modpackUpdateInfo = createFont(12);
