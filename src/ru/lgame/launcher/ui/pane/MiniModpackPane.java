@@ -254,16 +254,17 @@ public class MiniModpackPane extends JPanel {
 		g.setFont(modpackTitle);
 		g.drawString(modpackName, x, g.getFontMetrics().getHeight() / 2 + 5);
 		int ty = g.getFontMetrics().getHeight() + yyy;
-		if(category != null) {
+		/*if(category != null) {
 			g.setFont(modpackCategory);
 			int cth = g.getFontMetrics(modpackCategory).getHeight();
-			g.setColor(new Color(0xcccccc));
-			g.drawString(category, x, g.getFontMetrics().getHeight() / 2 + ty - 2);
-			g.setColor(UIManager.getColor("Label.foreground"));
+			//g.setColor(new Color(0xcccccc));
+			g.drawString(category, x, g.getFontMetrics().getHeight() / 2 + ty);
+			//g.setColor(UIManager.getColor("Label.foreground"));
 			ty += cth + 4;
 		} else {
 			ty += 10;
-		}
+		}*/
+		ty += 10;
 		g.setFont(modpackDesc);
 		if((descArr == null || lastW != w) && desc != null) descArr = getStringArray(desc, tw, g.getFontMetrics());
 		if(descArr != null) {

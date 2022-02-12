@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -266,7 +265,7 @@ public class Modpack {
 
 	private static Date parseDate(String str) {
 		if(str == null) {
-			str = "1.1.2020";
+			str = "2.2.2022";
 		}
 		String[] s = str.split("\\.", 3);
 		Calendar cal = Calendar.getInstance();
