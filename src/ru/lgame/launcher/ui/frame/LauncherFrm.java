@@ -11,7 +11,6 @@ import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.ColorUIResource;
 
 import ru.lgame.launcher.Config;
@@ -22,6 +21,7 @@ import ru.lgame.launcher.ui.pane.SettingsPane;
 import ru.lgame.launcher.ui.swing.ButtonUI;
 import ru.lgame.launcher.utils.logging.Log;
 import ru.lgame.launcher.utils.ui.StackLayout;
+import java.awt.FlowLayout;
 
 /**
  * Окно лаунчера
@@ -49,8 +49,11 @@ public class LauncherFrm extends JFrame implements WindowListener {
 		setUI(this);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		contentPane = new JPanel();
+		FlowLayout flowLayout = (FlowLayout) contentPane.getLayout();
+		flowLayout.setVgap(0);
+		flowLayout.setHgap(0);
 		if(!Config.getBoolean("legacyLook")) contentPane.setBackground(new Color(35, 36, 40));
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		//contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(layout = new StackLayout());
 		setContentPane(contentPane);
 		addWindowListener(this);
@@ -188,6 +191,10 @@ public class LauncherFrm extends JFrame implements WindowListener {
 	@Override
 	public void windowDeactivated(WindowEvent e) {
 		
+	}
+
+	public void start() {
+		mainPanel.start();
 	}
 
 }

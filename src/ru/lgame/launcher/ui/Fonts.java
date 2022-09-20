@@ -23,7 +23,7 @@ public class Fonts {
 		modpackCategory = createFont("Montserrat-Regular", 14);
 		modpackTitle = createFontBold("Montserrat-Bold", 18);
 		modpackState = createFontBold("Montserrat-Bold", 14);
-		modpackUpdateInfo = createFont("Montserrat-Bold", 12);
+		modpackUpdateInfo = createFont("Montserrat-Regular", 12);
 		username = createFont("Montserrat-Regular", 11.5f);
 		loading = createFont("Montserrat-Regular", 12);
 		//label = createFont(11);

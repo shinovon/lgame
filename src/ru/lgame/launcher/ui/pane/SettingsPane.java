@@ -38,6 +38,7 @@ import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.frame.LauncherFrm;
+import ru.lgame.launcher.ui.frame.LgameFrm;
 
 /**
  * @author Shinovon
@@ -62,6 +63,8 @@ public class SettingsPane extends JPanel {
 		// Максимальное количество выделяемой памяти (MB)
 		int max = 16384;
 		
+		this.setBorder(new EmptyBorder(5, 5, 5, 5));
+		
 		setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel = new JPanel();
@@ -79,37 +82,45 @@ public class SettingsPane extends JPanel {
 			}
 		});
 		
-		JLabel lblNewLabel_2 = new JLabel("LGame Launcher " + Launcher.string_version + " (testers build)");
-		panel.add(lblNewLabel_2);
-		
-		JButton btnNewButton_2 = new JButton("Команда разработки LGame Launcher");
-		panel.add(btnNewButton_2);
-		btnNewButton_2.addActionListener(new ActionListener() {
+		JButton showTeamBtn = new JButton("Обо мне");
+		panel.add(showTeamBtn);
+		//showTeamBtn.setVisible(false);
+		showTeamBtn.addActionListener(new ActionListener() {
+			private LgameFrm lgameFrame;
+
 			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent e) {
+				
+				
 				final String[] c = new String[] {
-						"Люди связанные с разработкой LGame Launcher:",
+						"LGame Launcher",
 						"",
-						"Арман Д. (@shinovon)",
+						"Люди делающие его:",
+						" Арман Д. (@shinovon)",
 						"  Лид разработчик, Дизайн, Идея",
-						"Вадим Д. (@vadim_drobot_03)",
-						"  Глава LGame Studio",
-						"Иван Ж. (@algorithmlx)",
-						"  Тестирование, Помощь в разработке",
-						"Александр К. (@h4x4d)",
+						" Александр К. (@h4x4d)",
 						"  Дизайн, Тестирование",
-						"Hollow H. (@hollowhorizon)",
-						"  Помощь в разработке, просто хороший человек :)",
-						"Remuru T. (@slime79)",
-						"  Тестирование",
-						"Тимур С. (@timursagitov)",
-						"  Тестирование",
+						"Тестеры:",
+						" Иван Ж. (@algorithmlx)",
+						" Remuru T. (@slime79)",
+						" Тимур С. (@timursagitov)",
+						" Максим Б. (@barahtanovm)",
+						"",
+						"Донаты на сервер",
+						"  donationalerts.com/r/rehdzi",
+						"",
+						"Связаться с разработчиком",
+						"  t.me/shinovon",
+						"  vk.com/shinovon",
 				};
 				String s = "";
 				for(String x: c) {
 					s += x + "\n";
 				}
 				Launcher l = Launcher.inst;
+				//if(lgameFrame == null)
+				//	lgameFrame = new LgameFrm();
+				//lgameFrame.setVisible(true);
 				JDialog dialog = new JDialog(l.frame(), "", true);
 				dialog.setAlwaysOnTop(true);
 		        Container contentPane = dialog.getContentPane();
@@ -147,11 +158,11 @@ public class SettingsPane extends JPanel {
 		        dialog.dispose();
 			}
 		});
-		btnNewButton_2.setPreferredSize(new Dimension(300, 23));
+		showTeamBtn.setPreferredSize(new Dimension(100, 23));
 		panel.add(openDirBtn);
 		
-		JButton btnNewButton = new JButton(Text.get("button.showlogger"));
-		panel.add(btnNewButton);
+		JButton logsBtn = new JButton(Text.get("button.showlogger"));
+		panel.add(logsBtn);
 		
 		JButton settsBackBtn = new JButton(Text.get("button.back"));
 		settsBackBtn.addActionListener(new ActionListener() {
@@ -163,7 +174,7 @@ public class SettingsPane extends JPanel {
 		});
 		settsBackBtn.addActionListener(frm.settingsListener);
 		panel.add(settsBackBtn);
-		btnNewButton.addActionListener(new ActionListener() {
+		logsBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Launcher.inst.showLoggerFrame();
 			}
@@ -205,78 +216,83 @@ public class SettingsPane extends JPanel {
 		content.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = gbc();
 		
-		JPanel panel_2 = new JPanel();
-		FlowLayout flowLayout = (FlowLayout) panel_2.getLayout();
-		flowLayout.setVgap(0);
-		flowLayout.setHgap(0);
-		flowLayout.setAlignment(FlowLayout.LEFT);
-		content.add(panel_2, gbc);
+		JPanel ramTitlePane = new JPanel();
+		FlowLayout fl_ramTitlePanel = (FlowLayout) ramTitlePane.getLayout();
+		fl_ramTitlePanel.setVgap(0);
+		fl_ramTitlePanel.setHgap(0);
+		fl_ramTitlePanel.setAlignment(FlowLayout.LEFT);
+		content.add(ramTitlePane, gbc);
 		
-		JPanel panel_9 = new JPanel();
-		panel_9.setPreferredSize(new Dimension(610, 32));
-		panel_2.add(panel_9);
-		JSlider slider = new JSlider();
-		panel_9.setLayout(new BorderLayout(0, 0));
+		JPanel ramTitlePane2 = new JPanel();
+		ramTitlePane2.setPreferredSize(new Dimension(610, 32));
+		ramTitlePane.add(ramTitlePane2);
+		JSlider ramSlider = new JSlider();
+		ramTitlePane2.setLayout(new BorderLayout(0, 0));
 		
-		JPanel panel_11 = new JPanel();
-		FlowLayout flowLayout_7 = (FlowLayout) panel_11.getLayout();
-		flowLayout_7.setHgap(0);
-		flowLayout_7.setAlignment(FlowLayout.RIGHT);
-		panel_9.add(panel_11);
+		JPanel ramSpinnerPane = new JPanel();
+		FlowLayout fl_ramSpinnerPane = (FlowLayout) ramSpinnerPane.getLayout();
+		fl_ramSpinnerPane.setHgap(0);
+		fl_ramSpinnerPane.setAlignment(FlowLayout.RIGHT);
+		ramTitlePane2.add(ramSpinnerPane);
 		
-		JSpinner spinner = new JSpinner();
-		panel_11.add(spinner);
-		spinner.setModel(new SpinnerNumberModel(Config.getInt("xmx"), 512, max, 512));
+		JSpinner ramSpinner = new JSpinner();
+		ramSpinnerPane.add(ramSpinner);
+		try {
+			ramSpinner.setModel(new SpinnerNumberModel(Config.getInt("xmx"), 1024, max, 512));
+		} catch (Exception e) {
+			Config.set("xmx", 1024);
+			Config.saveLater();
+			ramSpinner.setModel(new SpinnerNumberModel(Config.getInt("xmx"), 1024, max, 512));
+		}
 		
-		JPanel panel_13 = new JPanel();
-		panel_11.add(panel_13);
+		JPanel ramSpinMargPane = new JPanel();
+		ramSpinnerPane.add(ramSpinMargPane);
 		
-		JPanel panel_12 = new JPanel();
-		FlowLayout flowLayout_6 = (FlowLayout) panel_12.getLayout();
-		flowLayout_6.setVgap(10);
-		panel_9.add(panel_12, BorderLayout.WEST);
+		JPanel ramTitleLabelPane = new JPanel();
+		FlowLayout fl_ramTitleLabelPane = (FlowLayout) ramTitleLabelPane.getLayout();
+		fl_ramTitleLabelPane.setVgap(10);
+		ramTitlePane2.add(ramTitleLabelPane, BorderLayout.WEST);
 		
-		JLabel lblNewLabel = new JLabel(Text.get("label.memory") + ": ");
-		panel_12.add(lblNewLabel);
-		spinner.addChangeListener(new ChangeListener() {
+		JLabel ramTitleLabel = new JLabel(Text.get("label.memory") + ": ");
+		ramTitleLabelPane.add(ramTitleLabel);
+		ramSpinner.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				if((Integer)spinner.getValue() == 0) return;
-				slider.setValue((Integer)spinner.getValue());
-				Config.set("xmx", (Integer)spinner.getValue());
+				if((Integer)ramSpinner.getValue() == 0) return;
+				ramSlider.setValue((Integer)ramSpinner.getValue());
+				Config.set("xmx", (Integer)ramSpinner.getValue());
 				Config.saveLater();
 			}
 		});
 
-		JPanel panel_7 = new JPanel();
-		FlowLayout flowLayout_4 = (FlowLayout) panel_7.getLayout();
-		flowLayout_4.setAlignment(FlowLayout.LEFT);
-		content.add(panel_7, gbc.clone());
+		JPanel ramSliderPane = new JPanel();
+		FlowLayout fl_ramSliderPane = (FlowLayout) ramSliderPane.getLayout();
+		fl_ramSliderPane.setAlignment(FlowLayout.LEFT);
+		content.add(ramSliderPane, gbc.clone());
 
-		slider.setSnapToTicks(true);
-		slider.setPaintTicks(true);
-		slider.setMinorTickSpacing(256);
-		slider.setMajorTickSpacing(512);
-		slider.setPreferredSize(new Dimension(600, 36));
-		slider.setMinimum(512);
-		slider.setMaximum(max);
-		slider.setValue(Config.getInt("xmx"));
-		slider.addChangeListener(new ChangeListener() {
+		ramSlider.setSnapToTicks(true);
+		ramSlider.setPaintTicks(true);
+		ramSlider.setMinorTickSpacing(512);
+		ramSlider.setMajorTickSpacing(1024);
+		ramSlider.setPreferredSize(new Dimension(600, 36));
+		ramSlider.setMinimum(1024);
+		ramSlider.setMaximum(max);
+		ramSlider.setValue(Config.getInt("xmx"));
+		ramSlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				if(slider.getValue() == 0) return;
-				spinner.setValue(slider.getValue());
-				Config.set("xmx", slider.getValue());
+				if(ramSlider.getValue() == 0) return;
+				ramSpinner.setValue(ramSlider.getValue());
+				Config.set("xmx", ramSlider.getValue());
 				Config.saveLater();
 			}
 		});
-		panel_7.add(slider);
+		ramSliderPane.add(ramSlider);
 		
-		JPanel panel_3 = new JPanel();
-		FlowLayout flowLayout_1 = (FlowLayout) panel_3.getLayout();
-		flowLayout_1.setAlignment(FlowLayout.LEFT);
-		content.add(panel_3, gbc.clone());
+		JPanel javaPathPane = new JPanel();
+		javaPathPane.setLayout(new FlowLayout(FlowLayout.LEFT));
+		content.add(javaPathPane, gbc.clone());
 		
-		JLabel lblJava = new JLabel(Text.get("label.javapath") + ": ");
-		panel_3.add(lblJava);
+		JLabel javaPathLabel = new JLabel(Text.get("label.javapath") + ": ");
+		javaPathPane.add(javaPathLabel);
 		
 		javaPathField = new JTextField();
 		javaPathField.setCaretColor(new Color(-1));
@@ -295,15 +311,15 @@ public class SettingsPane extends JPanel {
 			}
 		});
 		
-		JPanel panel_8 = new JPanel();
-		panel_8.setPreferredSize(new Dimension(143, 10));
-		panel_3.add(panel_8);
+		JPanel javaPathSpacer = new JPanel();
+		javaPathSpacer.setPreferredSize(new Dimension(143, 10));
+		javaPathPane.add(javaPathSpacer);
 		javaPathField.setText(Config.get("javapath"));
-		panel_3.add(javaPathField);
+		javaPathPane.add(javaPathField);
 		javaPathField.setColumns(40);
 		
-		JButton btnNewButton_1 = new JButton("...");
-		btnNewButton_1.addActionListener(new ActionListener() {
+		JButton javaPathExploreBtn = new JButton("...");
+		javaPathExploreBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String j = Config.get("javapath");
 				if(j == null || j == "") {
@@ -321,23 +337,22 @@ public class SettingsPane extends JPanel {
 				}
 			}
 		});
-		panel_3.add(btnNewButton_1);
-		JPanel panel_l3 = new JPanel();
-		panel_l3.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		content.add(panel_l3, gbc.clone());
-		JLabel lblNewLabel_1 = new JLabel(Text.get("label.javapathnote"));
-		panel_l3.add(lblNewLabel_1);
-		JPanel pl3 = new JPanel();
-		pl3.setPreferredSize(new Dimension(50, 10));
-		panel_l3.add(pl3);
+		javaPathPane.add(javaPathExploreBtn);
+		JPanel javaPathTipPane = new JPanel();
+		javaPathTipPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		content.add(javaPathTipPane, gbc.clone());
+		JLabel javaPathTipLabel = new JLabel(Text.get("label.javapathnote"));
+		javaPathTipPane.add(javaPathTipLabel);
+		JPanel javapathtipspacer = new JPanel();
+		javapathtipspacer.setPreferredSize(new Dimension(50, 10));
+		javaPathTipPane.add(javapathtipspacer);
 
-		JPanel panel_5 = new JPanel();
-		FlowLayout flowLayout_5 = (FlowLayout) panel_5.getLayout();
-		flowLayout_5.setAlignment(FlowLayout.LEFT);
-		content.add(panel_5, gbc.clone());
+		JPanel libraryDirPane = new JPanel();
+		libraryDirPane.setLayout(new FlowLayout(FlowLayout.LEFT));
+		content.add(libraryDirPane, gbc.clone());
 		
-		JLabel label_1 = new JLabel(Text.get("label.savedir") + ": ");
-		panel_5.add(label_1);
+		JLabel libraryDirLabel = new JLabel(Text.get("label.savedir") + ": ");
+		libraryDirPane.add(libraryDirLabel);
 		
 		libraryPathField = new JTextField();
 		libraryPathField.setCaretColor(new Color(-1));
@@ -358,15 +373,15 @@ public class SettingsPane extends JPanel {
 			}
 		});
 		
-		JPanel panel_10 = new JPanel();
-		panel_10.setPreferredSize(new Dimension(50, 10));
-		panel_5.add(panel_10);
+		JPanel libraryDirSpacer = new JPanel();
+		libraryDirSpacer.setPreferredSize(new Dimension(50, 10));
+		libraryDirPane.add(libraryDirSpacer);
 		libraryPathField.setText(Config.get("path"));
 		libraryPathField.setColumns(40);
-		panel_5.add(libraryPathField);
+		libraryDirPane.add(libraryPathField);
 		
-		JButton button = new JButton("...");
-		button.addActionListener(new ActionListener() {
+		JButton libraryDirExploreBtn = new JButton("...");
+		libraryDirExploreBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser c = new NativeJFileChooser(Config.get("path"));
 				c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -381,29 +396,30 @@ public class SettingsPane extends JPanel {
 				}
 			}
 		});
-		panel_5.add(button);
+		libraryDirPane.add(libraryDirExploreBtn);
 		
-		JPanel panel_4 = new JPanel();
-		FlowLayout flowLayout_3 = (FlowLayout) panel_4.getLayout();
-		flowLayout_3.setAlignment(FlowLayout.LEADING);
-		add(panel_4, BorderLayout.NORTH);
+		JPanel titlePanel = new JPanel();
+		//titlePanel.setVisible(false);
+		titlePanel.setLayout(new FlowLayout(FlowLayout.LEADING));
+		add(titlePanel, BorderLayout.NORTH);
 		
-		JLabel label = new JLabel(Text.get("label.settings"));
-		panel_4.add(label);
+		JLabel titleLabel = new JLabel("LGame Launcher " + Launcher.string_version);
+		
+		titlePanel.add(titleLabel);
 		setPreferredSize(new Dimension(1000, 600));
 		
-		JPanel panel_1 = new JPanel();
-		add(panel_1, BorderLayout.WEST);
+		JPanel leftMarginPanel = new JPanel();
+		add(leftMarginPanel, BorderLayout.WEST);
 		
-		JPanel panel_6 = new JPanel();
-		add(panel_6, BorderLayout.EAST);
+		JPanel rightMarginPanel = new JPanel();
+		add(rightMarginPanel, BorderLayout.EAST);
 	}
 
 	private GridBagConstraints gbc() {
-		GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.weightx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-		return gbc;
+		GridBagConstraints gbc_ramTitlePanel = new GridBagConstraints();
+        gbc_ramTitlePanel.gridwidth = GridBagConstraints.REMAINDER;
+        gbc_ramTitlePanel.weightx = 1;
+        gbc_ramTitlePanel.fill = GridBagConstraints.HORIZONTAL;
+		return gbc_ramTitlePanel;
 	}
 }

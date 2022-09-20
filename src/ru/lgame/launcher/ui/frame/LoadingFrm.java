@@ -2,6 +2,7 @@ package ru.lgame.launcher.ui.frame;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.io.File;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -51,7 +52,12 @@ public class LoadingFrm extends JFrame {
 		contentPane.add(label);
 
 		JLabel img = new JLabel();
-		img.setIcon(new ImageIcon(LoadingFrm.class.getResource("/launch133px.png")));
+		File f = new File(Launcher.getLauncherDir() + "bg.png");
+		if(f.exists()) {
+			img.setIcon(new ImageIcon(f.getAbsolutePath()));
+		} else {
+			img.setIcon(new ImageIcon(LoadingFrm.class.getResource("/launch133px.png")));
+		}
 		img.setBounds(0, 0, 399, 133);
 		contentPane.add(img);
 		pack();

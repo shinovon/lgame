@@ -46,6 +46,7 @@ public class Modpack {
 	private JSONObject clientLibrariesJson;
 	
 	private int cachedState;
+	private String client_assets_data;
 	
 	public Modpack(String id) {
 		this.id = id;

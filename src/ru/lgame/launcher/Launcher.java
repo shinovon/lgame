@@ -41,14 +41,14 @@ import static ru.lgame.launcher.utils.HashUtils.getMD5String;
  */
 public class Launcher {
 	
-	public static final String version = "0.6.5";
+	public static final String version = "0.7";
 	public static final String build_date = "-";
 	public static final boolean DEBUG = true;
 	
-	public static final String string_version = "v" + version + "";
-	private static final String title_add = " (test build)";
+	public static final String string_version = "v" + version + " BETA";
+	private static final String title_add = " BETA";
 	
-	private static final String LAUNCHER_JSON_URL = "http://dl.nnproject.cc/lgame/launcher.json";
+	private static final String LAUNCHER_JSON_URL = "https://nnp.nnchan.ru/lgame/launcher.json";
 
 	public static Launcher inst;
 	
@@ -96,6 +96,11 @@ public class Launcher {
 
 	public void startLauncher() {
 		running = true;
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				Log.close();
+			}
+		});
 		try {
 			EventQueue.invokeAndWait(new Runnable() {
 				public void run() {
@@ -110,9 +115,11 @@ public class Launcher {
 			});
 		} catch (Exception e) {
 		}
-		eventThread.setPriority(2);
+		eventThread.setPriority(2); 
 		eventThread.start();
 		getLauncherDir();
+		Log.init();
+		Log.info("Launcher path set: " + getLauncherDir());
 		Config.init();
 		createDirsIfNecessary();
 		Config.saveConfig();
@@ -310,7 +317,6 @@ public class Launcher {
 		if(s.endsWith("/") || s.endsWith("\\"))
 			s = s.substring(0, s.length()-1);
 		s += File.separator + ".lgame" + File.separator;
-		Log.info("Launcher path set: " + s);
 		return launcherPath = s;
 	}
 
@@ -485,6 +491,22 @@ public class Launcher {
 
 	public void notifyClientStop(Updater client) {
 		frame.setVisible(true);
+	}
+	
+	public static void stat(JSONObject o) {
+		o.put("launcher_version", version);
+		if(DEBUG) {
+			o.put("debug", "1");
+		}
+		new Thread() {
+			public void run() {
+				try {
+					WebUtils.postReq("https://nnp.nnchan.ru/lgame/api.php", o.toString());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}.start();
 	}
 
 }

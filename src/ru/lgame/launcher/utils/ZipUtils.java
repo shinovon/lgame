@@ -108,7 +108,9 @@ public final class ZipUtils {
 				processedEntries++;
 			}
 		} catch (ZipException e) {
-			throw new IOException(currentFile == null ? "archive: " + f(zipFile) : "currentFile: " + currentFile, e);
+			Log.error("Unzip error! archive: " + f(zipFile) + (currentFile != null ? " currentFile: " + currentFile : ""));
+			throw e;
+			//throw new IOException((currentFile == null ? "archive: " + f(zipFile) : "currentFile: " + currentFile), e);
 		}
 		try {
 			zis.closeEntry();

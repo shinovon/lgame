@@ -1,5 +1,7 @@
 package ru.lgame.launcher.utils.logging;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Calendar;
@@ -13,6 +15,8 @@ import ru.lgame.launcher.Launcher;
 public class Log {
 	
 	private static StringBuffer buffer = new StringBuffer(7000);
+	private static FileWriter fw;
+	private static BufferedWriter logWriter;
 
 	public static void info(String x) {
 		log("INFO ", x);
@@ -56,6 +60,10 @@ public class Log {
 	private static void println(String s, boolean stdonly) {
 		System.out.println(s);
 		buffer.append(s).append("\n");
+		try {
+			logWriter.append(s).append("\n");
+		} catch (Exception e) {
+		}
 		if(Launcher.inst != null && Launcher.inst.loggerFrame() != null && !stdonly)
 			Launcher.inst.loggerFrame().append(s + "\n");
 	}
@@ -88,6 +96,16 @@ public class Log {
 		}
 		return s;
 	}
+    
+    public static void close() {
+		if(logWriter != null)
+    	try {
+			logWriter.close();
+			logWriter = null;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
 	
 	public static void clearBuffer() {
 		buffer.delete(0, buffer.length());
@@ -95,5 +113,14 @@ public class Log {
 	
 	public static String getLog() {
 		return buffer.toString();
+	}
+	
+	public static void init() {
+		try {
+			fw = new FileWriter(Launcher.getLauncherDir() + "log.txt", false);
+			logWriter = new BufferedWriter(fw);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -9,12 +9,12 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.zip.ZipException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import net.sf.jazzlib.ZipException;
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Errors;
 import ru.lgame.launcher.Launcher;
@@ -49,6 +49,12 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	private JSONObject json;
 	private JSONObject clientJson;
 
+	private boolean clientNewLibraries;
+	private boolean clientNewAssets;
+
+	private JSONObject clientLibrariesJson;
+	private JSONObject clientAssetsJson;
+
 	private boolean forceUpdate;
 
 	private boolean updating;
@@ -66,7 +72,6 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	public boolean clientStarted;
 
 	private int tasksDone;
-
 	private int totalTasks;
 
 	private boolean offline;
@@ -79,10 +84,6 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	private String[] clientExtraArgs;
 
-	private boolean clientNewLibraries;
-
-	private JSONObject clientLibrariesJson;
-	
 	private static Process clientProcess;
 
 	 
@@ -95,12 +96,14 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	public static void start(Modpack m, Auth a) {
 		if(currentThread != null && currentThread.isAlive()) return;
 		currentThread = new Thread(new Updater(m, a, false));
+		currentThread.setPriority(9);
 		currentThread.start();
 	}
 	
 	public static void startForceUpdate(Modpack m, Auth a) {
 		if(currentThread != null && currentThread.isAlive()) return;
 		currentThread = new Thread(new Updater(m, a, true));
+		currentThread.setPriority(9);
 		currentThread.start();
 	}
 
@@ -189,7 +192,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		ArrayList<String> names = new ArrayList<String>();
 		JSONObject ck = md.getJSONObject("checksums");
 		for (String s : ck.keySet()) {
-			names.add(s);
+			names.add(s.toLowerCase());
 			String hash = ck.getString(s);
 			String filep = p + "mods" + File.separator + s;
 			File file = new File(filep);
@@ -231,8 +234,10 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					Log.debug("blacklisted mod: " + n);
 					if(deleteBlacklisted) f.delete();
 					else {
-						if(removeAll) FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
-						return false;
+						if(removeAll) {
+							FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
+							return false;
+						}
 					}
 				}
 			}
@@ -243,7 +248,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					new File(p + n).delete();
 				} catch (Exception e) {
 				}
-				return false;
+				if(removeAll) return false;
 			}
 		}
 		return true;
@@ -313,7 +318,15 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			Log.debug("natives check");
 			return checkClientNatives(p);
 		}
+		if(j.has("assets")) {
+			return checkClientAssets(p);
+		}
 		return true;
+	}
+	
+	private boolean checkClientAssets(String p) {
+		return new File(p + "assets" + File.separator + "objects" + File.separator).exists()
+				&& new File(p + "assets" + File.separator + "indexes" + File.separator + clientJson.getString("asset_index") + ".json").exists();
 	}
 	
 	private boolean checkClientLibrary(String p, JSONObject j) throws Exception {
@@ -353,9 +366,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			if(clientLibrariesJson == null) {
 				modpack.setClientLibrariesURL(md.getString("url"));
 				clientLibrariesJson = modpack.getClientLibrariesJson();
+				totalTasks += clientLibrariesJson.getJSONArray("libraries").length();
 			}
 			if(!new File(p + "libraries" + File.separator).exists()) return false;
-			
 			JSONArray libraries = clientLibrariesJson.getJSONArray("libraries");
 			for (Object o: libraries) {
 				if(!checkClientLibrary(p, (JSONObject) o))
@@ -384,9 +397,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			}
 		}
 		FileFilter filter = (file) -> file.isDirectory() || file.getName().toLowerCase().endsWith(".jar");
-		File[] mods = new File(p + "libraries" + File.separator).listFiles(filter);
-		if(mods != null)
-		for (File f : mods) {
+		File[] libs = new File(p + "libraries" + File.separator).listFiles(filter);
+		if(libs != null)
+		for (File f : libs) {
 			if(f.isDirectory()) continue;
 			String n = f.getName().toLowerCase();
 			if(!names.contains(n)) {
@@ -422,9 +435,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			}
 		}
 		FileFilter filter = (file) -> file.isDirectory() || (file.getName().toLowerCase().endsWith(".dll") || file.getName().toLowerCase().endsWith(".so"));
-		File[] mods = new File(p + "natives" + File.separator).listFiles(filter);
-		if(mods != null)
-		for (File f : mods) {
+		File[] natives = new File(p + "natives" + File.separator).listFiles(filter);
+		if(natives != null)
+		for (File f : natives) {
 			if(f.isDirectory()) continue;
 			String n = f.getName().toLowerCase();
 			if(!names.contains(n)) {
@@ -478,6 +491,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		updating = true;
 		modpack.setUpdateInfo(repeated ? Text.get("state.updating") : "Сбор информации", repeated ? "Проверка правильности установки" : "Проверка установки", 0);
 		int modpackState = forceUpdate ? 3 : checkInstalled(modpack) ? -100 : 0;
+		stat("run");
 		try {
 			modpack.setUpdateInfo(null, "Получение дескриптора запуска клиента", 15);
 			clientStartJson = modpack.getClientStartJson(modpackState == 0 || forceUpdate);
@@ -494,17 +508,33 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			if(clientStartJson.has("extra_args")) {
 				clientExtraArgs = clientStartJson.getJSONArray("extra_args").toList().toArray(new String[0]);
 			}
-			try {
-				if(clientJson.getJSONObject("integrity_check").getJSONObject("libraries").optBoolean("new_libraries")) {
-					clientNewLibraries = true;
-					Log.debug("client uses new libraries");
-				}
-			} catch (NullPointerException e) {
-			}
 			modpack.setUpdateInfo(null, "Скачивание конфигурации сборки", 33);
 			json = modpack.getUpdateJson(true);
 			modpack.setUpdateInfo(null, "Скачивание конфигурации клиента", 67);
 			clientJson = modpack.getClientUpdateJson(true);
+			try {
+				if(clientJson.getJSONObject("integrity_check").getJSONObject("libraries").optBoolean("new_libraries")) {
+					clientNewLibraries = true;
+					Log.debug("client uses new libraries");
+					if(clientLibrariesJson == null) {
+						modpack.setClientLibrariesURL(clientJson.getJSONObject("integrity_check").getJSONObject("libraries").getString("url"));
+						clientLibrariesJson = modpack.getClientLibrariesJson();
+						//totalTasks += clientLibrariesJson.getJSONArray("libraries").length();
+					}
+				}
+			} catch (Exception e) {
+			}
+			try {
+				if(clientJson.getJSONObject("integrity_check").getJSONObject("assets").optBoolean("new_assets")) {
+					clientNewAssets = true;
+					Log.debug("client uses new assets");
+					if(clientAssetsJson == null) {
+						clientAssetsJson = new JSONObject(WebUtils.get((clientJson.getJSONObject("integrity_check").getJSONObject("assets").getString("url"))));
+						//totalTasks += clientAssetsJson.getJSONObject("objects").length();
+					}
+				}
+			} catch (Exception e) {
+			}
 		} catch (LauncherOfflineException e) {
 			if(modpackState == 0 || forceUpdate) {
 				updateFatalError("Нет подключения к интернету или сервер не отвечает!", e.getCause(), Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
@@ -587,6 +617,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		}
 		case 1:
 		{
+			stat("launch");
 			modpack.setUpdateInfo("", Text.get("state.startingclient"), 100);
 			try {
 				startClient();
@@ -634,6 +665,18 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			return;
 		}
 		reset();
+		Launcher.inst.frame().mainPane().update();
+	}
+
+	private void stat(String type) {
+		JSONObject o = new JSONObject();
+		o.put("type", "updater_" + type);
+		o.put("modpack", modpack.id());
+		try {
+			o.put("modpack_build", FileUtils.getString(Launcher.getLibraryDir() + modpack.client() + File.separator + "version"));
+		} catch (Exception e) {
+		}
+		Launcher.stat(o);
 	}
 
 	private boolean updateClient() {
@@ -650,6 +693,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		totalTasks += download.length();
 		if(clientNewLibraries) {
 			totalTasks += clientLibrariesJson.getJSONArray("libraries").length();
+		}
+		if(clientNewAssets) {
+			totalTasks += clientAssetsJson.getJSONObject("objects").length();
 		}
 		totalTasks += unzip.length();
 		if(preremove == null || scriptedRemoveDirs(preremove, p, t)) {
@@ -687,6 +733,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		if(clientNewLibraries) {
 			totalTasks += clientLibrariesJson.getJSONArray("libraries").length();
 		}
+		if(clientNewAssets) {
+			totalTasks += clientAssetsJson.getJSONObject("objects").length();
+		}
 		boolean fail = false;
 		if(download == null || scriptedDownload(download, p, t)) {
 			if(unzip == null || scriptedUnzip(unzip, p, t)) {
@@ -704,6 +753,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 
 	private void update() {
+		stat("update");
 		totalTasks = 0;
 		tasksDone = 0;
 		updating = true;
@@ -727,6 +777,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 	
 	private void install() {
+		stat("install");
 		totalTasks = 0;
 		tasksDone = 0;
 		updating = true;
@@ -817,9 +868,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		modpack.setUpdateInfo(null, Text.get("state.downloading"), -2);
 		WebUtils.setListener(this);
 		String p = root;
-		String tp = temp;
-		if(p.endsWith(File.separator)) p.substring(0, p.length() - 1);
-		if(tp.endsWith(File.separator)) tp.substring(0, tp.length() - 1);
+		//String tp = temp;
+		//if(p.endsWith(File.separator)) p = p.substring(0, p.length() - 1);
+		//if(tp.endsWith(File.separator)) tp = tp.substring(0, tp.length() - 1);
 		int mods = -1;
 		for(Iterator<Object> it = j.iterator(); it.hasNext(); ) {
 			JSONObject o = (JSONObject) it.next();
@@ -846,6 +897,12 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 								if(b && clientNewLibraries) {
 									tasksDone+=clientLibrariesJson.getJSONArray("libraries").length();
 								}
+							}  else if(type.equals("assets")) {
+								if(checkClientAssets(p)) b = true;
+
+								if(b && clientNewAssets && clientAssetsJson != null) {
+									tasksDone+=clientAssetsJson.getJSONObject("objects").length();
+								}
 							} else if(type.equals("natives")) {
 								if(checkClientNatives(root)) b = true;
 							} else if(type.equals("exists")) {
@@ -871,6 +928,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					if(clientLibrariesJson == null) {
 						modpack.setClientLibrariesURL(o.getString("url"));
 						clientLibrariesJson = modpack.getClientLibrariesJson();
+						totalTasks += clientLibrariesJson.getJSONArray("libraries").length();
 					}
 					
 					JSONArray libraries = clientLibrariesJson.getJSONArray("libraries");
@@ -879,8 +937,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 						String path = k.getString("path");
 						String url = k.getString("url");
 						String dir = p + "libraries" + File.separator + path(path);
-						modpack.setUpdateInfo(null, Text.get("state.downloading") + ": " + path.substring(path.lastIndexOf("/") + 1) + " (0%)", percentI());
 						if(!checkClientLibrary(p, k)) {
+							modpack.setUpdateInfo(null, Text.get("state.downloading") + ": " + path.substring(path.lastIndexOf("/") + 1) + " (0%)", percentI());
 							try {
 								WebUtils.download(url, dir);
 							} catch(IOException e) {
@@ -893,7 +951,47 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 						tasksDone++;
 					}
 					tasksDone++;
-					return true;
+					continue;
+				}
+				if(o.optBoolean("new_assets")) {
+					Log.debug("aaa");
+					clientNewAssets = true;
+					String indexUrl = o.getString("url");
+					if(clientAssetsJson == null) {
+						clientAssetsJson = new JSONObject(WebUtils.get(indexUrl));
+						totalTasks += clientAssetsJson.getJSONObject("objects").length();
+					}
+					WebUtils.download(indexUrl, p + "assets" + File.separator + "indexes" + File.separator + o.getString("name"));
+					JSONObject objects = clientAssetsJson.getJSONObject("objects");
+					boolean b = true;
+					boolean repeat = false;
+					while(b) {
+						try {
+							for (String s: objects.keySet()) {
+								JSONObject k = objects.getJSONObject(s);
+								String hash = k.getString("hash");
+								String sh = hash.substring(0, 2);
+								String dir = p + "assets" + File.separator + "objects" + File.separator + sh + File.separator + hash;
+								if(!new File(dir).exists()) {
+									String url = "https://resources.download.minecraft.net/" + sh + "/" + hash;
+									modpack.setUpdateInfo(null, Text.get("state.downloading") + ": " + hash, percentI());
+									WebUtils.download(url, dir);
+									tasksDone++;
+								} else if(!repeat) {
+									tasksDone++;
+								}
+							}
+							b = false;
+						} catch(IOException e) {
+							repeat = true;
+							if(downloadFailCount > Config.getInt("downloadMaxAttempts")) throw e;
+							Log.warn("download io err: " + e.toString() + ", retrying..");
+							downloadFailCount++;
+							Thread.sleep(500L);
+						}
+					}
+					tasksDone++;
+					continue;
 				}
 				String url = o.getString("url");
 				String dir = path(o.getString("dir"));
@@ -953,7 +1051,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			try {
 				ZipUtils.unzip(from, path);
 			} catch (ZipException e) {
-				if(!e.toString().equalsIgnoreCase("zip file is empty")) {
+				if(!e.toString().contains("zip file is empty") && !e.toString().contains("probably not a zip file")) {
 					updateFatalError("scriptedUnzip(): unzip", e, Errors.UPDATER_SCRIPTEDUNZIP_UNZIP);
 					return false;
 				}

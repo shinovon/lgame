@@ -7,7 +7,7 @@ public class LauncherStart {
 	
 	public static void main(String[] args) {
 		Launcher.starter = true;
-		Main.main(args);
+		Main.main_(args);
 	}
 
 }

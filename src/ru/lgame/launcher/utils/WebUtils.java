@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -94,6 +95,10 @@ public class WebUtils {
 		};
 		try {
 			HttpURLConnection con = getHttpConnection(uri);
+			//con.setRequestProperty("Accept-Encoding", "gzip");
+			con.setRequestMethod("GET");
+			con.setConnectTimeout(10000);
+			con.setReadTimeout(20000);
 			con.setDoInput(true);
 			con.connect();
 			int res = con.getResponseCode();
@@ -101,7 +106,7 @@ public class WebUtils {
 			FileOutputStream fout = new FileOutputStream(path);
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			InputStream in = getHttpInputStream(con, false);
-			byte buffer[] = new byte[16 * 1024];
+			byte buffer[] = new byte[512 * 1024];
 			int read;
 			need = con.getContentLength();
 			Log.info("Downloading: \"" + uri + "\" to \"" + path + "\", size: " + (need / 1024) + "k");
@@ -164,6 +169,7 @@ public class WebUtils {
 
 	public static int getHttpContentLength(String url) throws IOException {
 		HttpURLConnection con = getHttpConnection(url);
+		con.setRequestMethod("GET");
 		con.connect();
 		int i = con.getContentLength();
 		con.disconnect();
@@ -172,6 +178,7 @@ public class WebUtils {
 
 	public static String getHttpContentType(String url) throws IOException {
 		HttpURLConnection con = getHttpConnection(url);
+		con.setRequestMethod("GET");
 		con.connect();
 		String s = con.getContentType();
 		con.disconnect();
@@ -185,10 +192,7 @@ public class WebUtils {
 	private static HttpURLConnection getHttpConnection(URL url) throws IOException {
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestProperty("User-Agent", useragent);
-		con.setRequestProperty("ru.lgame.launcher.hwid", getHWID());
-		con.setRequestMethod("GET");
-		con.setConnectTimeout(10000);
-		con.setReadTimeout(20000);
+		con.setRequestProperty("User-UID", getHWID());
 		return con;
 	}
 	public  static String getHWID() {
@@ -241,18 +245,17 @@ public class WebUtils {
 	}
 
 	public static byte[] getBytes(String url) throws IOException {
-		Log.info("GET " + url);
+		Log.debug("GET " + url);
 		InputStream is = null;
 		try {
-			HttpURLConnection con = (HttpURLConnection) new URL(url).openConnection();
+			HttpURLConnection con = getHttpConnection(url);
 			con.setRequestMethod("GET");
-			//con.setRequestProperty("User-Agent", useragent);
 			con.setRequestProperty("Accept-Encoding", "gzip");
 			con.connect();
 			//Log.debug("Connected, getting text");
 			if(con.getResponseCode() == 404) {
 				con.disconnect();
-				throw new FileNotFoundException();
+				throw new FileNotFoundException(url);
 			}
 			//Log.debug("response code: " + con.getResponseCode());
 			is = getHttpInputStream(con);
@@ -269,11 +272,34 @@ public class WebUtils {
 			byte[] b = baos.toByteArray();
 			baos.close();
 			return b;
+		} catch (FileNotFoundException e) {
+			throw e;
 		} catch (IOException e) {
 			throw new IOException(url, e);
 		} finally {
 			if(is != null) is.close();
 		}
-		
+	}
+
+	public static void postReq(String url, String data) throws IOException {
+		Log.debug("POST " + url);
+		Log.debug("POST DATA: " + data);
+		try {
+			HttpURLConnection con = getHttpConnection(url);
+			con.setRequestMethod("POST");
+			con.setDoOutput(true);
+			con.connect();
+			OutputStream os = con.getOutputStream();
+			os.write(data.getBytes("UTF-8"));
+			if(con.getResponseCode() == 404) {
+				con.disconnect();
+				throw new FileNotFoundException(url);
+			}
+			con.disconnect();
+		} catch (FileNotFoundException e) {
+			throw e;
+		} catch (IOException e) {
+			throw new IOException(url, e);
+		}
 	}
 }

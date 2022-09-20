@@ -32,7 +32,7 @@ public class StartUtil {
 
 	private static String getJavaExec() {
 		String p = Config.get("javapath");
-		String exec = "java.exe";
+		String exec = "java" + (System.getProperty("os.name").toLowerCase().contains("win") ? ".exe" : "");
 		if(p != null && p.length() > 3) {
 			p = p.replace("\\", File.separator);
 			p = p.replace("/", File.separator);

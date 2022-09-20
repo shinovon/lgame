@@ -64,6 +64,7 @@ public class ButtonUI extends BasicButtonUI {
 	public Dimension getPreferredSize(JComponent c) {
 		AbstractButton btn = (AbstractButton) c;
 		String s = btn.getText();
+		if(s == null || c == null || c.getGraphics() == null) return new Dimension(24, 24);
 		if(s.equals("Играть") || s.equals("Обновить") || s.equals("Установить")) return new Dimension(100, 24);
 		int width = c.getGraphics().getFontMetrics(buttonFont).stringWidth(s) + 24;
 		int height = 24;

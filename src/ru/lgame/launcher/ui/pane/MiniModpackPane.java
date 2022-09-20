@@ -87,6 +87,11 @@ public class MiniModpackPane extends JPanel {
 		addMouseListener(new MouseListener() {
 
 			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
+					radioButton.setSelected(true);
+					selected();
+					Launcher.inst.frame().start();
+				}
 			}
 
 			public void mousePressed(MouseEvent e) {

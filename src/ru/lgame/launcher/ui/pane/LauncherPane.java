@@ -26,6 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 import org.json.JSONObject;
 
@@ -38,6 +39,9 @@ import ru.lgame.launcher.ui.frame.LauncherFrm;
 import ru.lgame.launcher.update.Modpack;
 import ru.lgame.launcher.utils.WebUtils;
 import ru.lgame.launcher.utils.logging.Log;
+import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * @author Shinovon
@@ -66,11 +70,72 @@ public class LauncherPane extends JPanel {
 
 	protected String skinName;
 
+	protected boolean customWarn;
+
+	private LauncherFrm frm;
+
+	private JCheckBox forceUpdateCheck;
+
 	public LauncherPane(LauncherFrm frm) {
+		this.frm = frm;
 		this.setLayout(new BorderLayout(0, 0));
 		
+		JPanel warnPane = new JPanel();
+		warnPane.setVisible(!Config.getBoolean("betaWarnShown"));
+		warnPane.setBackground(Color.ORANGE);
+		this.add(warnPane, BorderLayout.NORTH);
+		warnPane.setLayout(new BorderLayout(0, 0));
+		
+		JPanel warnTextPane = new JPanel();
+		warnTextPane.setBackground(Color.ORANGE);
+		warnPane.add(warnTextPane, BorderLayout.CENTER);
+		warnTextPane.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(!customWarn)
+				try {
+					Runtime.getRuntime().exec("explorer \"https://vk.com/im?sel=381458425\"");
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		
+		JLabel warnTextLabel = new JLabel(Text.get("label.warnbeta"));
+		warnTextLabel.setForeground(Color.BLACK);
+		warnTextPane.add(warnTextLabel);
+		
+		JPanel warnClosePane = new JPanel();
+		warnClosePane.setBackground(Color.ORANGE);
+		warnPane.add(warnClosePane, BorderLayout.EAST);
+		
+		JLabel warnCloseLabel = new JLabel("x");
+		warnCloseLabel.setForeground(Color.BLACK);
+		warnCloseLabel.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				warnCloseLabel.setForeground(Color.GRAY);
+			}
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				warnPane.setVisible(false);
+				if(!customWarn) Config.set("betaWarnShown", true);
+				Config.saveLater();
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				warnCloseLabel.setForeground(Color.BLACK);
+			}
+		});
+		warnClosePane.add(warnCloseLabel);
+		
+		JPanel contentPane2 = new JPanel();
+		contentPane2.setBorder(new EmptyBorder(5, 5, 5, 5));
+		add(contentPane2, BorderLayout.CENTER);
+		contentPane2.setLayout(new BorderLayout(0, 0));
+		
 		JPanel modpacksPanel = new JPanel();
-		this.add(modpacksPanel, BorderLayout.CENTER);
+		contentPane2.add(modpacksPanel, BorderLayout.CENTER);
 		modpacksPanel.setLayout(new BorderLayout(0, 0));
 		
 		scrollPane = new JScrollPane();
@@ -92,11 +157,8 @@ public class LauncherPane extends JPanel {
 		list.setLayout(new GridBagLayout());
         bg = new ButtonGroup();
 		
-		JPanel panel_2 = new JPanel();
-		modpacksPanel.add(panel_2, BorderLayout.NORTH);
-		
 		JPanel bottomPanel = new JPanel();
-		this.add(bottomPanel, BorderLayout.SOUTH);
+		contentPane2.add(bottomPanel, BorderLayout.SOUTH);
 		bottomPanel.setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel_3_1 = new JPanel();
@@ -153,7 +215,7 @@ public class LauncherPane extends JPanel {
 		flowLayout_1.setAlignment(FlowLayout.TRAILING);
 		bottomPanel.add(panel_3);
 		
-		JCheckBox forceUpdateCheck = new JCheckBox(Text.get("check.forceinstall"));
+		forceUpdateCheck = new JCheckBox(Text.get("check.forceinstall"));
 		panel_3.add(forceUpdateCheck);
 		
 		//usernameField = new JTextField();
@@ -167,29 +229,7 @@ public class LauncherPane extends JPanel {
 		startBtn.setEnabled(false);
 		startBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(Launcher.inst.currentAuth() != null) {
-					int i = Launcher.inst.currentAuth().checkAuth();
-					if(i == 0) {
-						Config.saveLater();
-						if(forceUpdateCheck.isSelected()) 
-							Launcher.inst.runForceUpdate(Launcher.inst.currentAuth(), selected.getModpack());
-						else Launcher.inst.run(Launcher.inst.currentAuth(), selected.getModpack());
-					} else {
-						JOptionPane.showMessageDialog(frm, "auth response: " + i, "", JOptionPane.WARNING_MESSAGE);
-					}
-				} else if(usernameField != null) {
-					Config.set("username", usernameField.getText());
-					Config.saveLater();
-					if(usernameField.getText() == null || usernameField.getText().length() <= 4) {
-						JOptionPane.showMessageDialog(frm, "Введите никнейм", "", JOptionPane.WARNING_MESSAGE);
-						return;
-					}
-					if(forceUpdateCheck.isSelected()) 
-						Launcher.inst.runForceUpdate(Auth.fromUsername(usernameField.getText()), selected.getModpack());
-					else Launcher.inst.run(Auth.fromUsername(usernameField.getText()), selected.getModpack());
-				} else {
-					JOptionPane.showMessageDialog(frm, Text.get("msg.noaccount"), "", JOptionPane.WARNING_MESSAGE);
-				}
+				start();
 			}
 		});
 		addModpacks();
@@ -197,6 +237,32 @@ public class LauncherPane extends JPanel {
 		updateAuth();
 	}
 	
+	public void start() {
+		if(Launcher.inst.currentAuth() != null) {
+			int i = Launcher.inst.currentAuth().checkAuth();
+			if(i == 0) {
+				Config.saveLater();
+				if(forceUpdateCheck.isSelected()) 
+					Launcher.inst.runForceUpdate(Launcher.inst.currentAuth(), selected.getModpack());
+				else Launcher.inst.run(Launcher.inst.currentAuth(), selected.getModpack());
+			} else {
+				JOptionPane.showMessageDialog(frm, "auth response: " + i, "", JOptionPane.WARNING_MESSAGE);
+			}
+		} else if(usernameField != null) {
+			Config.set("username", usernameField.getText());
+			Config.saveLater();
+			if(usernameField.getText() == null || usernameField.getText().length() <= 4) {
+				JOptionPane.showMessageDialog(frm, "Введите никнейм", "", JOptionPane.WARNING_MESSAGE);
+				return;
+			}
+			if(forceUpdateCheck.isSelected()) 
+				Launcher.inst.runForceUpdate(Auth.fromUsername(usernameField.getText()), selected.getModpack());
+			else Launcher.inst.run(Auth.fromUsername(usernameField.getText()), selected.getModpack());
+		} else {
+			JOptionPane.showMessageDialog(frm, Text.get("msg.noaccount"), "", JOptionPane.WARNING_MESSAGE);
+		}
+	}
+
 	private void getSkin() {
 		Launcher.inst.queue(new Runnable() {
 			public void run() {
@@ -355,6 +421,10 @@ public class LauncherPane extends JPanel {
 		}
 		scrollPane.revalidate();
 		repaint();
+	}
+	
+	public void update() {
+		selected();
 	}
 
 }
