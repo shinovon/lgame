@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
+import javax.net.ssl.SSLHandshakeException;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -43,7 +43,7 @@ public class Launcher {
 	
 	public static final String version = "0.7";
 	public static final String build_date = "-";
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	
 	public static final String string_version = "v" + version + " BETA";
 	private static final String title_add = " BETA";
@@ -130,13 +130,21 @@ public class Launcher {
 		}
 		loadingFrame.setText(Text.get("loading.fetchingmodpacks"));
 		try {
-			if(tryLoadModpacksFromServer()) {
-			} else if(loadCachedLauncherJson()) {
-				offline = true;
-			} else {
-				JOptionPane.showMessageDialog(new JPanel(), Text.get("msg.firststart"));
-				System.exit(0);
-				return;
+			try {
+				loadModpacksFromServer();
+			} catch (IOException e) {
+				e.printStackTrace();
+				if(loadCachedLauncherJson()) {
+					offline = true;
+				} else {
+					if(e.getCause() != null && e.getCause() instanceof SSLHandshakeException) {
+						ErrorUI.showError(Text.get("title.launchererror"), "В Java нет нужных сертификатов, обновите ее!\nhttps://java.com/ru/download", e);			
+					} else {
+						JOptionPane.showMessageDialog(loadingFrame, Text.get("msg.firststart"), "", JOptionPane.ERROR_MESSAGE, null);
+					}
+					System.exit(0);
+					return;
+				}
 			}
 		} catch (Exception e) {
 			ErrorUI.showError(Text.get("title.launchererror"), Text.get("loading.fetchingmodpacks"), e);
@@ -195,18 +203,11 @@ public class Launcher {
 
 	/**
 	 * Попытаться загрузить launcher.json с сервера
-	 * @return Получилось ли
 	 */
-	private boolean tryLoadModpacksFromServer() {
-		try {
-			String s = WebUtils.get(LAUNCHER_JSON_URL);
-			FileUtils.writeString(new File(getCacheDir() + "launcher.json"), s);
-			parseLauncherJson(s);
-			return true;
-		} catch (IOException e) {
-			Log.error("failed to load launcher.json", e);
-			return false;
-		}
+	private void loadModpacksFromServer() throws IOException {
+		String s = WebUtils.get(LAUNCHER_JSON_URL);
+		FileUtils.writeString(new File(getCacheDir() + "launcher.json"), s);
+		parseLauncherJson(s);
 	}
 
 	/**
@@ -264,7 +265,9 @@ public class Launcher {
 			});
 		} catch (Exception e) {
 		}
-		if(!tryLoadModpacksFromServer()) {
+		try {
+			loadModpacksFromServer();
+		} catch (IOException e) {
 			loadCachedLauncherJson();
 		}
 		loadingFrame.setVisible(false);
