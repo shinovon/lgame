@@ -1010,8 +1010,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 								String sh = hash.substring(0, 2);
 								String dir = p + "assets" + File.separator + "objects" + File.separator + sh + File.separator + hash;
 								File file = new File(dir);
-								long l = org.apache.commons.io.FileUtils.sizeOf(file);
-								if(!file.exists() || l != k.getLong("size")) {
+								if(!file.exists() || org.apache.commons.io.FileUtils.sizeOf(file) != k.getLong("size")) {
 									String url = "https://resources.download.minecraft.net/" + sh + "/" + hash;
 									uiInfo(null, "Скачивание ассетов (" + downloadedAssets + "/" + totalAssets + ")", percentD(0), null);
 									WebUtils.download(url, dir);
