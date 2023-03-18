@@ -84,6 +84,12 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	private String[] clientExtraArgs;
 
+	private int totalAssets;
+
+	private boolean downloadingAssets;
+
+	private int downloadedAssets;
+
 	private static Process clientProcess;
 
 	 
@@ -207,8 +213,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				return false;
 			}
 			try {
-				if (!HashUtils.getFileChecksum(filep, digest).equalsIgnoreCase(hash)) {
-					Log.debug("wrong checksum: " + s);
+				String hash2 = HashUtils.getFileChecksum(filep, digest);
+				if (!hash2.equalsIgnoreCase(hash)) {
+					Log.debug("wrong checksum: " + s + " " + hash2);
 					if(removeAll) FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
 					else {
 						try {
@@ -281,8 +288,10 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	private boolean checkClientJar(String p) throws Exception {
 		File f = new File(p + "client.jar");
 		if(!f.exists()) return false;
-		if(!HashUtils.getFileChecksum(f.toString(), "SHA-1").equalsIgnoreCase(clientJson.getJSONObject("integrity_check").getString("client_sha1")))
+		if(!HashUtils.getFileChecksum(f.toString(), "SHA-1").equalsIgnoreCase(clientJson.getJSONObject("integrity_check").getString("client_sha1"))) {
+			Log.debug("Client has wrong hash");
 			return false;
+		}
 		return true;
 	}
 
@@ -316,19 +325,40 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 		if(j.has("natives")) {
 			Log.debug("natives check");
-			return checkClientNatives(p);
+			if(!checkClientNatives(p)) return false;
 		}
 		if(j.has("assets")) {
-			return checkClientAssets(p);
+			Log.debug("assets check");
+			if(!checkClientAssets(p)) return false;
 		}
 		return true;
 	}
 	
 	private boolean checkClientAssets(String p) {
 		return new File(p + "assets" + File.separator + "objects" + File.separator).exists()
-				&& new File(p + "assets" + File.separator + "indexes" + File.separator + clientJson.getString("asset_index") + ".json").exists();
+				&& new File(p + "assets" + File.separator + "indexes" + File.separator + clientJson.getString("asset_index") + ".json").exists()
+				&& (clientNewAssets ? checkClientNewAssets(p) : true);
 	}
 	
+	private boolean checkClientNewAssets(String p) {
+		JSONObject objects = clientAssetsJson.getJSONObject("objects");
+		for(String key: objects.keySet()) {
+			JSONObject object = objects.getJSONObject(key);
+			String hash = object.getString("hash");
+			File file = new File(p + "assets" + File.separator + "objects" + File.separator + hash.substring(0, 2) + File.separator + hash);
+			if(!file.exists()) {
+				Log.debug("Asset not exists: " + hash + " (" + key + ")");
+				return false;
+			}
+			long l = org.apache.commons.io.FileUtils.sizeOf(file);
+			if(l != object.getLong("size")) {
+				Log.debug("Asset has wrong size: " + hash + " (" + key + ")");
+				return false;
+			}
+		}
+		return true;
+	}
+
 	private boolean checkClientLibrary(String p, JSONObject j) throws Exception {
 		String s = j.getString("name");
 		String sha1 = j.getString("sha1");
@@ -336,21 +366,22 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		String path = p + "libraries" + File.separator + path(j.getString("path"));
 		File file = new File(path);
 		if (!file.exists()) {
-			Log.debug("not exists: " + s);
+			Log.debug("Library does not exists: " + s);
 			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 			return false;
 		}
 		long l = org.apache.commons.io.FileUtils.sizeOf(file);
 		if(l != size) {
-			Log.debug("wrong size: " + s + " " + l + " " + size + " " + path);
+			Log.debug("Library has wrong size: " + s + " " + l + " " + size + " " + path);
 			file.delete();
 			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 			return false;
 		}
-		if (!HashUtils.getFileChecksum(path, "SHA-1").equalsIgnoreCase(sha1)) {
+		String hash2 = HashUtils.getFileChecksum(path, "SHA-1");
+		if (!hash2.equalsIgnoreCase(sha1)) {
 			file.delete();
 			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
-			Log.debug("wrong checksum: " + s);
+			Log.debug("Library has wrong checksum: " + s + " " + hash2);
 			return false;
 		}
 		return true;
@@ -424,13 +455,13 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			String filep = p + "natives" + File.separator + s;
 			File file = new File(filep);
 			if (!file.exists()) {
-				Log.debug("not exists: " + s);
+				Log.debug("Native does not exists: " + s);
 				FileUtils.deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
 				return false;
 			}
 			if (!HashUtils.getFileChecksum(filep, digest).equalsIgnoreCase(hash)) {
 				FileUtils.deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
-				Log.debug("wrong checksum: " + s);
+				Log.debug("Native has wrong checksum: " + s);
 				return false;
 			}
 		}
@@ -441,7 +472,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			if(f.isDirectory()) continue;
 			String n = f.getName().toLowerCase();
 			if(!names.contains(n)) {
-				Log.debug("Excess dynamic library: " + n);
+				Log.debug("Excess native: " + n);
 				return false;
 			}
 		}
@@ -695,7 +726,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			totalTasks += clientLibrariesJson.getJSONArray("libraries").length();
 		}
 		if(clientNewAssets) {
-			totalTasks += clientAssetsJson.getJSONObject("objects").length();
+			totalAssets = clientAssetsJson.getJSONObject("objects").length();
+			totalTasks += totalAssets;
 		}
 		totalTasks += unzip.length();
 		if(preremove == null || scriptedRemoveDirs(preremove, p, t)) {
@@ -734,7 +766,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			totalTasks += clientLibrariesJson.getJSONArray("libraries").length();
 		}
 		if(clientNewAssets) {
-			totalTasks += clientAssetsJson.getJSONObject("objects").length();
+			totalAssets = clientAssetsJson.getJSONObject("objects").length();
+			totalTasks += totalAssets;
 		}
 		boolean fail = false;
 		if(download == null || scriptedDownload(download, p, t)) {
@@ -882,37 +915,37 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					String type = check.optString("type");
 					if(type != null && !type.equals("force")) {
 						try {
-							boolean b = false;
+							boolean skip = false;
 							if(type.equals("mods")) {
 								if(forceUpdate) {
-									b = false;
+									skip = false;
 									break check;
 								}
 								if(mods != -1) {
-									if(mods == 1) b = true;
-								} else if((mods = checkMods(modpack, root, json.getJSONObject("integrity_check")) ? 1 : 0) == 1) b = true;
+									if(mods == 1) skip = true;
+								} else if((mods = checkMods(modpack, root, json.getJSONObject("integrity_check")) ? 1 : 0) == 1) skip = true;
 							} else if(type.equals("libraries")) {
-								if(checkClientLibraries(root)) b = true;
+								if(checkClientLibraries(root)) skip = true;
 
-								if(b && clientNewLibraries) {
+								if(skip && clientNewLibraries) {
 									tasksDone+=clientLibrariesJson.getJSONArray("libraries").length();
 								}
 							}  else if(type.equals("assets")) {
-								if(checkClientAssets(p)) b = true;
+								if(checkClientAssets(p)) skip = true;
 
-								if(b && clientNewAssets && clientAssetsJson != null) {
+								if(skip && clientNewAssets && clientAssetsJson != null) {
 									tasksDone+=clientAssetsJson.getJSONObject("objects").length();
 								}
 							} else if(type.equals("natives")) {
-								if(checkClientNatives(root)) b = true;
+								if(checkClientNatives(root)) skip = true;
 							} else if(type.equals("exists")) {
-								if(new File(p + path(check.getString("path"))).exists()) b = true;
+								if(new File(p + path(check.getString("path"))).exists()) skip = true;
 							} else if(type.equals("notexists")) {
-								if(!new File(p + path(check.getString("path"))).exists()) b = true;
+								if(!new File(p + path(check.getString("path"))).exists()) skip = true;
 							} else if(type.equals("client")) {
-								if(checkClientJar(p)) b = true;
+								if(checkClientJar(p)) skip = true;
 							}
-							if(b) {
+							if(skip) {
 								tasksDone++;
 								continue;
 							}
@@ -939,13 +972,17 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 						String dir = p + "libraries" + File.separator + path(path);
 						if(!checkClientLibrary(p, k)) {
 							modpack.setUpdateInfo(null, Text.get("state.downloading") + ": " + path.substring(path.lastIndexOf("/") + 1) + " (0%)", percentI());
-							try {
-								WebUtils.download(url, dir);
-							} catch(IOException e) {
-								if(downloadFailCount > Config.getInt("downloadMaxAttempts")) throw e;
-								Log.warn("download io err: " + e.toString() + ", retrying..");
-								downloadFailCount++;
-								Thread.sleep(500L);
+							boolean b = true;
+							while(b) {
+								try {
+									WebUtils.download(url, dir);
+									b = false;
+								} catch(IOException e) {
+									if(downloadFailCount > Config.getInt("downloadMaxAttempts")) throw e;
+									Log.warn("download io err: " + e.toString() + ", retrying..");
+									downloadFailCount++;
+									Thread.sleep(500L);
+								}
 							}
 						}
 						tasksDone++;
@@ -954,13 +991,13 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					continue;
 				}
 				if(o.optBoolean("new_assets")) {
-					Log.debug("aaa");
 					clientNewAssets = true;
 					String indexUrl = o.getString("url");
 					if(clientAssetsJson == null) {
 						clientAssetsJson = new JSONObject(WebUtils.get(indexUrl));
 						totalTasks += clientAssetsJson.getJSONObject("objects").length();
 					}
+					downloadingAssets = true;
 					WebUtils.download(indexUrl, p + "assets" + File.separator + "indexes" + File.separator + o.getString("name"));
 					JSONObject objects = clientAssetsJson.getJSONObject("objects");
 					boolean b = true;
@@ -972,13 +1009,17 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 								String hash = k.getString("hash");
 								String sh = hash.substring(0, 2);
 								String dir = p + "assets" + File.separator + "objects" + File.separator + sh + File.separator + hash;
-								if(!new File(dir).exists()) {
+								File file = new File(dir);
+								long l = org.apache.commons.io.FileUtils.sizeOf(file);
+								if(!file.exists() || l != k.getLong("size")) {
 									String url = "https://resources.download.minecraft.net/" + sh + "/" + hash;
-									modpack.setUpdateInfo(null, Text.get("state.downloading") + ": " + hash, percentI());
+									uiInfo(null, "Скачивание ассетов (" + downloadedAssets + "/" + totalAssets + ")", percentD(0), null);
 									WebUtils.download(url, dir);
 									tasksDone++;
+									downloadedAssets++;
 								} else if(!repeat) {
 									tasksDone++;
+									downloadedAssets++;
 								}
 							}
 							b = false;
@@ -990,6 +1031,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 							Thread.sleep(500L);
 						}
 					}
+					downloadingAssets = false;
 					tasksDone++;
 					continue;
 				}
@@ -1065,7 +1107,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 
 	private double percentD(double i) {
-		return percentD() + (i * (1D / (double) totalTasks) * 100D);
+		//return percentD() + (i * (1D / (double) totalTasks) * 100D);
+		//return ((double) (tasksDone+i) / (double) totalTasks) * 100D;
+		return percentD();
 	}
 
 	private int percentI(double i) {
@@ -1316,6 +1360,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	@Override
 	public void startDownload(String filename) {
+		if(downloadingAssets) {
+			return;
+		}
 		uiInfo(null, "Скачивание: " +  filename + " (0%)", percentD(0), null);
 	}
 	
@@ -1329,6 +1376,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			avgspeed = avgsum / 15;
 			avgsum = avgspeed;
 			avgcounter = 1;
+		}
+		if(downloadingAssets) {
+			return;
 		}
 		float s = avgspeed;
 		s = Math.round(s * 100) / 100F;

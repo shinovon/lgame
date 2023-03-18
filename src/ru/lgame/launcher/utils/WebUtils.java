@@ -253,9 +253,14 @@ public class WebUtils {
 			con.setRequestProperty("Accept-Encoding", "gzip");
 			con.connect();
 			//Log.debug("Connected, getting text");
-			if(con.getResponseCode() == 404) {
+			int r = con.getResponseCode();
+			if(r == 404) {
 				con.disconnect();
 				throw new FileNotFoundException(url);
+			}
+			if(r == 522) {
+				con.disconnect();
+				throw new IOException("Cloudflare error 522");
 			}
 			//Log.debug("response code: " + con.getResponseCode());
 			is = getHttpInputStream(con);

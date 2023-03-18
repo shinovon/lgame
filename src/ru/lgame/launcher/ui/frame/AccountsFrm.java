@@ -182,7 +182,7 @@ public class AccountsFrm extends JFrame {
 		            boolean cellHasFocus) {
 		    	if(value instanceof Auth) {
 		    		super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-		    		setText(((Auth) value).getUsername() + "(" + ((Auth) value).getType() + ")");
+		    		setText(((Auth) value).getUsername() + " (" + ((Auth) value).getType() + ")");
 		    	} else {
 		    		super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 		    	}
