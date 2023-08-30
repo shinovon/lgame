@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import ru.lgame.launcher.Launcher;
+import ru.lgame.launcher.update.Updater;
 
 /**
  * @author Shinovon
@@ -31,6 +32,10 @@ public class ClientLog extends PrintStream {
 		super.write(buf, off, len);
 		try {
 			String s = new String(buf, off, len, "UTF-8");
+			try {
+				if(s.contains("ExitTrappedException")) Updater.clientProcess.destroy();
+			} catch (Exception e) {
+			}
 			if(pw != null) pw.write(s);
 			if(Launcher.inst != null && Launcher.inst.loggerFrame() != null)
 				Launcher.inst.loggerFrame().append(s);

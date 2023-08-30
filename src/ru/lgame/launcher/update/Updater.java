@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,7 +24,6 @@ import ru.lgame.launcher.ui.ErrorUI;
 import ru.lgame.launcher.utils.FileUtils;
 import ru.lgame.launcher.utils.HashUtils;
 import ru.lgame.launcher.utils.LauncherOfflineException;
-import ru.lgame.launcher.utils.StartUtil;
 import ru.lgame.launcher.utils.ZipUtils;
 import ru.lgame.launcher.utils.logging.ClientLog;
 import ru.lgame.launcher.utils.logging.InputStreamCopier;
@@ -71,7 +70,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	public boolean clientStarted;
 
-	private int tasksDone;
+	protected int tasksDone;
 	private int totalTasks;
 
 	private boolean offline;
@@ -86,13 +85,16 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	private int totalAssets;
 
-	private boolean downloadingAssets;
-
 	private int downloadedAssets;
 
-	private static Process clientProcess;
+	private boolean hasMojangJre;
 
-	 
+	private boolean hideDownloadStatus;
+
+	private String[] clientJvmArgs;
+
+	public static Process clientProcess;
+
 	private Updater(Modpack m, Auth a, boolean b) {
 		this.modpack = m;
 		this.auth = a;
@@ -124,10 +126,13 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			//if(!checkModpackIntegrity(m)) return 3;
 			if(checkUpdatesAvailable(m)) return 2;
 		} catch (FileNotFoundException e) {
+			Log.warn("Get modpack state failed", e);
 			return -2;
 		} catch (IOException e) {
+			Log.warn("Get modpack state failed", e);
 			return -1;
 		} catch (Exception e) {
+			Log.warn("Get modpack state failed", e);
 			return -3;
 		}
 		return 1;
@@ -174,7 +179,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				if(o.getString("type").equals("exists")) {
 					String d = path(o.getString("path"));
 					if(!new File(p + d).exists()) {
-						Log.debug("not exists " + p + d);
+						Log.warn("not exists " + p + d);
 						return false;
 					}
 				}
@@ -191,6 +196,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	 */
 	public static boolean checkMods(Modpack m, String p, JSONObject integrityCheck) throws Exception {
 		JSONObject md = integrityCheck.getJSONObject("mods");
+		JSONArray ignoreMods = md.optJSONArray("ignore");
 		boolean ignoreExcessMods = md.getBoolean("ignore_excess_mods");
 		boolean removeAll = md.getBoolean("remove_all_if_check_failed");
 		boolean deleteBlacklisted = md.getBoolean("delete_blacklist_mods");
@@ -203,7 +209,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			String filep = p + "mods" + File.separator + s;
 			File file = new File(filep);
 			if (!file.exists()) {
-				Log.debug("not exists: " + file);
+				Log.warn("mod not exists: " + file);
 				if(removeAll) {
 					try {
 						FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
@@ -215,7 +221,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			try {
 				String hash2 = HashUtils.getFileChecksum(filep, digest);
 				if (!hash2.equalsIgnoreCase(hash)) {
-					Log.debug("wrong checksum: " + s + " " + hash2);
+					Log.debug("mod has wrong checksum: " + s + " " + hash2);
 					if(removeAll) FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
 					else {
 						try {
@@ -238,7 +244,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			String n = f.getName().toLowerCase();
 			for(String s: blacklist) {
 				if(n.contains(s.toLowerCase())) {
-					Log.debug("blacklisted mod: " + n);
+					Log.warn("blacklisted mod: " + n);
 					if(deleteBlacklisted) f.delete();
 					else {
 						if(removeAll) {
@@ -249,11 +255,22 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				}
 			}
 			if(!ignoreExcessMods && !names.contains(n)) {
-				Log.debug("Excess mod: " + n);
+				boolean b = false;
+				if(ignoreMods != null) {
+					for(Object s: ignoreMods.toList()) {
+						if(n.startsWith((String)s)) {
+							b = true;
+							break;
+						}
+					}
+				}
+				if(b) continue;
+				Log.warn("Excess mod: " + n);
 				if(removeAll) FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
 				else try {
-					new File(p + n).delete();
+					f.delete();
 				} catch (Exception e) {
+					e.printStackTrace();
 				}
 				if(removeAll) return false;
 			}
@@ -289,7 +306,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		File f = new File(p + "client.jar");
 		if(!f.exists()) return false;
 		if(!HashUtils.getFileChecksum(f.toString(), "SHA-1").equalsIgnoreCase(clientJson.getJSONObject("integrity_check").getString("client_sha1"))) {
-			Log.debug("Client has wrong hash");
+			Log.warn("Client has wrong hash");
 			return false;
 		}
 		return true;
@@ -300,7 +317,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	 * Проверка целостности клиента
 	 */
 	private boolean checkClientIntegrity() throws Exception {
-		Log.debug("check client");
+		Log.info("Checking client integrity");
 		String p = Launcher.getLibraryDir() + modpack.client() + File.separator;
 		File f = new File(p + "version");
 		if(!f.exists()) return false;
@@ -319,17 +336,21 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		}
 		
 		if(j.has("libraries")) {
-			Log.debug("check libraries");
+			Log.info("Checking client libraries");
 			if(!checkClientLibraries(p)) return false;
 		}
 
 		if(j.has("natives")) {
-			Log.debug("natives check");
+			Log.info("Checking client natives");
 			if(!checkClientNatives(p)) return false;
 		}
 		if(j.has("assets")) {
-			Log.debug("assets check");
+			Log.info("Checking client assets");
 			if(!checkClientAssets(p)) return false;
+		}
+		if(j.has("mojang_jre")) {
+			Log.info("Checking mojang jre");
+			if(!checkClientMojangJRE()) return false;
 		}
 		return true;
 	}
@@ -347,12 +368,12 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			String hash = object.getString("hash");
 			File file = new File(p + "assets" + File.separator + "objects" + File.separator + hash.substring(0, 2) + File.separator + hash);
 			if(!file.exists()) {
-				Log.debug("Asset not exists: " + hash + " (" + key + ")");
+				Log.warn("Asset not exists: " + hash + " (" + key + ")");
 				return false;
 			}
 			long l = org.apache.commons.io.FileUtils.sizeOf(file);
 			if(l != object.getLong("size")) {
-				Log.debug("Asset has wrong size: " + hash + " (" + key + ")");
+				Log.warn("Asset has wrong size: " + hash + " (" + key + ")");
 				return false;
 			}
 		}
@@ -366,13 +387,13 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		String path = p + "libraries" + File.separator + path(j.getString("path"));
 		File file = new File(path);
 		if (!file.exists()) {
-			Log.debug("Library does not exists: " + s);
+			Log.warn("Library does not exists: " + s);
 			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 			return false;
 		}
 		long l = org.apache.commons.io.FileUtils.sizeOf(file);
 		if(l != size) {
-			Log.debug("Library has wrong size: " + s + " " + l + " " + size + " " + path);
+			Log.warn("Library has wrong size: " + s + " " + l + " " + size + " " + path);
 			file.delete();
 			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 			return false;
@@ -381,7 +402,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		if (!hash2.equalsIgnoreCase(sha1)) {
 			file.delete();
 			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
-			Log.debug("Library has wrong checksum: " + s + " " + hash2);
+			Log.warn("Library has wrong checksum: " + s + " " + hash2);
 			return false;
 		}
 		return true;
@@ -417,13 +438,15 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			String filep = p + "libraries" + File.separator + s;
 			File file = new File(filep);
 			if (!file.exists()) {
-				Log.debug("not exists: " + s);
+				Log.warn("not exists: " + s);
 				FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 				return false;
 			}
-			if (!HashUtils.getFileChecksum(filep, digest).equalsIgnoreCase(hash)) {
+			if (!HashUtils.getFileChecksum(filep, digest).equalsIgnoreCase(hash)
+					/*&& !(s.contains("-srg.jar") && s.contains("client-1.16.5")) */ // костыль
+					) {
 				FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
-				Log.debug("wrong checksum: " + s);
+				Log.warn("wrong checksum: " + s);
 				return false;
 			}
 		}
@@ -434,7 +457,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			if(f.isDirectory()) continue;
 			String n = f.getName().toLowerCase();
 			if(!names.contains(n)) {
-				Log.debug("Excess jar library: " + n);
+				Log.warn("Excess jar library: " + n);
 				return false;
 			}
 		}
@@ -455,13 +478,13 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			String filep = p + "natives" + File.separator + s;
 			File file = new File(filep);
 			if (!file.exists()) {
-				Log.debug("Native does not exists: " + s);
+				Log.warn("Native does not exists: " + s);
 				FileUtils.deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
 				return false;
 			}
 			if (!HashUtils.getFileChecksum(filep, digest).equalsIgnoreCase(hash)) {
 				FileUtils.deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
-				Log.debug("Native has wrong checksum: " + s);
+				Log.warn("Native has wrong checksum: " + s);
 				return false;
 			}
 		}
@@ -472,7 +495,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			if(f.isDirectory()) continue;
 			String n = f.getName().toLowerCase();
 			if(!names.contains(n)) {
-				Log.debug("Excess native: " + n);
+				FileUtils.deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
+				Log.warn("Excess native: " + n);
 				return false;
 			}
 		}
@@ -539,6 +563,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			if(clientStartJson.has("extra_args")) {
 				clientExtraArgs = clientStartJson.getJSONArray("extra_args").toList().toArray(new String[0]);
 			}
+			if(clientStartJson.has("jvm_args")) {
+				clientJvmArgs = clientStartJson.getJSONArray("jvm_args").toList().toArray(new String[0]);
+			}
 			modpack.setUpdateInfo(null, "Скачивание конфигурации сборки", 33);
 			json = modpack.getUpdateJson(true);
 			modpack.setUpdateInfo(null, "Скачивание конфигурации клиента", 67);
@@ -546,7 +573,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			try {
 				if(clientJson.getJSONObject("integrity_check").getJSONObject("libraries").optBoolean("new_libraries")) {
 					clientNewLibraries = true;
-					Log.debug("client uses new libraries");
+					Log.info("client uses new libraries");
 					if(clientLibrariesJson == null) {
 						modpack.setClientLibrariesURL(clientJson.getJSONObject("integrity_check").getJSONObject("libraries").getString("url"));
 						clientLibrariesJson = modpack.getClientLibrariesJson();
@@ -558,11 +585,19 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			try {
 				if(clientJson.getJSONObject("integrity_check").getJSONObject("assets").optBoolean("new_assets")) {
 					clientNewAssets = true;
-					Log.debug("client uses new assets");
+					Log.info("client uses new assets");
 					if(clientAssetsJson == null) {
 						clientAssetsJson = new JSONObject(WebUtils.get((clientJson.getJSONObject("integrity_check").getJSONObject("assets").getString("url"))));
 						//totalTasks += clientAssetsJson.getJSONObject("objects").length();
 					}
+				}
+			} catch (Exception e) {
+			}
+			try {
+				if(clientJson.optBoolean("has_mojang_jre")) {
+					hasMojangJre = true;
+					Log.info("client uses mojang jre");
+					mojang_jre = clientJson.getString("mojang_jre");
 				}
 			} catch (Exception e) {
 			}
@@ -630,7 +665,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			interrupted();
 			return;
 		}
-		Log.debug("install state: " + modpackState);
+		Log.info("install state: " + modpackState);
 		modpack.setUpdateInfo(Text.get("state.updating"), "Инициализация системы обновления", 0);
 		// обнова либо старт сборки
 		boolean ret = !repeated;
@@ -840,6 +875,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 
 	private void clientVersionFile() {
+		Log.info("Writing client version file");
 		String s = Launcher.getLibraryDir() + modpack.client() + File.separator;
 		File f2 = new File(s + "start.json");
 		if(f2.exists()) f2.delete();
@@ -847,6 +883,15 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			FileUtils.writeString(f2, clientStartJson.toString());
 		} catch (Exception e) {
 			Log.error("client start.json write failed", e);
+		}
+		if(clientNewLibraries) {
+			File f3 = new File(s + "libraries.json");
+			if(f3.exists()) f3.delete();
+			try {
+				FileUtils.writeString(f3, clientLibrariesJson.toString());
+			} catch (Exception e) {
+				Log.error("client libraries.json write failed", e);
+			}
 		}
 		File f = new File(s + "version");
 		if(f.exists()) f.delete();
@@ -944,6 +989,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 								if(!new File(p + path(check.getString("path"))).exists()) skip = true;
 							} else if(type.equals("client")) {
 								if(checkClientJar(p)) skip = true;
+							} else if(type.equals("mojang_jre")) {
+								if(checkClientMojangJRE()) skip = true;
 							}
 							if(skip) {
 								tasksDone++;
@@ -963,15 +1010,19 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 						clientLibrariesJson = modpack.getClientLibrariesJson();
 						totalTasks += clientLibrariesJson.getJSONArray("libraries").length();
 					}
-					
+					hideDownloadStatus = true;
 					JSONArray libraries = clientLibrariesJson.getJSONArray("libraries");
+					uiInfo("Скачивание библиотек");
+					MultiThreadedDownloader downloader = new MultiThreadedDownloader(3, libraries.length(), this, "Скачивание библиотек");
 					for (Object i: libraries) {
 						JSONObject k = (JSONObject) i;
 						String path = k.getString("path");
 						String url = k.getString("url");
 						String dir = p + "libraries" + File.separator + path(path);
 						if(!checkClientLibrary(p, k)) {
-							modpack.setUpdateInfo(null, Text.get("state.downloading") + ": " + path.substring(path.lastIndexOf("/") + 1) + " (0%)", percentI());
+							//modpack.setUpdateInfo(null, Text.get("state.downloading") + ": " + path.substring(path.lastIndexOf("/") + 1) + " (0%)", percentI());
+							downloader.add(url, dir);
+							/*
 							boolean b = true;
 							while(b) {
 								try {
@@ -984,9 +1035,12 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 									Thread.sleep(500L);
 								}
 							}
+							*/
 						}
-						tasksDone++;
+						//tasksDone++;
 					}
+					downloader.lock();
+					hideDownloadStatus = false;
 					tasksDone++;
 					continue;
 				}
@@ -997,9 +1051,11 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 						clientAssetsJson = new JSONObject(WebUtils.get(indexUrl));
 						totalTasks += clientAssetsJson.getJSONObject("objects").length();
 					}
-					downloadingAssets = true;
+					hideDownloadStatus = true;
+					uiInfo("Скачивание ассетов");
 					WebUtils.download(indexUrl, p + "assets" + File.separator + "indexes" + File.separator + o.getString("name"));
 					JSONObject objects = clientAssetsJson.getJSONObject("objects");
+					/*
 					boolean b = true;
 					boolean repeat = false;
 					while(b) {
@@ -1030,7 +1086,56 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 							Thread.sleep(500L);
 						}
 					}
-					downloadingAssets = false;
+					*/
+					MultiThreadedDownloader downloader = new MultiThreadedDownloader(5, objects.length(), this, "Скачивание ассетов");
+					for (String s: objects.keySet()) {
+						JSONObject k = objects.getJSONObject(s);
+						String hash = k.getString("hash");
+						String sh = hash.substring(0, 2);
+						String dir = p + "assets" + File.separator + "objects" + File.separator + sh + File.separator + hash;
+						File file = new File(dir);
+						if(!file.exists() || org.apache.commons.io.FileUtils.sizeOf(file) != k.getLong("size")) {
+							downloader.add("https://resources.download.minecraft.net/" + sh + "/" + hash, dir);
+						}
+					}
+					downloader.lock();
+					hideDownloadStatus = false;
+					tasksDone++;
+					continue;
+				}
+				if(o.optBoolean("mojang_jre")) {
+					hideDownloadStatus = true;
+					uiInfo("Скачивание Java");
+					String allUrl = o.getString("url");
+					JSONObject allJson = new JSONObject(WebUtils.get(allUrl));
+					JSONObject platform = allJson.getJSONObject(getMojangJREPlatform());
+					JSONObject jre = platform.getJSONArray(mojang_jre).optJSONObject(0);
+					if(jre != null) {
+						String manifestUrl = jre.getJSONObject("manifest").getString("url");
+						JSONObject manifestJson = new JSONObject(WebUtils.get(manifestUrl));
+						JSONObject files = manifestJson.getJSONObject("files");
+						totalTasks += files.length();
+						//int downloadedFiles = 0;
+						//int totalFiles = files.length();
+						MultiThreadedDownloader downloader = new MultiThreadedDownloader(3, files.length(), this, "Скачивание Java");
+						for(String key: files.keySet()) {
+							//downloadedFiles++;
+							File file = new File(Launcher.getLibraryDir()+"mojang_jre"+File.separator+mojang_jre+File.separator+getMojangJREPlatform()+File.separator + key);
+							JSONObject json = files.getJSONObject(key);
+							if(json.getString("type").equals("directory")) {
+								file.mkdirs();
+								file.mkdir();
+								continue;
+							}
+							JSONObject raw = json.getJSONObject("downloads").getJSONObject("raw");
+							if(file.exists() && org.apache.commons.io.FileUtils.sizeOf(file) == raw.getLong("size")) continue;
+							downloader.add(raw.getString("url"), file.getCanonicalPath());
+							//uiInfo(null, "Скачивание Java: " + key + "("+downloadedFiles+"/"+totalFiles+")", percentD((double)downloadedFiles / (double)totalFiles), null);
+							//WebUtils.download(raw.getString("url"), file.getCanonicalPath());
+						}
+						downloader.lock();
+					}
+					hideDownloadStatus = false;
 					tasksDone++;
 					continue;
 				}
@@ -1060,6 +1165,44 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		return true;
 	}
 	
+	private boolean checkClientMojangJRE() {
+		String p = Launcher.getLibraryDir()+"mojang_jre"+File.separator+mojang_jre+File.separator+getMojangJREPlatform()+File.separator;
+		if(!new File(p).exists()) {
+			Log.info("jre folder does not exist");
+			return false;
+		}
+		String allUrl = clientJson.getJSONObject("integrity_check").getJSONObject("mojang_jre").getString("url");
+		try {
+			JSONObject allJson = new JSONObject(WebUtils.get(allUrl));
+			JSONObject platform = allJson.getJSONObject(getMojangJREPlatform());
+			JSONObject jre = platform.getJSONArray(mojang_jre).optJSONObject(0);
+			if(jre != null) {
+				String manifestUrl = jre.getJSONObject("manifest").getString("url");
+				JSONObject manifestJson = new JSONObject(WebUtils.get(manifestUrl));
+				JSONObject files = manifestJson.getJSONObject("files");
+				for(String key: files.keySet()) {
+					File file = new File(p + key);
+					JSONObject json = files.getJSONObject(key);
+					if(!file.exists()) {
+						Log.info("jre file " + key + " does not exist");
+						return false;
+					}
+					if(json.getString("type").equals("directory")) {
+						continue;
+					}
+					if(org.apache.commons.io.FileUtils.sizeOf(file) != json.getJSONObject("downloads").getJSONObject("raw").getLong("size")) {
+						Log.info("jre file " + key + " has wrong size");
+						return false;
+					}
+				}
+			}
+		} catch (Exception e) {
+			Log.error("Failed to check jre integrity", e);
+			return true;
+		}
+		return true;
+	}
+
 	private boolean scriptedUnzip(JSONArray j, String root, String temp) {
 		modpack.setUpdateInfo(null, Text.get("state.unzipstart"), -2);
 		ZipUtils.setListener(this);
@@ -1128,15 +1271,22 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			throw new IllegalStateException("Client still running!");
 		try {
 			File[] libraries = getClientLibariesFiles();
-			HashSet<File> d = new HashSet<File>();
-			d.add(new File(getClientJarPath()));
+			ArrayList<File> d = new ArrayList<File>();
 			for (File f: libraries) d.add(f);
+			d.add(new File(getClientJarPath()));
 			ArrayList<String> jvmArgs = new ArrayList<>();
 			jvmArgs.add("-Xms" + Config.getInt("xms") + "M");
 			jvmArgs.add("-Xmx" + Config.getInt("xmx") + "M");
 			jvmArgs.add("-Djava.library.path=" + getNativesDir());
 			jvmArgs.add("-Dfile.encoding=UTF-8");
-
+			if(clientJvmArgs != null) {
+				for (String s : clientJvmArgs) {
+					jvmArgs.add(s
+							.replace("${library_directory}", getClientDir() + "libraries")
+							.replace("${classpath_separator}", "" + File.pathSeparatorChar)
+							);
+				}
+			}
 			ArrayList<String> appArgs = new ArrayList<>();
 			if(auth.isCracked()) {
 				appArgs.add("--username");
@@ -1177,8 +1327,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			appArgs.add(modpack.id());
 			appArgs.add("--modpackname");
 			appArgs.add(modpack.getName());
-			clientProcess = StartUtil.startJarProcess(new File(getModpackDir()), d, clientMainClass, jvmArgs,
-					appArgs);
+			clientProcess = startJarProcess(new File(getModpackDir()), d, clientMainClass, jvmArgs, appArgs);
 			PrintStream ps = ClientLog.getInstance();
 			final InputStreamCopier input = new InputStreamCopier(clientProcess.getInputStream(), ps);
 			final InputStreamCopier error = new InputStreamCopier(clientProcess.getErrorStream(), ps);
@@ -1247,7 +1396,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	}
 
 	public File[] getClientLibariesFiles() {
-		if(clientNewLibraries) {
+		if(clientNewLibraries || new File(getClientDir() + "libraries.json").exists()) {
 			if(clientLibrariesJson == null) {
 				clientLibrariesJson = modpack.getClientLibrariesJson();
 			}
@@ -1255,10 +1404,12 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			ArrayList<File> list = new ArrayList<File>();
 			for (Object i: libraries) {
 				JSONObject k = (JSONObject) i;
+				if(k.optBoolean("downloadOnly")) continue;
 				list.add(new File(getClientDir() + "libraries" + File.separator + path(k.getString("path"))));
 			}
 			return list.toArray(new File[0]);
 		}
+		Log.warn("Client libraries.json was not found! Trying to list libraries");
 		return new File(getClientDir() + "libraries" + File.separator).listFiles((file) -> file.isDirectory() || file.getName().toLowerCase().endsWith(".jar"));
 	}
 
@@ -1269,6 +1420,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	private void clientError(String s) {
 		String x = ClientLog.getInstance().getLastException();
 		if(x == null) x = "No Error";
+		/*
 		if(x.contains("java.lang.NoClassDefFoundError: java/util/jar/Pack200") || 
 				x.contains("java.lang.ClassNotFoundException: java.util.jar.Pack200")) {
 		x = "Возможное решение:\nОшибка несовместимости Forge с версией Java!!\nИспользуйте версию Java меньше 14 \n"
@@ -1276,6 +1428,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		} else if(x.contains("AppClassLoader cannot be cast to class java.net.URLClassLoader")) {
 			x = "Возможное решение:\nОшибка несовместимости Forge с версией Java!!\nИспользуйте версию Java 8\n" + x;
 		}
+		*/
 		ErrorUI.clientError(Text.get("title.clienterror", "Ошибка клиента"), s, x);	
 	}
 
@@ -1359,7 +1512,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	@Override
 	public void startDownload(String filename) {
-		if(downloadingAssets) {
+		if(hideDownloadStatus) {
 			return;
 		}
 		uiInfo(null, "Скачивание: " +  filename + " (0%)", percentD(0), null);
@@ -1367,6 +1520,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	
 	int avgcounter;
 	float avgsum;
+
+	private String mojang_jre;
 	@Override
 	public void downloadProgress(String filename, double speed, int percent, int bytesLeft) {
 		avgsum += speed;
@@ -1376,7 +1531,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			avgsum = avgspeed;
 			avgcounter = 1;
 		}
-		if(downloadingAssets) {
+		if(hideDownloadStatus) {
 			return;
 		}
 		float s = avgspeed;
@@ -1412,10 +1567,116 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	private void uiInfo(String s1, String s2, double p, String time) {
 		modpack.setUpdateInfo(s1, s2, p, time);
 	}
+	
+	protected void uiInfo(String s) {
+		modpack.setUpdateInfo(null, s, percentD());
+	}
 
 	@Override
 	public void doneDownload(String zipFile) {
 		
+	}
+	
+	public Process startJarProcess(File dir, List<File> classpathList, String mainClass, List<String> jvmArgs, List<String> appArgs) throws IOException {
+		List<String> cmd = new ArrayList<String>();
+		cmd.add(getJavaExec());
+		cmd.addAll(jvmArgs);
+		cmd.add("-cp");
+		cmd.add(constructClassPath(classpathList));
+		cmd.add(mainClass);
+		cmd.addAll(appArgs);
+		Log.info(cmd.toString());
+		return startProcess(dir, cmd);
+	}
+
+	private Process startProcess(File dir, List<String> cmd) throws IOException {
+		return new ProcessBuilder(new String[0]).command(cmd).directory(dir).start();
+	}
+
+	private String getJavaExec() {
+		String p = Config.get("javapath");
+		String exec = "java" + (System.getProperty("os.name").toLowerCase().contains("win") ? "w.exe" : "");
+		if(p != null && p.length() > 3) {
+			p = p.replace("\\", File.separator);
+			p = p.replace("/", File.separator);
+			if(p.endsWith("java.exe")) return p;
+			if(p.endsWith("bin" + File.separator)) return p + exec;
+			if(p.endsWith("bin")) return p + File.separator + exec;
+			if(p.endsWith(File.separator)) return p + "bin" + File.separator + exec;
+			Log.debug("1: " + p);
+			return p + File.separator + "bin" + File.separator + exec;
+		}
+		String mojangjre = clientStartJson != null && clientStartJson.has("mojang_jre") ? clientStartJson.getString("mojang_jre") : mojang_jre;
+		if(mojangjre != null) {
+			String platform = getMojangJREPlatform();
+			String jre = Launcher.getLibraryDir() + "mojang_jre" + File.separator + mojangjre + File.separator + platform + File.separator;
+			if(new File(jre).exists()) {
+				return jre + "bin" + File.separator + exec;
+			}
+		}
+		String home = System.getProperty("java.home");
+		if(home == null || home == "" || home == " " || home.length() < 2)
+			throw new RuntimeException("invalid java.home value");
+		Log.debug("2: " + home);
+		return home + File.separator + "bin" + File.separator + exec;
+	}
+	
+	private static String getJavaPathDir() {
+		String[] paths = System.getenv("path").split(";");
+		String w = null;
+		for (int i = 0; i < paths.length; i++) {
+			String o = paths[i];
+			String s = o.toLowerCase();
+			if ((s.contains("java") || s.contains("jre")) && s.endsWith("bin")) {
+				if(s.contains("jdk") && w.contains("jdk")) {
+					if(!o.contains("jre") && w.contains("jre")) {
+						continue;
+					}
+				}
+				w = o;
+			}
+		}
+		return w;
+	}
+
+	private static String constructClassPath(List<File> classpathList) throws IOException {
+		StringBuilder classpathBuilder = new StringBuilder();
+		for (File classpathEntry : classpathList) {
+			if (!classpathEntry.exists()) {
+				throw new FileNotFoundException("classpath not found: " + classpathEntry.getAbsolutePath());
+			}
+			if (classpathBuilder.length() > 0) {
+				classpathBuilder.append(File.pathSeparatorChar);
+			}
+			classpathBuilder.append(classpathEntry.getAbsolutePath());
+		}
+		return classpathBuilder.toString();
+	}
+	
+	public static String getMojangJREPlatform() {
+		String os = System.getProperty("os.name").toLowerCase();
+		String arch = System.getProperty("os.arch").toLowerCase();
+		String s = "";
+		if(os.startsWith("win")) {
+			if(arch.contains("64")) {
+				s = "windows-x64";
+			} else {
+				s = "windows-x86";
+			}
+		} else if(os.startsWith("linux") || os.contains("nux") || os.startsWith("nix") || os.startsWith("aix")) {
+			if(arch.contains("64")) {
+				s = "linux";
+			} else {
+				s = "linux-i386";
+			}
+		} else if(os.contains("darwin") || os.contains("mac")) {
+			if(arch.contains("arm")) {
+				s = "mac-os-arm64";
+			} else {
+				s = "mac-os";
+			}
+		}
+		return s;
 	}
 
 }

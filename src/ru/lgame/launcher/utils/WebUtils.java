@@ -110,6 +110,7 @@ public class WebUtils {
 			int read;
 			need = con.getContentLength();
 			Log.info("Downloading: \"" + uri + "\" to \"" + path + "\", size: " + (need / 1024) + "k");
+			if(need == -1) Log.warn("Content-size unknown");
 			int i = 0;
 			st.start();
 			if(listener != null) listener.startDownload(f.getName());
@@ -142,7 +143,7 @@ public class WebUtils {
 			}
 			if(listener != null) listener.downloadProgress(file, speed, 100, 0);
 			Log.debug("Size of " + path + " " + downloaded);
-			if(downloaded != need) Log.warn("Content-Size and actual file size does not match!!");
+			if(need != -1 && downloaded != need) Log.warn("Content-Size and actual file size does not match!! " + downloaded + " vs " + need + " needed");
 			st.interrupt();
 			in.close();
 			con.disconnect();

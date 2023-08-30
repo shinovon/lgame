@@ -41,12 +41,12 @@ import static ru.lgame.launcher.utils.HashUtils.getMD5String;
  */
 public class Launcher {
 	
-	public static final String version = "0.7.1";
+	public static final String version = "1.0";
 	public static final String build_date = "-";
 	public static final boolean DEBUG = false;
 	
-	public static final String string_version = "v" + version + " BETA";
-	private static final String title_add = " BETA";
+	public static final String string_version = "v" + version;
+	private static final String title_add = "";
 	
 	private static final String LAUNCHER_JSON_URL = "https://nnp.nnchan.ru/lgame/launcher.json";
 
@@ -506,7 +506,6 @@ public class Launcher {
 				try {
 					WebUtils.postReq("https://nnp.nnchan.ru/lgame/api.php", o.toString());
 				} catch (IOException e) {
-					e.printStackTrace();
 				}
 			}
 		}.start();

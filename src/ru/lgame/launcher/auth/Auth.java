@@ -17,6 +17,8 @@ public final class Auth {
 
 	private boolean cracked;
 	private boolean mojang;
+	private boolean microsoft;
+	private boolean lgame;
 	
 	private String username;
 	
@@ -110,6 +112,14 @@ public final class Auth {
 		return mojang;
 	}
 	
+	public boolean isMicrosoft() {
+		return microsoft;
+	}
+	
+	public boolean isLGame() {
+		return lgame;
+	}
+	
 	public String getMojangUUID() {
 		return mojangUUID;
 	}
@@ -154,7 +164,9 @@ public final class Auth {
 	public String getType() {
 		if(isCracked()) return "CRACKED";
 		if(isMojang()) return "MOJANG";
-		return "BLANK";
+		if(isMicrosoft()) return "MICROSOFT";
+		if(isLGame()) return "LGAME";
+		return "UNKNOWN";
 	}
 	
 	private String[] decrypt(String enc) {

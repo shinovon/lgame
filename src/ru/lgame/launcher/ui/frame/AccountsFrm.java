@@ -182,7 +182,7 @@ public class AccountsFrm extends JFrame {
 		            boolean cellHasFocus) {
 		    	if(value instanceof Auth) {
 		    		super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-		    		setText(((Auth) value).getUsername() + " (" + ((Auth) value).getType() + ")");
+		    		setText(((Auth) value).getUsername() + " (" + localizeType(((Auth) value).getType()) + ")");
 		    	} else {
 		    		super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 		    	}
@@ -241,6 +241,19 @@ public class AccountsFrm extends JFrame {
 		update();
 	}
 	
+	protected String localizeType(String type) {
+		if(type.equals("MOJANG")) {
+			return "Mojang";
+		}
+		if(type.equals("MICROSOFT")) {
+			return "Microsoft";
+		}
+		if(type.equals("LGAME")) {
+			return "LGame";
+		}
+		return "По нику";
+	}
+
 	public void update() {
 		list.removeAll();
 		list.setListData(AuthStore.list());
