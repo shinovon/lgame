@@ -81,7 +81,8 @@ public class LauncherPane extends JPanel {
 		this.setLayout(new BorderLayout(0, 0));
 		
 		JPanel warnPane = new JPanel();
-		warnPane.setVisible(!Config.getBoolean("betaWarnShown"));
+		//warnPane.setVisible(!Config.getBoolean("betaWarnShown"));
+		warnPane.setVisible(false);
 		warnPane.setBackground(Color.ORANGE);
 		this.add(warnPane, BorderLayout.NORTH);
 		warnPane.setLayout(new BorderLayout(0, 0));
@@ -94,7 +95,8 @@ public class LauncherPane extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				if(!customWarn)
 				try {
-					Runtime.getRuntime().exec("explorer \"https://vk.com/im?sel=381458425\"");
+					//Runtime.getRuntime().exec("explorer \"https://vk.com/im?sel=381458425\"");
+					Runtime.getRuntime().exec("explorer \"https://t.me/shinovon\"");
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -375,6 +377,7 @@ public class LauncherPane extends JPanel {
 	 * Добавить сборку в список
 	 */
 	private void addModpack(MiniModpackPane sb) {
+		if(sb.getModpack().isHidden()) return;
 		sb.setButtonGroup(bg);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;

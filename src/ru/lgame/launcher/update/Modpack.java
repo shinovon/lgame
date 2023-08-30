@@ -47,6 +47,7 @@ public class Modpack {
 	
 	private int cachedState;
 	private String client_assets_data;
+	private boolean hidden;
 	
 	public Modpack(String id) {
 		this.id = id;
@@ -68,6 +69,7 @@ public class Modpack {
 		client_start_data = client_update_data.replace("/update.json", "/start.json");
 		client_libraries_data = client_update_data.replace("/update.json", "/libraries.json");
 		type = o.optString("type");
+		hidden = o.optBoolean("hidden");
 		return this;
 	}
 
@@ -105,6 +107,10 @@ public class Modpack {
 
 	public Date getReleaseDate() {
 		return releaseDate;
+	}
+	
+	public boolean isHidden() {
+		return hidden;
 	}
 
 	/**

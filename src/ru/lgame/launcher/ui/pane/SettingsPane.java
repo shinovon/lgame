@@ -83,6 +83,7 @@ public class SettingsPane extends JPanel {
 		});
 		
 		JButton showTeamBtn = new JButton("Обо мне");
+		showTeamBtn.setVisible(false);
 		panel.add(showTeamBtn);
 		//showTeamBtn.setVisible(false);
 		showTeamBtn.addActionListener(new ActionListener() {
@@ -95,7 +96,7 @@ public class SettingsPane extends JPanel {
 				final String[] c = new String[] {
 						"LGame Launcher",
 						"",
-						"Люди делающие его:",
+						"Люди которые делали его:",
 						" Арман Д. (@shinovon)",
 						"  Лид разработчик, Дизайн, Идея",
 						" Александр К. (@h4x4d)",
