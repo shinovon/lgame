@@ -95,6 +95,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	public static Process clientProcess;
 
+	private static int ids;
+
 	private Updater(Modpack m, Auth a, boolean b) {
 		this.modpack = m;
 		this.auth = a;
@@ -103,14 +105,14 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	
 	public static void start(Modpack m, Auth a) {
 		if(currentThread != null && currentThread.isAlive()) return;
-		currentThread = new Thread(new Updater(m, a, false));
+		currentThread = new Thread(new Updater(m, a, false), "Updater-" + (ids++));
 		currentThread.setPriority(9);
 		currentThread.start();
 	}
 	
 	public static void startForceUpdate(Modpack m, Auth a) {
 		if(currentThread != null && currentThread.isAlive()) return;
-		currentThread = new Thread(new Updater(m, a, true));
+		currentThread = new Thread(new Updater(m, a, true), "Updater-" + (ids++));
 		currentThread.setPriority(9);
 		currentThread.start();
 	}
@@ -944,7 +946,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	private boolean scriptedDownload(JSONArray j, String root, String temp) {
 		modpack.setUpdateInfo(null, Text.get("state.downloading"), -2);
-		WebUtils.setListener(this);
+		WebUtils httpClient = new WebUtils();
+		httpClient.setListener(this);
 		String p = root;
 		//String tp = temp;
 		//if(p.endsWith(File.separator)) p = p.substring(0, p.length() - 1);
@@ -1013,7 +1016,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					hideDownloadStatus = true;
 					JSONArray libraries = clientLibrariesJson.getJSONArray("libraries");
 					uiInfo("Скачивание библиотек");
-					MultiThreadedDownloader downloader = new MultiThreadedDownloader(3, libraries.length(), this, "Скачивание библиотек");
+					MultiThreadedDownloader downloader = new MultiThreadedDownloader(3, libraries.length(), this, "Скачивание библиотек", true);
 					for (Object i: libraries) {
 						JSONObject k = (JSONObject) i;
 						String path = k.getString("path");
@@ -1040,6 +1043,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 						//tasksDone++;
 					}
 					downloader.lock();
+					downloader.stop();
 					hideDownloadStatus = false;
 					tasksDone++;
 					continue;
@@ -1053,7 +1057,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					}
 					hideDownloadStatus = true;
 					uiInfo("Скачивание ассетов");
-					WebUtils.download(indexUrl, p + "assets" + File.separator + "indexes" + File.separator + o.getString("name"));
+					httpClient.download(indexUrl, p + "assets" + File.separator + "indexes" + File.separator + o.getString("name"));
 					JSONObject objects = clientAssetsJson.getJSONObject("objects");
 					/*
 					boolean b = true;
@@ -1087,7 +1091,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 						}
 					}
 					*/
-					MultiThreadedDownloader downloader = new MultiThreadedDownloader(5, objects.length(), this, "Скачивание ассетов");
+					MultiThreadedDownloader downloader = new MultiThreadedDownloader(8, objects.length(), this, "Скачивание ассетов", false);
 					for (String s: objects.keySet()) {
 						JSONObject k = objects.getJSONObject(s);
 						String hash = k.getString("hash");
@@ -1099,6 +1103,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 						}
 					}
 					downloader.lock();
+					downloader.stop();
 					hideDownloadStatus = false;
 					tasksDone++;
 					continue;
@@ -1117,7 +1122,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 						totalTasks += files.length();
 						//int downloadedFiles = 0;
 						//int totalFiles = files.length();
-						MultiThreadedDownloader downloader = new MultiThreadedDownloader(3, files.length(), this, "Скачивание Java");
+						MultiThreadedDownloader downloader = new MultiThreadedDownloader(3, files.length(), this, "Скачивание Java", true);
 						for(String key: files.keySet()) {
 							//downloadedFiles++;
 							File file = new File(Launcher.getLibraryDir()+"mojang_jre"+File.separator+mojang_jre+File.separator+getMojangJREPlatform()+File.separator + key);
@@ -1134,6 +1139,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 							//WebUtils.download(raw.getString("url"), file.getCanonicalPath());
 						}
 						downloader.lock();
+						downloader.stop();
 					}
 					hideDownloadStatus = false;
 					tasksDone++;
@@ -1147,7 +1153,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 				boolean b = true;
 				while(b) {
 					try {
-						WebUtils.download(url, dir);
+						httpClient.download(url, dir);
 						b = false;
 					} catch(IOException e) {
 						if(downloadFailCount > Config.getInt("downloadMaxAttempts")) throw e;

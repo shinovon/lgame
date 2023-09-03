@@ -43,7 +43,7 @@ public class Launcher {
 	
 	public static final String version = "1.0";
 	public static final String build_date = "-";
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 	
 	public static final String string_version = "v" + version;
 	private static final String title_add = "";
@@ -70,7 +70,7 @@ public class Launcher {
 
 	private boolean offline;
 
-	private Thread eventThread = new Thread() {
+	private Thread eventThread = new Thread("Event thread") {
 		public void run() {
 			while(true) {
 				if(queuedTasks.size() > 0) {

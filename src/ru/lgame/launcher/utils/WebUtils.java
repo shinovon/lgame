@@ -22,7 +22,7 @@ import ru.lgame.launcher.utils.logging.Log;
  * @author Shinovon
  */
 public class WebUtils {
-	private static final Runnable progressUpdRun = new Runnable() {
+	private final Runnable progressUpdRun = new Runnable() {
 		public void run() {
 			if(file == null) return;
 			if(listener == null) return;
@@ -33,20 +33,20 @@ public class WebUtils {
 		}
 	};
 
-	private static ProgressListener listener;
+	private ProgressListener listener;
 	
-	public static int downloaded;
-	public static int need;
-	private static String file;
+	public int downloaded;
+	public int need;
+	private String file;
 	private static String useragent = "Mozilla/5.0";
 
 	public static double speed;
 	
-	public static void setListener(ProgressListener p) {
+	public void setListener(ProgressListener p) {
 		listener = p;
 	}
 
-	public static void _downloadChannels(final String uri, final String fileName) throws IOException {
+	public void _downloadChannels(final String uri, final String fileName) throws IOException {
 		downloaded = 0;
 		need = 0;
 
@@ -60,7 +60,7 @@ public class WebUtils {
 		fileOutputStream.close();
 	}
 
-	public final static void download(String a, String b) throws IOException, InterruptedException {
+	public final void download(String a, String b) throws IOException, InterruptedException {
 		_download(a, b);
 	}
 	
@@ -69,30 +69,32 @@ public class WebUtils {
 		return (double) ((int) (d * pow)) / pow;
 	}
 
-	public final static void _download(String uri, String path)
+	public final void _download(String uri, String path)
 			throws IOException, InterruptedException {
 		File f = new File(path);
-		file = f.getName();
+		this.file = f.getName();
 		File d = f.getParentFile();
 		if(!d.exists()) d.mkdirs();
-		if(Thread.interrupted()) throw new InterruptedException("Thread.interrupted()");
-		if(listener != null)
-		downloaded = 0;
-		need = 0;
-		speed = 0;
-		Thread st = new Thread() {
-			public void run() {
-				int ld = downloaded;
-				try {
-					while(true) {
-						Thread.sleep(1000);
-						speed = round((downloaded - ld) / 1024D / 1024D);
-						ld = downloaded;
+		if(Thread.interrupted()) throw new InterruptedException("download");
+		Thread st = null;
+		if(listener != null) {
+			downloaded = 0;
+			need = 0;
+			speed = 0;
+			st = new Thread("DST "+file) {
+				public void run() {
+					int ld = downloaded;
+					try {
+						while(true) {
+							Thread.sleep(1000);
+							speed = round((downloaded - ld) / 1024D / 1024D);
+							ld = downloaded;
+						}
+					} catch (Exception e) {
 					}
-				} catch (Exception e) {
 				}
-			}
-		};
+			};
+		}
 		try {
 			HttpURLConnection con = getHttpConnection(uri);
 			//con.setRequestProperty("Accept-Encoding", "gzip");
@@ -112,7 +114,7 @@ public class WebUtils {
 			Log.info("Downloading: \"" + uri + "\" to \"" + path + "\", size: " + (need / 1024) + "k");
 			if(need == -1) Log.warn("Content-size unknown");
 			int i = 0;
-			st.start();
+			if(st != null) st.start();
 			if(listener != null) listener.startDownload(f.getName());
 			while ((read = in.read(buffer)) != -1) {
 				out.write(buffer, 0, read);
@@ -142,9 +144,9 @@ public class WebUtils {
 				}
 			}
 			if(listener != null) listener.downloadProgress(file, speed, 100, 0);
-			Log.debug("Size of " + path + " " + downloaded);
+			Log.debug("Size of " + file + " " + downloaded);
 			if(need != -1 && downloaded != need) Log.warn("Content-Size and actual file size does not match!! " + downloaded + " vs " + need + " needed");
-			st.interrupt();
+			if(st != null) st.interrupt();
 			in.close();
 			con.disconnect();
 			byte[] bytes = out.toByteArray();

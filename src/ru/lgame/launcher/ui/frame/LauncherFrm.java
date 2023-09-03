@@ -57,7 +57,7 @@ public class LauncherFrm extends JFrame implements WindowListener {
 		contentPane.setLayout(layout = new StackLayout());
 		setContentPane(contentPane);
 		addWindowListener(this);
-		repaintThread = new Thread() {
+		repaintThread = new Thread("UI repaint thread") {
 			public void run() {
 				try {
 					while(Launcher.running) {

@@ -18,12 +18,14 @@ public class MultiThreadedDownloader {
 	private int downloaded;
 	private int total;
 	private Exception exception;
+	private boolean listen;
 	
-	public MultiThreadedDownloader(int threads, int total, Updater updater, String text) {
+	public MultiThreadedDownloader(int threads, int total, Updater updater, String text, boolean listen) {
 		init(threads);
 		this.total = total;
 		this.updater = updater;
 		this.text = text;
+		this.listen = listen;
 	}
 
 	private class DownloadTask {
@@ -37,9 +39,13 @@ public class MultiThreadedDownloader {
 	
 	private class DownloadThread extends Thread {
 		private Stack<DownloadTask> tasks;
+		private WebUtils httpClient;
 		
 		DownloadThread(int i) {
+			super("DT-" + i);
 			tasks = tasksList.get(i);
+			httpClient = new WebUtils();
+			if(listen) httpClient.setListener(updater);
 		}
 		
 		public void run() {
@@ -52,7 +58,7 @@ public class MultiThreadedDownloader {
 							int attempts = 0;
 							while(!success) {
 								try {
-									WebUtils.download(task.url, task.dir);
+									httpClient.download(task.url, task.dir);
 									success = true;
 								} catch (IOException e) {
 									if(attempts >= 2) {
@@ -77,6 +83,11 @@ public class MultiThreadedDownloader {
 							}
 						}
 					} catch (InterruptedException e) {
+						Log.debug(getName() + " interrupted");
+						synchronized(waitLock) {
+							waitLock.notify();
+						}
+						return;
 					} catch (Exception e) {
 						Log.error("Error while multi threaded downloading", e);
 					}
@@ -99,6 +110,7 @@ public class MultiThreadedDownloader {
 	}
 	
 	public void stop() {
+		Log.debug("MTD stop");
 		for(Stack<DownloadTask> tasks: tasksList) {
 			tasks.clear();
 		}
