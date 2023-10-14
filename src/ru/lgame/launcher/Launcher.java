@@ -126,7 +126,7 @@ public class Launcher {
 		try {
 			AuthStore.init();
 		} catch (InvalidCredentialsException e) {
-			ErrorUI.showError(Text.get("title.accounts"), Text.get("msg.mojangtokenexpired"));
+		//	ErrorUI.showError(Text.get("title.accounts"), Text.get("msg.mojangtokenexpired"));
 		}
 		loadingFrame.setText(Text.get("loading.fetchingmodpacks"));
 		try {

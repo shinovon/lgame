@@ -377,7 +377,7 @@ public class LauncherPane extends JPanel {
 	 * Добавить сборку в список
 	 */
 	private void addModpack(MiniModpackPane sb) {
-		if(sb.getModpack().isHidden()) return;
+		if(sb.getModpack().isHidden() && !Launcher.DEBUG) return;
 		sb.setButtonGroup(bg);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridwidth = GridBagConstraints.REMAINDER;

@@ -78,7 +78,7 @@ public final class AuthStore {
 			String c = decodeAES1(new String(Base64.getDecoder().decode(x), "UTF-8"));
 			String[] sa = split(c, ":|:");
 			String type = sa[0];
-			//Log.debug("decoded descriptor: " + Arrays.toString(sa));
+			//Log.debug("decoded descriptor: " + java.util.Arrays.toString(sa));
 			String s = decodeAES2(sa[2]);
 			//Log.debug("decrypted auth data: " + s);
 			Auth a = null;

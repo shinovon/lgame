@@ -36,9 +36,6 @@ import java.awt.Color;
  */
 public class AccountsFrm extends JFrame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 5110118649257355719L;
 	
 	private JPanel contentPane;
@@ -89,20 +86,20 @@ public class AccountsFrm extends JFrame {
 		usernameField = new JTextField();
 		usernameField.setCaretColor(new Color(-1));
 		panel_7.add(usernameField);
-		usernameField.setMaximumSize(new Dimension(300, 2147483647));
+		usernameField.setMaximumSize(new Dimension(300, Integer.MAX_VALUE));
 		usernameField.setMinimumSize(new Dimension(120, 20));
 		usernameField.setPreferredSize(new Dimension(120, 20));
 		usernameField.setColumns(16);
 		
-		JLabel passwordLabel = new JLabel(Text.get("label.password"));
-		panel_7.add(passwordLabel);
+		//JLabel passwordLabel = new JLabel(Text.get("label.password"));
+		//panel_7.add(passwordLabel);
 		
 		passwordField = new JPasswordField();
 		passwordField.setCaretColor(new Color(-1));
-		panel_7.add(passwordField);
+		//panel_7.add(passwordField);
 		passwordField.setPreferredSize(new Dimension(120, 20));
 		passwordField.setMinimumSize(new Dimension(120, 20));
-		passwordField.setMaximumSize(new Dimension(300, 2147483647));
+		passwordField.setMaximumSize(new Dimension(300, Integer.MAX_VALUE));
 		passwordField.setColumns(16);
 		passwordField.setEnabled(false);
 		
@@ -124,10 +121,9 @@ public class AccountsFrm extends JFrame {
 				update();
 			}
 		});
-		panel_4.add(comboBox);
+		//panel_4.add(comboBox);
 		comboBox.setPreferredSize(new Dimension(134, 20));
 		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {Text.get("button.account.cracked"), Text.get("button.account.mojang")}));
-		
 		JPanel panel_5 = new JPanel();
 		accountPanel.add(panel_5, BorderLayout.SOUTH);
 		
@@ -138,20 +134,19 @@ public class AccountsFrm extends JFrame {
 		usernameField.setEnabled(false);
 		comboBox.setEnabled(false);
 		confirmBtn.setEnabled(false);
-		confirmBtn.addActionListener(new ActionListener() {
-			@SuppressWarnings("deprecation")
+		confirmBtn.addActionListener(new ActionListener() { // XXX: Mojang login disabled
 			public void actionPerformed(ActionEvent event) {
 				passwordField.setEnabled(false);
 				usernameField.setEnabled(false);
-				comboBox.setEnabled(false);
+				//comboBox.setEnabled(false);
 				confirmBtn.setEnabled(false);
 				try {
 					Auth a = null;
-					if(comboBox.getSelectedIndex() == 0) {
-						a = Auth.fromUsername(usernameField.getText());
-					} else {
-						a = Auth.fromMojang(usernameField.getText(), passwordField.getText());
-					}
+					//if(comboBox.getSelectedIndex() == 0) {
+					a = Auth.fromUsername(usernameField.getText());
+					//} else {
+					//	a = Auth.fromMojang(usernameField.getText(), passwordField.getText());
+					//}
 					AuthStore.add(a);
 					AuthStore.setSelected(a);
 				} catch (Throwable e) {
@@ -182,7 +177,7 @@ public class AccountsFrm extends JFrame {
 		            boolean cellHasFocus) {
 		    	if(value instanceof Auth) {
 		    		super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-		    		setText(((Auth) value).getUsername() + " (" + localizeType(((Auth) value).getType()) + ")");
+		    		setText(((Auth) value).getUsername() + (!((Auth) value).isCracked() ? " (" + localizeType(((Auth) value).getType()) + ")" : ""));
 		    	} else {
 		    		super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 		    	}
@@ -210,16 +205,16 @@ public class AccountsFrm extends JFrame {
 		addBtn.setPreferredSize(new Dimension(48, 23));
 		addBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(comboBox.getSelectedIndex() == 0) {
-					usernameLabel.setText(Text.get("label.username"));
-					passwordField.setEnabled(false);
-					usernameField.setEnabled(true);
-				} else {
-					usernameLabel.setText(Text.get("label.email"));
-					passwordField.setEnabled(true);
-					usernameField.setEnabled(true);
-				}
-				comboBox.setEnabled(true);
+				//if(comboBox.getSelectedIndex() == 0) {
+				usernameLabel.setText(Text.get("label.username"));
+				//passwordField.setEnabled(false);
+				usernameField.setEnabled(true);
+				//} else {
+				//	usernameLabel.setText(Text.get("label.email"));
+				//	passwordField.setEnabled(true);
+				//	usernameField.setEnabled(true);
+				//}
+				//comboBox.setEnabled(true);
 				confirmBtn.setEnabled(true);
 				update();
 			}
