@@ -38,7 +38,6 @@ import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.frame.LauncherFrm;
-import ru.lgame.launcher.ui.frame.LgameFrm;
 
 /**
  * @author Shinovon
@@ -87,7 +86,6 @@ public class SettingsPane extends JPanel {
 		panel.add(showTeamBtn);
 		//showTeamBtn.setVisible(false);
 		showTeamBtn.addActionListener(new ActionListener() {
-			private LgameFrm lgameFrame;
 
 			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent e) {

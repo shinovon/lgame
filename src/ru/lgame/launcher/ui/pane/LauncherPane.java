@@ -254,7 +254,7 @@ public class LauncherPane extends JPanel {
 			Config.set("username", usernameField.getText());
 			Config.saveLater();
 			if(usernameField.getText() == null || usernameField.getText().length() <= 4) {
-				JOptionPane.showMessageDialog(frm, "Введите никнейм", "", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(frm, Text.get("msg.nousername"), "", JOptionPane.WARNING_MESSAGE);
 				return;
 			}
 			if(forceUpdateCheck.isSelected()) 

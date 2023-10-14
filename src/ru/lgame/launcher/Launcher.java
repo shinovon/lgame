@@ -41,9 +41,9 @@ import static ru.lgame.launcher.utils.HashUtils.getMD5String;
  */
 public class Launcher {
 	
-	public static final String version = "1.1";
+	public static final String version = "1.2";
 	public static final String build_date = "-";
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	
 	public static final String string_version = "v" + version;
 	private static final String title_add = "";
@@ -138,7 +138,7 @@ public class Launcher {
 					offline = true;
 				} else {
 					if(e.getCause() != null && e.getCause() instanceof SSLHandshakeException) {
-						ErrorUI.showError(Text.get("title.launchererror"), "В Java нет нужных сертификатов, обновите ее!\nhttps://java.com/ru/download", e);			
+						ErrorUI.showError(Text.get("title.launchererror"), Text.get("err.ssl") + "\nhttps://java.com/ru/download", e);			
 					} else {
 						JOptionPane.showMessageDialog(loadingFrame, Text.get("msg.firststart"), "", JOptionPane.ERROR_MESSAGE, null);
 					}

@@ -7,7 +7,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -123,7 +122,7 @@ public class AccountsFrm extends JFrame {
 		});
 		//panel_4.add(comboBox);
 		comboBox.setPreferredSize(new Dimension(134, 20));
-		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {Text.get("button.account.cracked"), Text.get("button.account.mojang")}));
+		//comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {Text.get("button.account.cracked"), Text.get("button.account.mojang")}));
 		JPanel panel_5 = new JPanel();
 		accountPanel.add(panel_5, BorderLayout.SOUTH);
 		

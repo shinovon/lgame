@@ -546,17 +546,17 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		currentInst = this;
 		running = true;
 		updating = true;
-		modpack.setUpdateInfo(repeated ? Text.get("state.updating") : "Сбор информации", repeated ? "Проверка правильности установки" : "Проверка установки", 0);
+		modpack.setUpdateInfo(repeated ? Text.get("state.updating") : Text.get("state.updatestart"), repeated ? Text.get("state.updaterepeatcheck") : Text.get("state.installationcheck"), 0);
 		int modpackState = forceUpdate ? 3 : checkInstalled(modpack) ? -100 : 0;
 		stat("run");
 		try {
-			modpack.setUpdateInfo(null, "Получение дескриптора запуска клиента", 15);
+			modpack.setUpdateInfo(null, Text.get("state.clientstartjson"), 15);
 			clientStartJson = modpack.getClientStartJson(modpackState == 0 || forceUpdate);
 			if(clientStartJson == null) {
 				if(modpackState == 0 || forceUpdate)
-					updateFatalError("Нет подключения к интернету или сервер не отвечает!", 0, Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
+					updateFatalError(Text.get("err.offline"), 0, Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
 				else
-					updateFatalError("Файл дескриптора запуска клиента отсутсвует! Без него игра в оффлайн режиме невозможна!", 0, Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
+					updateFatalError(Text.get("err.nostartjson"), 0, Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
 				return;
 			}
 			clientAssetIndex = clientStartJson.getString("asset_index");
@@ -568,9 +568,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			if(clientStartJson.has("jvm_args")) {
 				clientJvmArgs = clientStartJson.getJSONArray("jvm_args").toList().toArray(new String[0]);
 			}
-			modpack.setUpdateInfo(null, "Скачивание конфигурации сборки", 33);
+			modpack.setUpdateInfo(null, Text.get("state.modpackupdatejson"), 33);
 			json = modpack.getUpdateJson(true);
-			modpack.setUpdateInfo(null, "Скачивание конфигурации клиента", 67);
+			modpack.setUpdateInfo(null, Text.get("state.clientupdatejson"), 67);
 			clientJson = modpack.getClientUpdateJson(true);
 			try {
 				if(clientJson.getJSONObject("integrity_check").getJSONObject("libraries").optBoolean("new_libraries")) {
@@ -605,17 +605,17 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			}
 		} catch (LauncherOfflineException e) {
 			if(modpackState == 0 || forceUpdate) {
-				updateFatalError("Нет подключения к интернету или сервер не отвечает!", e.getCause(), Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
+				updateFatalError(Text.get("err.offline"), e.getCause(), Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
 				return;
 			}
 		} catch (IOException e) {
 			if(modpackState == 0 || forceUpdate) {
-				updateFatalError("Нет подключения к интернету или сервер не отвечает!", e, Errors.UPDATER_RUN_GETUPDATEJSON_IOEXCEPTION);
+				updateFatalError(Text.get("err.offline"), e, Errors.UPDATER_RUN_GETUPDATEJSON_IOEXCEPTION);
 				return;
 			}
 		} catch (JSONException e) {
 			if(modpackState == 0 || forceUpdate) {
-				updateFatalError("Ошибка парса", e, Errors.UPDATER_RUN_GETUPDATEJSON_JSONEXCEPTION);
+				updateFatalError(Text.get("err.parse"), e, Errors.UPDATER_RUN_GETUPDATEJSON_JSONEXCEPTION);
 				return;
 			}
 		}
@@ -626,20 +626,20 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			interrupted();
 			return;
 		}
-		modpack.setUpdateInfo("Проверка установки", "Проверка целостности клиента", 0);
+		modpack.setUpdateInfo(Text.get("state.installationcheck"), Text.get("state.clientintegritycheck"), 0);
 		//boolean packInstalled = modpackState != 0;
 		boolean clientInstalled = checkClientInstalled();
-		modpack.setUpdateInfo(null, "Проверка наличия обновлений клиента", 25);
+		modpack.setUpdateInfo(null, Text.get("state.clientupdatecheck"), 25);
 		boolean clientNeedsUpdate = false;
 		try {
 			clientNeedsUpdate = checkClientNeedUpdate();
 		} catch (LauncherOfflineException e) {
 			offline = true;
 		} catch (Exception e1) {
-			updateFatalError("Ошибка проверки клиента", e1, Errors.UPDATER_RUN_CHECKCLIENT_EXCEPTION);
+			updateFatalError(Text.get("err.clientupdatecheck"), e1, Errors.UPDATER_RUN_CHECKCLIENT_EXCEPTION);
 			return;
 		}
-		modpack.setUpdateInfo(null, "Проверка целостности сборки", 50);
+		modpack.setUpdateInfo(null, Text.get("state.modpackintegritycheck"), 50);
 		//сбросить кэшированное состояние сборки
 		modpack.getStateRst();
 		if(modpackState == -100) {
@@ -650,13 +650,13 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			try {
 				if(!checkModpackIntegrity(modpack, json)) modpackState = 3;
 				else {
-					modpack.setUpdateInfo(null, "Проверка наличия обновлений сборки", 75);
+					modpack.setUpdateInfo(null, Text.get("state.updatesavailablecheck"), 75);
 					if(checkUpdatesAvailable(modpack)) modpackState = 2;
 				}
 			} catch (LauncherOfflineException e) {
 				offline = true;
 			} catch (Exception e) {
-				updateFatalError("Ошибка проверки сборки", e, Errors.UPDATER_RUN_CHECKMODPACK_EXCEPTION);
+				updateFatalError(Text.get("err.modpackcheck"), e, Errors.UPDATER_RUN_CHECKMODPACK_EXCEPTION);
 				return;
 			}
 		}
@@ -668,7 +668,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			return;
 		}
 		Log.info("install state: " + modpackState);
-		modpack.setUpdateInfo(Text.get("state.updating"), "Инициализация системы обновления", 0);
+		modpack.setUpdateInfo(Text.get("state.updating"), Text.get("stater.updaterinit"), 0);
 		// обнова либо старт сборки
 		boolean ret = !repeated;
 		switch(modpackState) {
@@ -690,7 +690,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			try {
 				startClient();
 			} catch (Exception e) {
-				clientError("Запуск не удался", e);
+				clientError(Text.get("err.clientstartfail"), e);
 				return;
 			}
 			ret = false;
@@ -725,7 +725,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		}
 		}
 		if(ret && !failed) {
-			modpack.setUpdateInfo(Text.get("state.updating"), "Повторная инициализация системы обновления", 100);
+			modpack.setUpdateInfo(Text.get("state.updating"), Text.get("state.updaterinitrepeat"), 100);
 			Log.info("Updater repeat");
 			reset();
 			repeated = true;
@@ -1344,7 +1344,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			ps.append("\nLOG END\n");
 			Log.info("Client exit code: " + exitCode);
 			if (exitCode == 1 || exitCode == -1) {
-				clientError("Клиент аварийно завершился! Код: " + exitCode);
+				clientError(Text.get("err.clientexitcode") + " " + exitCode);
 			}
 			input.interrupt();
 			error.interrupt();
@@ -1435,40 +1435,40 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 			x = "Возможное решение:\nОшибка несовместимости Forge с версией Java!!\nИспользуйте версию Java 8\n" + x;
 		}
 		*/
-		ErrorUI.clientError(Text.get("title.clienterror", "Ошибка клиента"), s, x);	
+		ErrorUI.clientError(Text.get("title.clienterror"), s, x);	
 	}
 
 	private void clientError(String s, Throwable t) {
 		String e = Log.exceptionToString(t);
-		ErrorUI.clientError(Text.get("title.clienterror", "Ошибка клиента"), s, s + "\n" + e);	
+		ErrorUI.clientError(Text.get("title.clienterror"), s, s + "\n" + e);	
 	}
 
 	private void updateFatalError(String s, Throwable t, int i) {
 		String e = Log.exceptionToString(t);
-		ErrorUI.showError(Text.get("title.updateerror", "Ошибка обновления"), s + " (Код ошибки: "  + Errors.toHexString(i) + ")", s + " (Код ошибки: " + Errors.toHexString(i) + ")\n" + e);	
+		ErrorUI.showError(Text.get("title.updateerror"), s + " (" + Text.get("err.code") + ": "  + Errors.toHexString(i) + ")", s + " (" + Text.get("err.code") + ": " + Errors.toHexString(i) + ")\n" + e);	
 		updateFatalError();
 	}
 
 	private void updateFatalError(String s, String s2, int i) {
-		ErrorUI.showError(Text.get("title.updateerror", "Ошибка обновления"), s, s + ": " + s2 + " (Код ошибки: " +  Errors.toHexString(i) + ")");
+		ErrorUI.showError(Text.get("title.updateerror"), s, s + ": " + s2 + " (" + Text.get("err.code") + ": " +  Errors.toHexString(i) + ")");
 		updateFatalError();
 	}
 
 	private void updateFatalError(String s, int i1, int i2) {
 		String e = Log.getTraceString(2);
-		ErrorUI.showError(Text.get("title.updateerror", "Ошибка обновления"), s, s + ": " + Errors.toHexString(i1) + " (Код ошибки: " + Errors.toHexString(i2) + ")\n" + e);
+		ErrorUI.showError(Text.get("title.updateerror"), s, s + ": " + Errors.toHexString(i1) + " (" + Text.get("err.code") + ": " + Errors.toHexString(i2) + ")\n" + e);
 		updateFatalError();
 	}
 
 	private void updateFatalError(String s, String s2) {
-		ErrorUI.showError(Text.get("title.updateerror", "Ошибка обновления"), s, s2);
+		ErrorUI.showError(Text.get("title.updateerror"), s, s2);
 		updateFatalError();
 	}
 
 	private void fatalError(String s) {
 		Log.error(s);
 		String e = Log.exceptionToString(new Exception());
-		ErrorUI.showError(Text.get("title.updateerror", "Ошибка обновления"), s, e);
+		ErrorUI.showError(Text.get("title.updateerror"), s, e);
 		updateFatalError();
 	}
 	
@@ -1491,14 +1491,15 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 	private static String path(String s) {
 		return s.replace("/", File.separator);
 	}
+	
 	@Override
 	public void startZip(String zipFile) {
-		uiInfo(null, "Упаковка: " + currentUnzipFile + " (%)", percentD(0), null);
+		uiInfo(null, Text.get("state.zipping") + ": " + currentUnzipFile + " (%)", percentD(0), null);
 	}
 
 	@Override
 	public void doneZip(String zipFile) {
-		uiInfo(null, "Упаковка: " + currentUnzipFile + " (100%)", percentD(1), null);
+		uiInfo(null, Text.get("state.zipping") + ": " + currentUnzipFile + " (100%)", percentD(1), null);
 	}
 
 	@Override
@@ -1521,7 +1522,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		if(hideDownloadStatus) {
 			return;
 		}
-		uiInfo(null, "Скачивание: " +  filename + " (0%)", percentD(0), null);
+		uiInfo(null, Text.get("state.downloading") + ": " +  filename + " (0%)", percentD(0), null);
 	}
 	
 	int avgcounter;
