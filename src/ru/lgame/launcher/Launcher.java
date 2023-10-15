@@ -42,11 +42,9 @@ import static ru.lgame.launcher.utils.HashUtils.getMD5String;
 public class Launcher {
 	
 	public static final String version = "1.2";
-	public static final String build_date = "-";
 	public static final boolean DEBUG = false;
 	
 	public static final String string_version = "v" + version;
-	private static final String title_add = "";
 	
 	private static final String LAUNCHER_JSON_URL = "https://nnp.nnchan.ru/lgame/launcher.json";
 
@@ -461,7 +459,10 @@ public class Launcher {
 	}
 
 	public static String getFrmTitle() {
-		return "LGame Launcher" + title_add;
+		if(DEBUG) {
+			return "LGame Launcher debug";
+		}
+		return "LGame Launcher";
 	}
 
 	public LoggerFrm loggerFrame() {
