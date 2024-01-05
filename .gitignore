@@ -11,3 +11,4 @@ bin
 .classpath
 obf
 web files
+*.jar
