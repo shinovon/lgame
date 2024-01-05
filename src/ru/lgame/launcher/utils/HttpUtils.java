@@ -9,9 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.security.MessageDigest;
 import java.util.zip.GZIPInputStream;
 
@@ -21,7 +18,8 @@ import ru.lgame.launcher.utils.logging.Log;
 /**
  * @author Shinovon
  */
-public class WebUtils {
+public class HttpUtils {
+	
 	private final Runnable progressUpdRun = new Runnable() {
 		public void run() {
 			if(file == null) return;
@@ -45,32 +43,13 @@ public class WebUtils {
 	public void setListener(ProgressListener p) {
 		listener = p;
 	}
-
-	public void _downloadChannels(final String uri, final String fileName) throws IOException {
-		downloaded = 0;
-		need = 0;
-
-		final URL url = new URL(uri);
-		ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
-
-		FileOutputStream fileOutputStream = new FileOutputStream(fileName);
-		FileChannel fileChannel = fileOutputStream.getChannel();
-		fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-		fileChannel.close();
-		fileOutputStream.close();
-	}
-
-	public final void download(String a, String b) throws IOException, InterruptedException {
-		_download(a, b);
-	}
 	
 	private static double round(double d) {
 		double pow = 100;
 		return (double) ((int) (d * pow)) / pow;
 	}
 
-	public final void _download(String uri, String path)
-			throws IOException, InterruptedException {
+	public final void download(String uri, String path) throws IOException, InterruptedException {
 		File f = new File(path);
 		this.file = f.getName();
 		File d = f.getParentFile();
@@ -100,7 +79,7 @@ public class WebUtils {
 			//con.setRequestProperty("Accept-Encoding", "gzip");
 			con.setRequestMethod("GET");
 			con.setConnectTimeout(10000);
-			con.setReadTimeout(20000);
+			con.setReadTimeout(30000);
 			con.setDoInput(true);
 			con.connect();
 			int res = con.getResponseCode();
@@ -172,7 +151,7 @@ public class WebUtils {
 
 	public static int getHttpContentLength(String url) throws IOException {
 		HttpURLConnection con = getHttpConnection(url);
-		con.setRequestMethod("GET");
+		con.setRequestMethod("HEAD");
 		con.connect();
 		int i = con.getContentLength();
 		con.disconnect();
@@ -181,7 +160,7 @@ public class WebUtils {
 
 	public static String getHttpContentType(String url) throws IOException {
 		HttpURLConnection con = getHttpConnection(url);
-		con.setRequestMethod("GET");
+		con.setRequestMethod("HEAD");
 		con.connect();
 		String s = con.getContentType();
 		con.disconnect();
@@ -198,7 +177,8 @@ public class WebUtils {
 		con.setRequestProperty("User-UID", getHWID());
 		return con;
 	}
-	public  static String getHWID() {
+	
+	public static String getHWID() {
         try {
             String s = System.getenv("COMPUTERNAME") + System.getProperty("user.name") + System.getenv("PROCESSOR_IDENTIFIER") + System.getenv("PROCESSOR_LEVEL");
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -233,10 +213,6 @@ public class WebUtils {
 
 	public final static String get(final String url) throws IOException {
 		return new String(getBytes(url), "UTF-8");
-	}
-
-	public static String getс(String url) throws IOException {
-		return get(url).replace(" ", "").replace("\r", "").replace("\n", "");
 	}
 	
 	public interface ProgressListener {

@@ -33,11 +33,11 @@ import org.json.JSONObject;
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.auth.Auth;
-import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.Fonts;
 import ru.lgame.launcher.ui.frame.LauncherFrm;
+import ru.lgame.launcher.ui.locale.Text;
 import ru.lgame.launcher.update.Modpack;
-import ru.lgame.launcher.utils.WebUtils;
+import ru.lgame.launcher.utils.HttpUtils;
 import ru.lgame.launcher.utils.logging.Log;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
@@ -280,7 +280,7 @@ public class LauncherPane extends JPanel {
 						if(uuid == null) {
 							String cv = Launcher.inst.getValueFromCache(username.toLowerCase() + "_uuid");
 							if(cv == null) {
-								String s = WebUtils.get("https://api.mojang.com/users/profiles/minecraft/" + username + "?at=" + (System.currentTimeMillis() / 1000L));
+								String s = HttpUtils.get("https://api.mojang.com/users/profiles/minecraft/" + username + "?at=" + (System.currentTimeMillis() / 1000L));
 								if(s == null || s == "" || s.length() < 2 || s.charAt(0) != '{') {
 									skinName = username;
 									skinState = true;
@@ -304,7 +304,7 @@ public class LauncherPane extends JPanel {
 							skinState = true;
 						}
 						try {
-							byte[] b = WebUtils.getBytes(url);
+							byte[] b = HttpUtils.getBytes(url);
 							BufferedImage img = (BufferedImage) ImageIO.read(new ByteArrayInputStream(b));
 							Launcher.inst.saveImageToCachePng(url, img);
 							skinImageLabel.setIcon(new ImageIcon(img));
@@ -376,6 +376,7 @@ public class LauncherPane extends JPanel {
 	/**
 	 * Добавить сборку в список
 	 */
+	@SuppressWarnings("unused")
 	private void addModpack(MiniModpackPane sb) {
 		if(sb.getModpack().isHidden() && !Launcher.DEBUG) return;
 		sb.setButtonGroup(bg);

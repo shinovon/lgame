@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
 
-import ru.lgame.launcher.utils.WebUtils;
+import ru.lgame.launcher.utils.HttpUtils;
 import ru.lgame.launcher.utils.logging.Log;
 
 public class MultiThreadedDownloader {
@@ -39,12 +39,12 @@ public class MultiThreadedDownloader {
 	
 	private class DownloadThread extends Thread {
 		private Stack<DownloadTask> tasks;
-		private WebUtils httpClient;
+		private HttpUtils httpClient;
 		
 		DownloadThread(int i) {
 			super("DT-" + i);
 			tasks = tasksList.get(i);
-			httpClient = new WebUtils();
+			httpClient = new HttpUtils();
 			if(listen) httpClient.setListener(updater);
 		}
 		

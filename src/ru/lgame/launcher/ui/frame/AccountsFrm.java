@@ -25,8 +25,9 @@ import javax.swing.event.ListSelectionListener;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.auth.AuthStore;
-import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.ErrorUI;
+import ru.lgame.launcher.ui.locale.Text;
+
 import java.awt.Color;
 
 /**

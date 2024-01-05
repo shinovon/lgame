@@ -25,8 +25,8 @@ import javax.swing.event.ChangeListener;
 
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
-import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.Fonts;
+import ru.lgame.launcher.ui.locale.Text;
 import ru.lgame.launcher.update.Modpack;
 
 import static ru.lgame.launcher.ui.Fonts.*;

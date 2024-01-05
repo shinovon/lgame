@@ -18,7 +18,7 @@ import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 
 import ru.lgame.launcher.Launcher;
-import ru.lgame.launcher.locale.Text;
+import ru.lgame.launcher.ui.locale.Text;
 import ru.lgame.launcher.utils.logging.Log;
 
 /**

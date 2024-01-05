@@ -22,16 +22,16 @@ import com.mojang.authlib.exceptions.InvalidCredentialsException;
 
 import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.auth.AuthStore;
-import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.ErrorUI;
 import ru.lgame.launcher.ui.frame.AccountsFrm;
 import ru.lgame.launcher.ui.frame.LauncherFrm;
 import ru.lgame.launcher.ui.frame.LoadingFrm;
 import ru.lgame.launcher.ui.frame.LoggerFrm;
+import ru.lgame.launcher.ui.locale.Text;
 import ru.lgame.launcher.update.Modpack;
 import ru.lgame.launcher.update.Updater;
 import ru.lgame.launcher.utils.FileUtils;
-import ru.lgame.launcher.utils.WebUtils;
+import ru.lgame.launcher.utils.HttpUtils;
 import ru.lgame.launcher.utils.logging.Log;
 
 import static ru.lgame.launcher.utils.HashUtils.getMD5String;
@@ -203,7 +203,7 @@ public class Launcher {
 	 * Попытаться загрузить launcher.json с сервера
 	 */
 	private void loadModpacksFromServer() throws IOException {
-		String s = WebUtils.get(LAUNCHER_JSON_URL);
+		String s = HttpUtils.get(LAUNCHER_JSON_URL);
 		FileUtils.writeString(new File(getCacheDir() + "launcher.json"), s);
 		parseLauncherJson(s);
 	}
@@ -505,7 +505,7 @@ public class Launcher {
 		new Thread() {
 			public void run() {
 				try {
-					WebUtils.postReq("https://nnp.nnchan.ru/lgame/api.php", o.toString());
+					HttpUtils.postReq("https://nnp.nnchan.ru/lgame/api.php", o.toString());
 				} catch (IOException e) {
 				}
 			}

@@ -16,7 +16,7 @@ import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.ui.pane.MiniModpackPane;
 import ru.lgame.launcher.utils.FileUtils;
 import ru.lgame.launcher.utils.LauncherOfflineException;
-import ru.lgame.launcher.utils.WebUtils;
+import ru.lgame.launcher.utils.HttpUtils;
 import ru.lgame.launcher.utils.logging.Log;
 
 /**
@@ -202,19 +202,19 @@ public class Modpack {
 	}
 	
 	public JSONObject getUpdateJson() throws IOException {
-		if(updateJson == null) updateJson = new JSONObject(WebUtils.get(update_data));
+		if(updateJson == null) updateJson = new JSONObject(HttpUtils.get(update_data));
 		return updateJson;
 	}
 	
 	public JSONObject getClientUpdateJson() throws IOException {
-		if(clientUpdateJson == null) clientUpdateJson = new JSONObject(WebUtils.get(client_update_data));
+		if(clientUpdateJson == null) clientUpdateJson = new JSONObject(HttpUtils.get(client_update_data));
 		return clientUpdateJson;
 	}
 	
 	public JSONObject getClientStartJson() {
 		if(clientStartJson == null) {
 			try {
-				clientStartJson = new JSONObject(WebUtils.get(client_start_data));
+				clientStartJson = new JSONObject(HttpUtils.get(client_start_data));
 			} catch (IOException e) {
 				try {
 					clientStartJson = new JSONObject(FileUtils.getString(getClientDir() + "start.json"));
@@ -227,13 +227,13 @@ public class Modpack {
 
 	public JSONObject getUpdateJson(boolean b) throws IOException {
 		if(b == false) return getUpdateJson();
-		return updateJson = new JSONObject(WebUtils.get(update_data));
+		return updateJson = new JSONObject(HttpUtils.get(update_data));
 	}
 	
 	public JSONObject getClientStartJson(boolean b) {
 		if(b == false) return getClientStartJson();
 		try {
-			return clientStartJson = new JSONObject(WebUtils.get(client_start_data));
+			return clientStartJson = new JSONObject(HttpUtils.get(client_start_data));
 		} catch (IOException e) {
 			throw new LauncherOfflineException(e);
 		}
@@ -241,7 +241,7 @@ public class Modpack {
 	
 	public JSONObject getClientUpdateJson(boolean b) throws IOException {
 		if(b == false) return getClientUpdateJson();
-		return clientUpdateJson = new JSONObject(WebUtils.get(client_update_data));
+		return clientUpdateJson = new JSONObject(HttpUtils.get(client_update_data));
 	}
 	
 	public String getClientDir() {
@@ -255,7 +255,7 @@ public class Modpack {
 	public JSONObject getClientLibrariesJson() {
 		if(clientLibrariesJson == null) {
 			try {
-				clientLibrariesJson = new JSONObject(WebUtils.get(client_libraries_data));
+				clientLibrariesJson = new JSONObject(HttpUtils.get(client_libraries_data));
 			} catch (IOException e) {
 				try {
 					clientLibrariesJson = new JSONObject(FileUtils.getString(getClientDir() + "libraries.json"));

@@ -15,12 +15,8 @@ public class Errors {
 	public static final int UPDATER_SCRIPTEDUNZIP_UNZIP = 1008;
 	public static final int UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION = 1009;
 	
-	public static String toHexString(int i) {
-		String s = Integer.toHexString(i);
-		while(s.length() < 8) {
-			s = "0" + s;
-		}
-		return "0x" + s;
+	public static String toString(int i) {
+		return Integer.toString(i);
 	}
 
 }

@@ -19,8 +19,8 @@ import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Errors;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.auth.Auth;
-import ru.lgame.launcher.locale.Text;
 import ru.lgame.launcher.ui.ErrorUI;
+import ru.lgame.launcher.ui.locale.Text;
 import ru.lgame.launcher.utils.FileUtils;
 import ru.lgame.launcher.utils.HashUtils;
 import ru.lgame.launcher.utils.LauncherOfflineException;
@@ -28,13 +28,13 @@ import ru.lgame.launcher.utils.ZipUtils;
 import ru.lgame.launcher.utils.logging.ClientLog;
 import ru.lgame.launcher.utils.logging.InputStreamCopier;
 import ru.lgame.launcher.utils.logging.Log;
-import ru.lgame.launcher.utils.WebUtils;
+import ru.lgame.launcher.utils.HttpUtils;
 
 /**
  * Система обновления
  * @author Shinovon
  */
-public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUtils.ProgressListener {
+public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpUtils.ProgressListener {
 	
 	private static Updater currentInst;
 
@@ -589,7 +589,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					clientNewAssets = true;
 					Log.info("client uses new assets");
 					if(clientAssetsJson == null) {
-						clientAssetsJson = new JSONObject(WebUtils.get((clientJson.getJSONObject("integrity_check").getJSONObject("assets").getString("url"))));
+						clientAssetsJson = new JSONObject(HttpUtils.get((clientJson.getJSONObject("integrity_check").getJSONObject("assets").getString("url"))));
 						//totalTasks += clientAssetsJson.getJSONObject("objects").length();
 					}
 				}
@@ -946,7 +946,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	private boolean scriptedDownload(JSONArray j, String root, String temp) {
 		modpack.setUpdateInfo(null, Text.get("state.downloading"), -2);
-		WebUtils httpClient = new WebUtils();
+		HttpUtils httpClient = new HttpUtils();
 		httpClient.setListener(this);
 		String p = root;
 		//String tp = temp;
@@ -1052,7 +1052,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					clientNewAssets = true;
 					String indexUrl = o.getString("url");
 					if(clientAssetsJson == null) {
-						clientAssetsJson = new JSONObject(WebUtils.get(indexUrl));
+						clientAssetsJson = new JSONObject(HttpUtils.get(indexUrl));
 						totalTasks += clientAssetsJson.getJSONObject("objects").length();
 					}
 					hideDownloadStatus = true;
@@ -1112,12 +1112,12 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 					hideDownloadStatus = true;
 					uiInfo("Скачивание Java");
 					String allUrl = o.getString("url");
-					JSONObject allJson = new JSONObject(WebUtils.get(allUrl));
+					JSONObject allJson = new JSONObject(HttpUtils.get(allUrl));
 					JSONObject platform = allJson.getJSONObject(getMojangJREPlatform());
 					JSONObject jre = platform.getJSONArray(mojang_jre).optJSONObject(0);
 					if(jre != null) {
 						String manifestUrl = jre.getJSONObject("manifest").getString("url");
-						JSONObject manifestJson = new JSONObject(WebUtils.get(manifestUrl));
+						JSONObject manifestJson = new JSONObject(HttpUtils.get(manifestUrl));
 						JSONObject files = manifestJson.getJSONObject("files");
 						totalTasks += files.length();
 						//int downloadedFiles = 0;
@@ -1179,12 +1179,12 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 		}
 		String allUrl = clientJson.getJSONObject("integrity_check").getJSONObject("mojang_jre").getString("url");
 		try {
-			JSONObject allJson = new JSONObject(WebUtils.get(allUrl));
+			JSONObject allJson = new JSONObject(HttpUtils.get(allUrl));
 			JSONObject platform = allJson.getJSONObject(getMojangJREPlatform());
 			JSONObject jre = platform.getJSONArray(mojang_jre).optJSONObject(0);
 			if(jre != null) {
 				String manifestUrl = jre.getJSONObject("manifest").getString("url");
-				JSONObject manifestJson = new JSONObject(WebUtils.get(manifestUrl));
+				JSONObject manifestJson = new JSONObject(HttpUtils.get(manifestUrl));
 				JSONObject files = manifestJson.getJSONObject("files");
 				for(String key: files.keySet()) {
 					File file = new File(p + key);
@@ -1445,18 +1445,18 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, WebUt
 
 	private void updateFatalError(String s, Throwable t, int i) {
 		String e = Log.exceptionToString(t);
-		ErrorUI.showError(Text.get("title.updateerror"), s + " (" + Text.get("err.code") + ": "  + Errors.toHexString(i) + ")", s + " (" + Text.get("err.code") + ": " + Errors.toHexString(i) + ")\n" + e);	
+		ErrorUI.showError(Text.get("title.updateerror"), s + " (" + Text.get("err.code") + ": "  + Errors.toString(i) + ")", s + " (" + Text.get("err.code") + ": " + Errors.toString(i) + ")\n" + e);	
 		updateFatalError();
 	}
 
 	private void updateFatalError(String s, String s2, int i) {
-		ErrorUI.showError(Text.get("title.updateerror"), s, s + ": " + s2 + " (" + Text.get("err.code") + ": " +  Errors.toHexString(i) + ")");
+		ErrorUI.showError(Text.get("title.updateerror"), s, s + ": " + s2 + " (" + Text.get("err.code") + ": " +  Errors.toString(i) + ")");
 		updateFatalError();
 	}
 
 	private void updateFatalError(String s, int i1, int i2) {
 		String e = Log.getTraceString(2);
-		ErrorUI.showError(Text.get("title.updateerror"), s, s + ": " + Errors.toHexString(i1) + " (" + Text.get("err.code") + ": " + Errors.toHexString(i2) + ")\n" + e);
+		ErrorUI.showError(Text.get("title.updateerror"), s, s + ": " + Errors.toString(i1) + " (" + Text.get("err.code") + ": " + Errors.toString(i2) + ")\n" + e);
 		updateFatalError();
 	}
 
