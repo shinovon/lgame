@@ -37,7 +37,6 @@ import ru.lgame.launcher.utils.HttpUtils;
 public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpUtils.ProgressListener {
 	
 	private static Updater currentInst;
-
 	private static Thread currentThread;
 
 	private boolean running;
@@ -55,47 +54,43 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 	private JSONObject clientAssetsJson;
 
 	private boolean forceUpdate;
-
 	private boolean updating;
-
 	private boolean failed;
-
-	private String clientMainClass;
-	private String[] clientTweakClasses;
-	private String clientAssetIndex;
-
-	private String currentUnzipFile;
-
 	private boolean repeated;
-
-	public boolean clientStarted;
+	private boolean offline;
 
 	protected int tasksDone;
 	private int totalTasks;
-
-	private boolean offline;
-
-	private JSONObject clientStartJson;
-
-	private float avgspeed;
-
+	
 	private int downloadFailCount;
 
+	public boolean clientStarted;
+
+	private JSONObject clientStartJson;
+	private String clientMainClass;
+	private String clientAssetIndex;
+	private String[] clientTweakClasses;
+	private String[] clientJvmArgs;
 	private String[] clientExtraArgs;
 
-	private int totalAssets;
+	private String currentUnzipFile;
 
+	private int totalAssets;
 	private int downloadedAssets;
 
 	private boolean hasMojangJre;
+	private String mojang_jre;
 
 	private boolean hideDownloadStatus;
 
-	private String[] clientJvmArgs;
-
 	public static Process clientProcess;
 
-	private static int ids;
+	private static int count;
+	
+	// счетчик скорости
+	private float avgspeed;
+	int avgcounter;
+	float avgsum;
 
 	private Updater(Modpack m, Auth a, boolean b) {
 		this.modpack = m;
@@ -105,14 +100,14 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 	
 	public static void start(Modpack m, Auth a) {
 		if(currentThread != null && currentThread.isAlive()) return;
-		currentThread = new Thread(new Updater(m, a, false), "Updater-" + (ids++));
+		currentThread = new Thread(new Updater(m, a, false), "Updater-" + (++count));
 		currentThread.setPriority(9);
 		currentThread.start();
 	}
 	
 	public static void startForceUpdate(Modpack m, Auth a) {
 		if(currentThread != null && currentThread.isAlive()) return;
-		currentThread = new Thread(new Updater(m, a, true), "Updater-" + (ids++));
+		currentThread = new Thread(new Updater(m, a, true), "Updater-" + (++count));
 		currentThread.setPriority(9);
 		currentThread.start();
 	}
@@ -634,6 +629,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		try {
 			clientNeedsUpdate = checkClientNeedUpdate();
 		} catch (LauncherOfflineException e) {
+			Log.warn("can't check client in offline mode");
 			offline = true;
 		} catch (Exception e1) {
 			updateFatalError(Text.get("err.clientupdatecheck"), e1, Errors.UPDATER_RUN_CHECKCLIENT_EXCEPTION);
@@ -654,6 +650,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 					if(checkUpdatesAvailable(modpack)) modpackState = 2;
 				}
 			} catch (LauncherOfflineException e) {
+				Log.warn("can't check modpack in offline mode");
 				offline = true;
 			} catch (Exception e) {
 				updateFatalError(Text.get("err.modpackcheck"), e, Errors.UPDATER_RUN_CHECKMODPACK_EXCEPTION);
@@ -732,6 +729,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			run();
 			return;
 		}
+		Log.info("updater finished");
 		reset();
 		Launcher.inst.frame().mainPane().update();
 	}
@@ -771,7 +769,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			if(download == null || scriptedDownload(download, p, t)) {
 				if(unzip == null || scriptedUnzip(unzip, p, t)) {
 					if(post != null) scriptedPost(post, p, t);
-					clientVersionFile();
+					writeClientInfo();
 					return true;
 				} else {
 					updateFatalError();
@@ -810,7 +808,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		if(download == null || scriptedDownload(download, p, t)) {
 			if(unzip == null || scriptedUnzip(unzip, p, t)) {
 				if(post != null) scriptedPost(post, p, t);
-				clientVersionFile();
+				writeClientInfo();
 			} else {
 				fail = true;
 				updateFatalError();
@@ -840,7 +838,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			if(download == null || scriptedDownload(download, p, t)) {
 				if(unzip == null || scriptedUnzip(unzip, p, t)) {
 					if(post != null) scriptedPost(post, p, t);
-					modpackVersionFile();
+					writeModpackInfo();
 				} else updateFatalError();
 			} else updateFatalError();
 		}
@@ -864,7 +862,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		if(download == null || scriptedDownload(download, p, t)) {
 			if(unzip == null || scriptedUnzip(unzip, p, t)) {
 				if(post != null) scriptedPost(post, p, t);
-				modpackVersionFile();
+				writeModpackInfo();
 				return;
 			} else {
 				updateFatalError();
@@ -876,7 +874,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		}
 	}
 
-	private void clientVersionFile() {
+	private void writeClientInfo() {
 		Log.info("Writing client version file");
 		String s = Launcher.getLibraryDir() + modpack.client() + File.separator;
 		File f2 = new File(s + "start.json");
@@ -904,9 +902,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		}
 	}
 	
-	private void modpackVersionFile() {
-		String s = Launcher.getLibraryDir() + modpack.id() + File.separator;
-		File f = new File(s + "version");
+	private void writeModpackInfo() {
+		File f = new File(Launcher.getLibraryDir() + modpack.id() + File.separator + "version");
 		if(f.exists()) f.delete();
 		try {
 			FileUtils.writeString(f, "" + json.getInt("update_build"));
@@ -1525,10 +1522,6 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		uiInfo(null, Text.get("state.downloading") + ": " +  filename + " (0%)", percentD(0), null);
 	}
 	
-	int avgcounter;
-	float avgsum;
-
-	private String mojang_jre;
 	@Override
 	public void downloadProgress(String filename, double speed, int percent, int bytesLeft) {
 		avgsum += speed;
