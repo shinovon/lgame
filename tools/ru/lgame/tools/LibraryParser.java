@@ -46,7 +46,9 @@ public class LibraryParser {
 					JSONObject dj = j.getJSONObject("downloads").getJSONObject("artifact");
 					r.put("name", name);
 					r.put("path", path + ".jar");
-					r.put("url", dj.getString("url"));
+					String url = dj.getString("url");
+					if(url.startsWith("/")) url = "https://eu02-www.tlaun.ch/repo/" + url;
+					r.put("url", url);
 					r.put("sha1", dj.getString("sha1"));
 					r.put("size", dj.getInt("size"));
 					if(j.optBoolean("downloadOnly")) {
