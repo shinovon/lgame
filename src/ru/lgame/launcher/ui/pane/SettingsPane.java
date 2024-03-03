@@ -122,10 +122,10 @@ public class SettingsPane extends JPanel {
 				//lgameFrame.setVisible(true);
 				JDialog dialog = new JDialog(l.frame(), "", true);
 				dialog.setAlwaysOnTop(true);
-		        Container contentPane = dialog.getContentPane();
-		        contentPane.setLayout(new BorderLayout());
-		        JPanel pane = new JPanel();
-		        contentPane.add(pane, BorderLayout.CENTER);
+				Container contentPane = dialog.getContentPane();
+				contentPane.setLayout(new BorderLayout());
+				JPanel pane = new JPanel();
+				contentPane.add(pane, BorderLayout.CENTER);
 				pane.setBorder(new EmptyBorder(5, 5, 5, 5));
 				pane.setLayout(new BorderLayout());
 					JScrollPane scrollPane = new JScrollPane();
@@ -151,10 +151,10 @@ public class SettingsPane extends JPanel {
 					dialog.getRootPane().setDefaultButton(okButton);
 				}
 				dialog.pack();
-		        dialog.setResizable(false);
-		        dialog.setLocationRelativeTo(l.frame());
-		        dialog.show();
-		        dialog.dispose();
+				dialog.setResizable(false);
+				dialog.setLocationRelativeTo(l.frame());
+				dialog.show();
+				dialog.dispose();
 			}
 		});
 		showTeamBtn.setPreferredSize(new Dimension(100, 23));
@@ -416,9 +416,9 @@ public class SettingsPane extends JPanel {
 
 	private GridBagConstraints gbc() {
 		GridBagConstraints gbc_ramTitlePanel = new GridBagConstraints();
-        gbc_ramTitlePanel.gridwidth = GridBagConstraints.REMAINDER;
-        gbc_ramTitlePanel.weightx = 1;
-        gbc_ramTitlePanel.fill = GridBagConstraints.HORIZONTAL;
+		gbc_ramTitlePanel.gridwidth = GridBagConstraints.REMAINDER;
+		gbc_ramTitlePanel.weightx = 1;
+		gbc_ramTitlePanel.fill = GridBagConstraints.HORIZONTAL;
 		return gbc_ramTitlePanel;
 	}
 }

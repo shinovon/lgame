@@ -34,10 +34,10 @@ public class ErrorUI {
 		Launcher l = Launcher.inst;
 		JDialog dialog = new JDialog(l.frame(), title, true);
 		dialog.setAlwaysOnTop(true);
-        Container contentPane = dialog.getContentPane();
-        contentPane.setLayout(new BorderLayout());
-        JPanel pane = new JPanel();
-        contentPane.add(pane, BorderLayout.CENTER);
+		Container contentPane = dialog.getContentPane();
+		contentPane.setLayout(new BorderLayout());
+		JPanel pane = new JPanel();
+		contentPane.add(pane, BorderLayout.CENTER);
 		pane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		pane.setLayout(new BorderLayout());
 		if(s != null && s.length() > 0) {
@@ -81,10 +81,10 @@ public class ErrorUI {
 			buttonPane.add(logsButton);
 		}
 		dialog.pack();
-        dialog.setResizable(false);
-        dialog.setLocationRelativeTo(l.frame());
-        dialog.show();
-        dialog.dispose();
+		dialog.setResizable(false);
+		dialog.setLocationRelativeTo(l.frame());
+		dialog.show();
+		dialog.dispose();
 	}
 
 	@SuppressWarnings("deprecation")
@@ -93,15 +93,15 @@ public class ErrorUI {
 		Log.error("showError(): " + trace);
 		JDialog dialog = new JDialog(l.frame(), title, true);
 		dialog.setAlwaysOnTop(true);
-        Container contentPane = dialog.getContentPane();
-        contentPane.setLayout(new BorderLayout());
-        JPanel pane = new JPanel();
-        contentPane.add(pane, BorderLayout.CENTER);
+		Container contentPane = dialog.getContentPane();
+		contentPane.setLayout(new BorderLayout());
+		JPanel pane = new JPanel();
+		contentPane.add(pane, BorderLayout.CENTER);
 		pane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		pane.setLayout(new BorderLayout());
 		if(text != null && text.length() > 0) {
 			JTextPane infopane = new JTextPane();
-	        infopane.setMinimumSize(new Dimension(600, 40));
+			infopane.setMinimumSize(new Dimension(600, 40));
 			infopane.setBackground(SystemColor.menu);
 			infopane.setEditable(false);
 			infopane.setText(text);
@@ -132,10 +132,10 @@ public class ErrorUI {
 			dialog.getRootPane().setDefaultButton(okButton);
 		}
 		dialog.pack();
-        dialog.setResizable(false);
-        dialog.setLocationRelativeTo(l.frame());
-        dialog.show();
-        dialog.dispose();
+		dialog.setResizable(false);
+		dialog.setLocationRelativeTo(l.frame());
+		dialog.show();
+		dialog.dispose();
 	}
 
 	public static void showError(String title, String text) {

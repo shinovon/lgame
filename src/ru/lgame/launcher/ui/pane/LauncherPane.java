@@ -157,7 +157,7 @@ public class LauncherPane extends JPanel {
 		list = new JPanel();
 		scrollPane.setViewportView(list);
 		list.setLayout(new GridBagLayout());
-        bg = new ButtonGroup();
+		bg = new ButtonGroup();
 		
 		JPanel bottomPanel = new JPanel();
 		contentPane2.add(bottomPanel, BorderLayout.SOUTH);
@@ -380,11 +380,11 @@ public class LauncherPane extends JPanel {
 	private void addModpack(MiniModpackPane sb) {
 		if(sb.getModpack().isHidden() && !Launcher.DEBUG) return;
 		sb.setButtonGroup(bg);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.weightx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        list.add(sb, gbc);
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		gbc.weightx = 1;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		list.add(sb, gbc);
 	}
 	
 	/**

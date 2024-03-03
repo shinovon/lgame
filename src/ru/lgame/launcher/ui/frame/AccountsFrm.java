@@ -169,20 +169,20 @@ public class AccountsFrm extends JFrame {
 		list.setCellRenderer(new DefaultListCellRenderer() {
 			private static final long serialVersionUID = 1L;
 			
-		    public Component getListCellRendererComponent(
-		            JList<?> list,
-		            Object value,
-		            int index,
-		            boolean isSelected,
-		            boolean cellHasFocus) {
-		    	if(value instanceof Auth) {
-		    		super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-		    		setText(((Auth) value).getUsername() + (!((Auth) value).isCracked() ? " (" + localizeType(((Auth) value).getType()) + ")" : ""));
-		    	} else {
-		    		super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-		    	}
-		    	return this;
-		    }
+			public Component getListCellRendererComponent(
+					JList<?> list,
+					Object value,
+					int index,
+					boolean isSelected,
+					boolean cellHasFocus) {
+				if(value instanceof Auth) {
+					super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+					setText(((Auth) value).getUsername() + (!((Auth) value).isCracked() ? " (" + localizeType(((Auth) value).getType()) + ")" : ""));
+				} else {
+					super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+				}
+				return this;
+			}
 		});
 		list.setSelectedValue(Launcher.inst.currentAuth(), true);
 		JButton deleteBtn = new JButton("-");

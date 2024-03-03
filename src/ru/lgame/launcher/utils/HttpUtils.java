@@ -178,22 +178,22 @@ public class HttpUtils {
 	}
 	
 	public static String getHWID() {
-        try {
-            String s = System.getenv("COMPUTERNAME") + System.getProperty("user.name") + System.getenv("PROCESSOR_IDENTIFIER") + System.getenv("PROCESSOR_LEVEL");
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(s.getBytes());
-            StringBuffer sb = new StringBuffer();
-            byte b[] = md.digest();
-            for (byte aByteData : b) {
-                String hex = Integer.toHexString(0xff & aByteData);
-                if (hex.length() == 1) sb.append('0');
-                sb.append(hex);
-            }
-            return sb.toString();
-        } catch (Exception e) {
-        	return "null";
-        }
-    }
+		try {
+			String s = System.getenv("COMPUTERNAME") + System.getProperty("user.name") + System.getenv("PROCESSOR_IDENTIFIER") + System.getenv("PROCESSOR_LEVEL");
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			md.update(s.getBytes());
+			StringBuffer sb = new StringBuffer();
+			byte b[] = md.digest();
+			for (byte aByteData : b) {
+				String hex = Integer.toHexString(0xff & aByteData);
+				if (hex.length() == 1) sb.append('0');
+				sb.append(hex);
+			}
+			return sb.toString();
+		} catch (Exception e) {
+			return "null";
+		}
+	}
 
 	private static InputStream getHttpInputStream(HttpURLConnection con, boolean err) throws IOException {
 		if(con.getContentEncoding() != null && con.getContentEncoding().equalsIgnoreCase("gzip"))

@@ -76,32 +76,32 @@ public final class Auth {
 	}
 	
 	private void createSession(String username, String password, Proxy proxy) throws Exception {
-	    YggdrasilAuthenticationService service = new YggdrasilAuthenticationService(proxy, "");
-	    YggdrasilUserAuthentication auth = (YggdrasilUserAuthentication) service
-	            .createUserAuthentication(Agent.MINECRAFT);
-	    auth.setUsername(this.M = username);
-	    auth.setPassword(this.P = password);
+		YggdrasilAuthenticationService service = new YggdrasilAuthenticationService(proxy, "");
+		YggdrasilUserAuthentication auth = (YggdrasilUserAuthentication) service
+				.createUserAuthentication(Agent.MINECRAFT);
+		auth.setUsername(this.M = username);
+		auth.setPassword(this.P = password);
 
-	    auth.logIn();
+		auth.logIn();
 		this.mojang = true;
 		this.mojangAuthInst = auth;
-	    this.username = auth.getSelectedProfile().getName();
-	    this.mojangUUID = auth.getSelectedProfile().getId().toString();
-	    this.mojangAuthToken = auth.getAuthenticatedToken();
+		this.username = auth.getSelectedProfile().getName();
+		this.mojangUUID = auth.getSelectedProfile().getId().toString();
+		this.mojangAuthToken = auth.getAuthenticatedToken();
 	}
 	
 	private void createSessionFromStorage(Map<String, Object> storage, Proxy proxy) throws Exception {
-	    YggdrasilAuthenticationService service = new YggdrasilAuthenticationService(proxy, "");
-	    YggdrasilUserAuthentication auth = (YggdrasilUserAuthentication) service
-	            .createUserAuthentication(Agent.MINECRAFT);
-	    auth.loadFromStorage(storage);
+		YggdrasilAuthenticationService service = new YggdrasilAuthenticationService(proxy, "");
+		YggdrasilUserAuthentication auth = (YggdrasilUserAuthentication) service
+				.createUserAuthentication(Agent.MINECRAFT);
+		auth.loadFromStorage(storage);
 
-	    auth.logIn();
+		auth.logIn();
 		this.mojang = true;
 		this.mojangAuthInst = auth;
-	    this.username = auth.getSelectedProfile().getName();
-	    this.mojangUUID = auth.getSelectedProfile().getId().toString();
-	    this.mojangAuthToken = auth.getAuthenticatedToken();
+		this.username = auth.getSelectedProfile().getName();
+		this.mojangUUID = auth.getSelectedProfile().getId().toString();
+		this.mojangAuthToken = auth.getAuthenticatedToken();
 	}
 
 	public boolean isCracked() {
