@@ -599,16 +599,21 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			} catch (Exception e) {
 			}
 		} catch (LauncherOfflineException e) {
+			Log.warn("in offline mode!");
 			if(modpackState == 0 || forceUpdate) {
 				updateFatalError(Text.get("err.offline"), e.getCause(), Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
 				return;
 			}
+			Log.debug("offline caused by", e);
 		} catch (IOException e) {
 			if(modpackState == 0 || forceUpdate) {
 				updateFatalError(Text.get("err.offline"), e, Errors.UPDATER_RUN_GETUPDATEJSON_IOEXCEPTION);
 				return;
 			}
+			Log.warn("went offline mode!");
+			Log.debug("offline caused by", e);
 		} catch (JSONException e) {
+			Log.debug("JSON error", e);
 			if(modpackState == 0 || forceUpdate) {
 				updateFatalError(Text.get("err.parse"), e, Errors.UPDATER_RUN_GETUPDATEJSON_JSONEXCEPTION);
 				return;
@@ -630,6 +635,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			clientNeedsUpdate = checkClientNeedUpdate();
 		} catch (LauncherOfflineException e) {
 			Log.warn("can't check client in offline mode");
+			Log.debug("offline caused by", e);
 			offline = true;
 		} catch (Exception e1) {
 			updateFatalError(Text.get("err.clientupdatecheck"), e1, Errors.UPDATER_RUN_CHECKCLIENT_EXCEPTION);
@@ -651,6 +657,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 				}
 			} catch (LauncherOfflineException e) {
 				Log.warn("can't check modpack in offline mode");
+				Log.debug("offline caused by", e);
 				offline = true;
 			} catch (Exception e) {
 				updateFatalError(Text.get("err.modpackcheck"), e, Errors.UPDATER_RUN_CHECKMODPACK_EXCEPTION);

@@ -34,6 +34,10 @@ public class Log {
 		if(Launcher.DEBUG) log("DEBUG", x);
 	}
 
+	public static void debug(String s, Throwable e) {
+		if(Launcher.DEBUG) debug(s + ": " + exceptionToString(e));
+	}
+
 	public static void error(String s, Throwable e) {
 		error(s + ": " + exceptionToString(e));
 	}
