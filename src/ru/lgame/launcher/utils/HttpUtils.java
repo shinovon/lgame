@@ -36,7 +36,6 @@ public class HttpUtils {
 	public int downloaded;
 	public int need;
 	private String file;
-	private static String useragent = "Mozilla/5.0";
 
 	public static double speed;
 	
@@ -173,8 +172,8 @@ public class HttpUtils {
 
 	private static HttpURLConnection getHttpConnection(URL url) throws IOException {
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		con.setRequestProperty("User-Agent", useragent);
-		con.setRequestProperty("User-UID", getHWID());
+		con.setRequestProperty("User-Agent", "LGameLauncher/" + Launcher.version);
+		con.setRequestProperty("X-User-UID", getHWID());
 		return con;
 	}
 	
