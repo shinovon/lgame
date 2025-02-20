@@ -549,197 +549,201 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		running = true;
 		updating = true;
 		modpack.setUpdateInfo(repeated ? Text.get("state.updating") : Text.get("state.updatestart"), repeated ? Text.get("state.updaterepeatcheck") : Text.get("state.installationcheck"), 0);
-		int modpackState = forceUpdate ? 3 : checkInstalled(modpack) ? -100 : 0;
-		stat("run");
 		try {
-			modpack.setUpdateInfo(null, Text.get("state.clientstartjson"), 15);
-			clientStartJson = modpack.getClientStartJson(modpackState == 0 || forceUpdate);
-			if(clientStartJson == null) {
-				if(modpackState == 0 || forceUpdate)
-					updateFatalError(Text.get("err.offline"), 0, Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
-				else
-					updateFatalError(Text.get("err.nostartjson"), 0, Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
-				return;
-			}
-			clientAssetIndex = clientStartJson.getString("asset_index");
-			clientMainClass = clientStartJson.getString("mainclass");
-			clientTweakClasses = clientStartJson.getJSONArray("tweak_classes").toList().toArray(new String[0]);
-			if(clientStartJson.has("extra_args")) {
-				clientExtraArgs = clientStartJson.getJSONArray("extra_args").toList().toArray(new String[0]);
-			}
-			if(clientStartJson.has("jvm_args")) {
-				clientJvmArgs = clientStartJson.getJSONArray("jvm_args").toList().toArray(new String[0]);
-			}
-			modpack.setUpdateInfo(null, Text.get("state.modpackupdatejson"), 33);
-			json = modpack.getUpdateJson(true);
-			modpack.setUpdateInfo(null, Text.get("state.clientupdatejson"), 67);
-			clientJson = modpack.getClientUpdateJson(true);
+			int modpackState = forceUpdate ? 3 : checkInstalled(modpack) ? -100 : 0;
+			stat("run");
 			try {
-				if(clientJson.getJSONObject("integrity_check").getJSONObject("libraries").optBoolean("new_libraries")) {
-					clientNewLibraries = true;
-					Log.info("client uses new libraries");
-					if(clientLibrariesJson == null) {
-						modpack.setClientLibrariesURL(clientJson.getJSONObject("integrity_check").getJSONObject("libraries").getString("url"));
-						clientLibrariesJson = modpack.getClientLibrariesJson();
-						//totalTasks += clientLibrariesJson.getJSONArray("libraries").length();
+				modpack.setUpdateInfo(null, Text.get("state.clientstartjson"), 15);
+				clientStartJson = modpack.getClientStartJson(modpackState == 0 || forceUpdate);
+				if(clientStartJson == null) {
+					if(modpackState == 0 || forceUpdate)
+						updateFatalError(Text.get("err.offline"), 0, Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
+					else
+						updateFatalError(Text.get("err.nostartjson"), 0, Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
+					return;
+				}
+				clientAssetIndex = clientStartJson.getString("asset_index");
+				clientMainClass = clientStartJson.getString("mainclass");
+				clientTweakClasses = clientStartJson.getJSONArray("tweak_classes").toList().toArray(new String[0]);
+				if(clientStartJson.has("extra_args")) {
+					clientExtraArgs = clientStartJson.getJSONArray("extra_args").toList().toArray(new String[0]);
+				}
+				if(clientStartJson.has("jvm_args")) {
+					clientJvmArgs = clientStartJson.getJSONArray("jvm_args").toList().toArray(new String[0]);
+				}
+				modpack.setUpdateInfo(null, Text.get("state.modpackupdatejson"), 33);
+				json = modpack.getUpdateJson(true);
+				modpack.setUpdateInfo(null, Text.get("state.clientupdatejson"), 67);
+				clientJson = modpack.getClientUpdateJson(true);
+				try {
+					if(clientJson.getJSONObject("integrity_check").getJSONObject("libraries").optBoolean("new_libraries")) {
+						clientNewLibraries = true;
+						Log.info("client uses new libraries");
+						if(clientLibrariesJson == null) {
+							modpack.setClientLibrariesURL(clientJson.getJSONObject("integrity_check").getJSONObject("libraries").getString("url"));
+							clientLibrariesJson = modpack.getClientLibrariesJson();
+							//totalTasks += clientLibrariesJson.getJSONArray("libraries").length();
+						}
 					}
+				} catch (Exception e) {
 				}
-			} catch (Exception e) {
-			}
-			try {
-				if(clientJson.getJSONObject("integrity_check").getJSONObject("assets").optBoolean("new_assets")) {
-					clientNewAssets = true;
-					Log.info("client uses new assets");
-					if(clientAssetsJson == null) {
-						clientAssetsJson = new JSONObject(HttpUtils.get((clientJson.getJSONObject("integrity_check").getJSONObject("assets").getString("url"))));
-						//totalTasks += clientAssetsJson.getJSONObject("objects").length();
+				try {
+					if(clientJson.getJSONObject("integrity_check").getJSONObject("assets").optBoolean("new_assets")) {
+						clientNewAssets = true;
+						Log.info("client uses new assets");
+						if(clientAssetsJson == null) {
+							clientAssetsJson = new JSONObject(HttpUtils.get((clientJson.getJSONObject("integrity_check").getJSONObject("assets").getString("url"))));
+							//totalTasks += clientAssetsJson.getJSONObject("objects").length();
+						}
 					}
+				} catch (Exception e) {
 				}
-			} catch (Exception e) {
-			}
-			try {
-				if(clientJson.optBoolean("has_mojang_jre")) {
-					hasMojangJre = true;
-					Log.info("client uses mojang jre");
-					mojang_jre = clientJson.getString("mojang_jre");
-				}
-			} catch (Exception e) {
-			}
-		} catch (LauncherOfflineException e) {
-			Log.warn("in offline mode!");
-			if(modpackState == 0 || forceUpdate) {
-				updateFatalError(Text.get("err.offline"), e.getCause(), Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
-				return;
-			}
-			Log.debug("offline caused by", e);
-		} catch (IOException e) {
-			if(modpackState == 0 || forceUpdate) {
-				updateFatalError(Text.get("err.offline"), e, Errors.UPDATER_RUN_GETUPDATEJSON_IOEXCEPTION);
-				return;
-			}
-			Log.warn("went offline mode!");
-			Log.debug("offline caused by", e);
-		} catch (JSONException e) {
-			Log.debug("JSON error", e);
-			if(modpackState == 0 || forceUpdate) {
-				updateFatalError(Text.get("err.parse"), e, Errors.UPDATER_RUN_GETUPDATEJSON_JSONEXCEPTION);
-				return;
-			}
-		}
-		modpack.setUpdateInfo(null, null, 100);
-		try {
-			Thread.sleep(10);
-		} catch (InterruptedException e2) {
-			interrupted();
-			return;
-		}
-		modpack.setUpdateInfo(Text.get("state.installationcheck"), Text.get("state.clientintegritycheck"), 0);
-		//boolean packInstalled = modpackState != 0;
-		boolean clientInstalled = checkClientInstalled();
-		modpack.setUpdateInfo(null, Text.get("state.clientupdatecheck"), 25);
-		boolean clientNeedsUpdate = false;
-		try {
-			clientNeedsUpdate = checkClientNeedUpdate();
-		} catch (LauncherOfflineException e) {
-			Log.warn("can't check client in offline mode");
-			Log.debug("offline caused by", e);
-			offline = true;
-		} catch (Exception e1) {
-			updateFatalError(Text.get("err.clientupdatecheck"), e1, Errors.UPDATER_RUN_CHECKCLIENT_EXCEPTION);
-			return;
-		}
-		modpack.setUpdateInfo(null, Text.get("state.modpackintegritycheck"), 50);
-		//сбросить кэшированное состояние сборки
-		modpack.getStateRst();
-		if(modpackState == -100) {
-			// Сборка установлена, нужно проверить обновления
-			modpackState = 1;
-			if(!clientInstalled) modpackState = 4;
-			else if(clientNeedsUpdate) modpackState = 5;
-			try {
-				if(!checkModpackIntegrity(modpack, json)) modpackState = 3;
-				else {
-					modpack.setUpdateInfo(null, Text.get("state.updatesavailablecheck"), 75);
-					if(checkUpdatesAvailable(modpack)) modpackState = 2;
+				try {
+					if(clientJson.optBoolean("has_mojang_jre")) {
+						hasMojangJre = true;
+						Log.info("client uses mojang jre");
+						mojang_jre = clientJson.getString("mojang_jre");
+					}
+				} catch (Exception e) {
 				}
 			} catch (LauncherOfflineException e) {
-				Log.warn("can't check modpack in offline mode");
+				Log.warn("in offline mode!");
+				if(modpackState == 0 || forceUpdate) {
+					updateFatalError(Text.get("err.offline"), e.getCause(), Errors.UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION);
+					return;
+				}
+				Log.debug("offline caused by", e);
+			} catch (IOException e) {
+				if(modpackState == 0 || forceUpdate) {
+					updateFatalError(Text.get("err.offline"), e, Errors.UPDATER_RUN_GETUPDATEJSON_IOEXCEPTION);
+					return;
+				}
+				Log.warn("went offline mode!");
+				Log.debug("offline caused by", e);
+			} catch (JSONException e) {
+				Log.debug("JSON error", e);
+				if(modpackState == 0 || forceUpdate) {
+					updateFatalError(Text.get("err.parse"), e, Errors.UPDATER_RUN_GETUPDATEJSON_JSONEXCEPTION);
+					return;
+				}
+			}
+			modpack.setUpdateInfo(null, null, 100);
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e2) {
+				interrupted();
+				return;
+			}
+			modpack.setUpdateInfo(Text.get("state.installationcheck"), Text.get("state.clientintegritycheck"), 0);
+			//boolean packInstalled = modpackState != 0;
+			boolean clientInstalled = checkClientInstalled();
+			modpack.setUpdateInfo(null, Text.get("state.clientupdatecheck"), 25);
+			boolean clientNeedsUpdate = false;
+			try {
+				clientNeedsUpdate = checkClientNeedUpdate();
+			} catch (LauncherOfflineException e) {
+				Log.warn("can't check client in offline mode");
 				Log.debug("offline caused by", e);
 				offline = true;
-			} catch (Exception e) {
-				updateFatalError(Text.get("err.modpackcheck"), e, Errors.UPDATER_RUN_CHECKMODPACK_EXCEPTION);
+			} catch (Exception e1) {
+				updateFatalError(Text.get("err.clientupdatecheck"), e1, Errors.UPDATER_RUN_CHECKCLIENT_EXCEPTION);
 				return;
 			}
-		}
-		modpack.setUpdateInfo(null, null, 100);
-		try {
-			Thread.sleep(10);
-		} catch (InterruptedException e2) {
-			interrupted();
-			return;
-		}
-		Log.info("install state: " + modpackState);
-		modpack.setUpdateInfo(Text.get("state.updating"), Text.get("stater.updaterinit"), 0);
-		// обнова либо старт сборки
-		boolean ret = !repeated;
-		switch(modpackState) {
-		case 0:
-		{
-			modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
-			if (clientInstalled ? !installClient() : clientNeedsUpdate ? !updateClient() : false)
-				break;
-			modpack.setUpdateInfo(Text.get("state.updatingmodpack"), Text.get("state.updatingmodpack"), -2);
-			install();
-			break;
-		}
-		case 1:
-		{
-			stat("launch");
-			modpack.setUpdateInfo("", Text.get("state.startingclient"), 100);
+			modpack.setUpdateInfo(null, Text.get("state.modpackintegritycheck"), 50);
+			//сбросить кэшированное состояние сборки
+			modpack.getStateRst();
+			if(modpackState == -100) {
+				// Сборка установлена, нужно проверить обновления
+				modpackState = 1;
+				if(!clientInstalled) modpackState = 4;
+				else if(clientNeedsUpdate) modpackState = 5;
+				try {
+					if(!checkModpackIntegrity(modpack, json)) modpackState = 3;
+					else {
+						modpack.setUpdateInfo(null, Text.get("state.updatesavailablecheck"), 75);
+						if(checkUpdatesAvailable(modpack)) modpackState = 2;
+					}
+				} catch (LauncherOfflineException e) {
+					Log.warn("can't check modpack in offline mode");
+					Log.debug("offline caused by", e);
+					offline = true;
+				} catch (Exception e) {
+					updateFatalError(Text.get("err.modpackcheck"), e, Errors.UPDATER_RUN_CHECKMODPACK_EXCEPTION);
+					return;
+				}
+			}
+			modpack.setUpdateInfo(null, null, 100);
 			try {
-				startClient();
-			} catch (Exception e) {
-				clientError(Text.get("err.clientstartfail"), e);
+				Thread.sleep(10);
+			} catch (InterruptedException e2) {
+				interrupted();
 				return;
 			}
-			ret = false;
-			break;
-		}
-		case 2:
-		case 3:
-		{
-			modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
-			if (clientInstalled ? !installClient() : clientNeedsUpdate ? !updateClient() : false)
+			Log.info("install state: " + modpackState);
+			modpack.setUpdateInfo(Text.get("state.updating"), Text.get("stater.updaterinit"), 0);
+			// обнова либо старт сборки
+			boolean ret = !repeated;
+			switch(modpackState) {
+			case 0:
+			{
+				modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
+				if (clientInstalled ? !installClient() : clientNeedsUpdate ? !updateClient() : false)
+					break;
+				modpack.setUpdateInfo(Text.get("state.updatingmodpack"), Text.get("state.updatingmodpack"), -2);
+				install();
 				break;
-			modpack.setUpdateInfo(Text.get("state.updatingmodpack"), Text.get("state.updatingmodpack"), -2);
-			update();
-			break;
-		}
-		case 4: {
-			modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
-			installClient();
-			break;
-		}
-		case 5: {
-			modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
-			updateClient();
-			break;
-		}
-		default:
-		{
-			modpack.setUpdateInfo("", Text.get("state.error"), -2);
-			updateFatalError("default", modpackState, Errors.UPDATER_GETMODPACKSTATE_ILLEGAL_VALUE);
-			ret = false;
-			break;
-		}
-		}
-		if(ret && !failed) {
-			modpack.setUpdateInfo(Text.get("state.updating"), Text.get("state.updaterinitrepeat"), 100);
-			Log.info("Updater repeat");
-			reset();
-			repeated = true;
-			run();
-			return;
+			}
+			case 1:
+			{
+				stat("launch");
+				modpack.setUpdateInfo("", Text.get("state.startingclient"), 100);
+				try {
+					startClient();
+				} catch (Exception e) {
+					clientError(Text.get("err.clientstartfail"), e);
+					return;
+				}
+				ret = false;
+				break;
+			}
+			case 2:
+			case 3:
+			{
+				modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
+				if (clientInstalled ? !installClient() : clientNeedsUpdate ? !updateClient() : false)
+					break;
+				modpack.setUpdateInfo(Text.get("state.updatingmodpack"), Text.get("state.updatingmodpack"), -2);
+				update();
+				break;
+			}
+			case 4: {
+				modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
+				installClient();
+				break;
+			}
+			case 5: {
+				modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
+				updateClient();
+				break;
+			}
+			default:
+			{
+				modpack.setUpdateInfo("", Text.get("state.error"), -2);
+				updateFatalError("default", modpackState, Errors.UPDATER_GETMODPACKSTATE_ILLEGAL_VALUE);
+				ret = false;
+				break;
+			}
+			}
+			if(ret && !failed) {
+				modpack.setUpdateInfo(Text.get("state.updating"), Text.get("state.updaterinitrepeat"), 100);
+				Log.info("Updater repeat");
+				reset();
+				repeated = true;
+				run();
+				return;
+			}
+		} catch (Exception e) {
+			updateFatalError("Updater", e, Errors.UPDATER_RUN);
 		}
 		Log.info("updater finished");
 		reset();

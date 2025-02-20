@@ -14,6 +14,7 @@ public class Errors {
 	public static final int UPDATER_SCRIPTEDDOWNLOAD_DOWNLOAD = 1007;
 	public static final int UPDATER_SCRIPTEDUNZIP_UNZIP = 1008;
 	public static final int UPDATER_RUN_GETCLIENTSTARTJSON_IOEXCEPTION = 1009;
+	public static final int UPDATER_RUN = 1010;
 	
 	public static String toString(int i) {
 		return Integer.toString(i);
