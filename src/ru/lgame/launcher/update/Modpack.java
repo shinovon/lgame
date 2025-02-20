@@ -47,6 +47,7 @@ public class Modpack {
 	private int cachedState;
 	private String client_assets_data;
 	private boolean hidden;
+	private String installedVersion;
 	
 	public Modpack(String id) {
 		this.id = id;
@@ -189,6 +190,21 @@ public class Modpack {
 		if(cachedState != -999) return cachedState;
 		if(isUpdating() || isStarted()) return cachedState = 1;
 		return cachedState = Updater.getModpackState(this);
+	}
+	
+	public int getCachedState() {
+		return cachedState;
+	}
+
+	public boolean isInstalled() {
+		if(cachedState != -999) return cachedState != 0;
+		return Updater.checkInstalled(this);
+	}
+	
+	public String getInstalledVersion(boolean invalidate) {
+		if (!isInstalled()) return null;
+		if (installedVersion != null && !invalidate) return installedVersion;
+		return installedVersion = Updater.getInstalledVersion(this);
 	}
 	
 	public void setUpdateInfo(String s1, String s2, double percent) {

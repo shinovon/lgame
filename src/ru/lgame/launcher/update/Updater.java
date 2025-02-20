@@ -146,6 +146,19 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		return true;
 	}
 	
+	public static String getInstalledVersion(Modpack m) {
+		String s = Launcher.getLibraryDir() + m.id() + File.separator;
+		File dir = new File(s);
+		if (!dir.exists()) return null;
+		File f = new File(s + "version");
+		if (!f.exists()) return null;
+		try {
+			return FileUtils.getString(f);
+		} catch (Exception ignored) {
+			return null;
+		}
+	}
+	
 	/**
 	 * Проверить целостность сборки
 	 * @throws Exception 
@@ -740,9 +753,11 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		o.put("type", "updater_" + type);
 		o.put("modpack", modpack.id());
 		try {
-			o.put("modpack_build", FileUtils.getString(Launcher.getLibraryDir() + modpack.client() + File.separator + "version"));
-		} catch (Exception e) {
-		}
+			o.put("modpack_build", FileUtils.getString(Launcher.getLibraryDir() + modpack.id() + File.separator + "version"));
+		} catch (Exception e) {}
+		try {
+			o.put("client_build", FileUtils.getString(Launcher.getLibraryDir() + modpack.client() + File.separator + "version"));
+		} catch (Exception e) {}
 		Launcher.stat(o);
 	}
 

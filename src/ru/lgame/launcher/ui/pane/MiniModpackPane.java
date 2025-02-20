@@ -43,6 +43,13 @@ public class MiniModpackPane extends JPanel {
 	private static final int IMAGE_HEIGHT = 240;
 	private static final int MAX_WIDTH = 560;
 
+	private static final Color PROGRESS_BAR_BG_COLOR = new Color(57, 57, 57);
+	private static final Color PROGRESS_BAR_FG_LEGACY_COLOR = new Color(65, 119, 179);
+	private static final Color PROGRESS_BAR_FG_COLOR = new Color(135, 44, 221);
+	private static final Color BACKGROUND_COLOR = new Color(21, 22, 24);
+	private static final Color STARTED_LABEL_COLOR = new Color(0, 200, 57);
+	private static final Color INSTALLED_LABEL_COLOR = new Color(170, 170, 170);
+
 	private Modpack modpack;
 	
 	private String id;
@@ -172,8 +179,6 @@ public class MiniModpackPane extends JPanel {
 		int ih = image.getHeight(null);
 		double r = (double) iw / (double) ih;
 		int w = (int) (r * (double)IMAGE_HEIGHT);
-		//int factor = greatestCommonFactor(iw, ih);
-		//Log.debug(id + " image scaled to: " + w + "x" + ITEM_HEIGHT + " (" + iw / factor + ":" + ih / factor + ")");
 		image = image.getScaledInstance(w, IMAGE_HEIGHT, Image.SCALE_SMOOTH);
 		updateContents();
 		return this;
@@ -187,6 +192,11 @@ public class MiniModpackPane extends JPanel {
 	public boolean isStarted() {
 		if(modpack == null) return false;
 		return modpack.isStarted();
+	}
+	
+	public boolean isInstalled() {
+		if(modpack == null) return false;
+		return modpack.isInstalled();
 	}
 	
 	public synchronized void setUpdateInfo(String s1, String s2, double p) {
@@ -222,7 +232,7 @@ public class MiniModpackPane extends JPanel {
 	
 	public void paintComponent(Graphics g) {
 		boolean l = Config.getBoolean("legacyLook");
-		if(!l) setBackground(new Color(21, 22, 24));
+		if(!l) setBackground(BACKGROUND_COLOR);
 		super.paintComponent(g);
 		if(g instanceof Graphics2D) {
 			Graphics2D g2d = (Graphics2D) g;
@@ -266,13 +276,16 @@ public class MiniModpackPane extends JPanel {
 		ty += 10;
 		g.setFont(modpackDesc);
 		if((descArr == null || lastW != w) && desc != null) descArr = getStringArray(desc, tw, g.getFontMetrics());
+		int dh = ty;
 		if(descArr != null) {
 			int dth = g.getFontMetrics().getHeight() - 6;
+			dh += dth * descArr.length;
 			for(int i = 0; i < descArr.length; i++) if(descArr[i] != null) g.drawString(descArr[i], x, ty + (i * (dth + 1)));
 		}
 		g.setFont(of);
+		String lastv = modpack.getLastVersion();
 		if(isStarted()) {
-			g.setColor(new Color(0, 200, 57));
+			g.setColor(STARTED_LABEL_COLOR);
 			g.fillRect(0, 0, w - 1, 3);
 			g.fillRect(0, 0, 3, h);
 			g.fillRect(0, rh - 2, w - 1, 3);
@@ -294,10 +307,10 @@ public class MiniModpackPane extends JPanel {
 			if(percent != -1) {
 				int px = x - 5;
 				int pww = w - px;
-				g.setColor(new Color(57, 57, 57));
+				g.setColor(PROGRESS_BAR_BG_COLOR);
 				g.fillRect(px, h - 3, pww - 1, 4);
-				if(l) g.setColor(new Color(65, 119, 179));
-				else g.setColor(new Color(135, 44, 221));
+				if(l) g.setColor(PROGRESS_BAR_FG_LEGACY_COLOR);
+				else g.setColor(PROGRESS_BAR_FG_COLOR);
 				int pw = (int) ((double)pww*(percent/100D));
 				g.fillRect(px, h - 3, pw - 1, 4);
 			}
@@ -309,12 +322,27 @@ public class MiniModpackPane extends JPanel {
 
 			g.setColor(UIManager.getColor("Label.foreground"));
 			g.drawString(t, w - g.getFontMetrics().stringWidth(t) - 2, h - th2 - 1);
+		} else if (dh < h - th - 1) {
+			g.setColor(INSTALLED_LABEL_COLOR);
+			if (isInstalled()) {
+				String s = "Установлена";
+				String v = modpack.getInstalledVersion(false);
+				if (v != null) {
+					if (v.contains(".")) {
+						s += ": " + v;
+						if (lastv != null && !v.equals(lastv)) {
+							s += ", Последняя: " + lastv;
+						}
+					} else if (modpack.getCachedState() > 1) {
+						s += ", Доступно обновление";
+					}
+				}
+				g.drawString(s, x, h - (g.getFontMetrics().getDescent()) - 2);
+			} else if (lastv != null) {
+				g.drawString("Последняя версия: " + lastv, x, h - (g.getFontMetrics().getDescent()) - 2);
+			}
 		}
 		lastW = w;
-	}
-	
-	private static int greatestCommonFactor(int width, int height) {
-		return (height == 0) ? width : greatestCommonFactor(height, width % height);
 	}
 	
 	public static String replace(String str, String from, String to) {
