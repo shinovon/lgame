@@ -227,10 +227,10 @@ public class HttpUtils {
 		InputStream is = null;
 		try {
 			HttpURLConnection con = getHttpConnection(url);
+			con.setRequestProperty("Cache-Control", "no-cache");
 			con.setRequestMethod("GET");
-			con.setRequestProperty("Accept-Encoding", "gzip");
 			con.connect();
-			//Log.debug("Connected, getting text");
+			Log.debug("Connected");
 			int r = con.getResponseCode();
 			if(r == 404) {
 				con.disconnect();

@@ -20,7 +20,6 @@ import ru.lgame.launcher.utils.HttpUtils;
 import ru.lgame.launcher.utils.logging.Log;
 
 /**
- * Объект сборки
  * @author Shinovon
  */
 public class Modpack {

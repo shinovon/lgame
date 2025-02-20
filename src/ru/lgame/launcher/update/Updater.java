@@ -114,7 +114,6 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 
 	/**
 	 * 
-	 * @param m Объект сборки
 	 * @return 0 - не установлена, 1 - можно играть, 2 - есть обновление, 3 - требуется обновление, отрицательное значение - ошибка
 	 */
 	public static int getModpackState(Modpack m) {
@@ -137,7 +136,6 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 
 	/**
 	 * Проверить установку сборки
-	 * @param m Объект сборки
 	 */
 	public static boolean checkInstalled(Modpack m) {
 		String s = Launcher.getLibraryDir() + m.id() + File.separator;
@@ -150,7 +148,6 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 	
 	/**
 	 * Проверить целостность сборки
-	 * @param m Объект сборки
 	 * @throws Exception 
 	 */
 	public static boolean checkModpackIntegrity(Modpack m) throws Exception {
@@ -159,7 +156,6 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 	
 	/**
 	 * Проверить целостность сборки
-	 * @param m Объект сборки
 	 * @throws Exception 
 	 */
 	public static boolean checkModpackIntegrity(Modpack m, JSONObject updateJson) throws Exception {
@@ -176,7 +172,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 				if(o.getString("type").equals("exists")) {
 					String d = path(o.getString("path"));
 					if(!new File(p + d).exists()) {
-						Log.warn("not exists " + p + d);
+						Log.warn("Missing: " + p + d);
 						return false;
 					}
 				}
@@ -206,7 +202,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			String filep = p + "mods" + File.separator + s;
 			File file = new File(filep);
 			if (!file.exists()) {
-				Log.warn("mod not exists: " + file);
+				Log.warn("Missing mod: " + file);
 				if(removeAll) {
 					try {
 						FileUtils.deleteDirectoryRecursion(Paths.get(p + "mods" + File.separator));
@@ -277,7 +273,6 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 
 	/**
 	 * Проверить наличие обновлений
-	 * @param m Объект сборки
 	 * @throws JSONException 
 	 * @throws IOException 
 	 */
@@ -365,7 +360,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			String hash = object.getString("hash");
 			File file = new File(p + "assets" + File.separator + "objects" + File.separator + hash.substring(0, 2) + File.separator + hash);
 			if(!file.exists()) {
-				Log.warn("Asset not exists: " + hash + " (" + key + ")");
+				Log.warn("Missing asset: " + hash + " (" + key + ")");
 				return false;
 			}
 			long l = org.apache.commons.io.FileUtils.sizeOf(file);
@@ -384,7 +379,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		String path = p + "libraries" + File.separator + path(j.getString("path"));
 		File file = new File(path);
 		if (!file.exists()) {
-			Log.warn("Library does not exists: " + s);
+			Log.warn("Missing library: " + s);
 			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 			return false;
 		}
@@ -435,7 +430,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			String filep = p + "libraries" + File.separator + s;
 			File file = new File(filep);
 			if (!file.exists()) {
-				Log.warn("not exists: " + s);
+				Log.warn("Missing client library: " + s);
 				FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 				return false;
 			}
@@ -475,7 +470,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			String filep = p + "natives" + File.separator + s;
 			File file = new File(filep);
 			if (!file.exists()) {
-				Log.warn("Native does not exists: " + s);
+				Log.warn("Missing native: " + s);
 				FileUtils.deleteDirectoryRecursion(Paths.get(p + "natives" + File.separator));
 				return false;
 			}
@@ -512,7 +507,6 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 
 	/**
 	 * Проверить наличие обновлений
-	 * @param m Объект сборки
 	 * @throws JSONException 
 	 * @throws IOException 
 	 */
@@ -1305,17 +1299,18 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 				appArgs.add("null");
 				appArgs.add("--userProperties");
 				appArgs.add("{}");
-			} else if(auth.isMojang()) {
-				appArgs.add("--username");
-				appArgs.add(auth.getUsername());
-				appArgs.add("--uuid");
-				appArgs.add(auth.getMojangUUID());
-				appArgs.add("--accessToken");
-				appArgs.add(auth.getMojangAuthToken());
-				appArgs.add("--userProperties");
-				appArgs.add("{}");
-				//appArgs.add("\"" + auth.getMojangUserProperties().replace("\"", "\\\"") + "\"");
 			}
+//			} else if(auth.isMojang()) {
+//				appArgs.add("--username");
+//				appArgs.add(auth.getUsername());
+//				appArgs.add("--uuid");
+//				appArgs.add(auth.getMojangUUID());
+//				appArgs.add("--accessToken");
+//				appArgs.add(auth.getMojangAuthToken());
+//				appArgs.add("--userProperties");
+//				appArgs.add("{}");
+//				//appArgs.add("\"" + auth.getMojangUserProperties().replace("\"", "\\\"") + "\"");
+//			}
 			appArgs.add("--gameDir");
 			appArgs.add(getModpackDir());
 			appArgs.add("--assetsDir");

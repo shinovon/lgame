@@ -11,8 +11,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.json.JSONObject;
 
-import com.mojang.authlib.exceptions.InvalidCredentialsException;
-
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.utils.FileUtils;
 import ru.lgame.launcher.utils.logging.Log;
@@ -31,13 +29,12 @@ public final class AuthStore {
 	private AuthStore() {
 	}
 	
-	public static void init() throws InvalidCredentialsException {
+	public static void init()  {
 		list = new ArrayList<Auth>();
 		load();
 	}
 	
-	private static void load() throws InvalidCredentialsException {
-		InvalidCredentialsException ice = null;
+	private static void load()  {
 		if(!authStoreFile().exists()) return;
 		try {
 			String l = FileUtils.getString(authStoreFile());
@@ -45,13 +42,9 @@ public final class AuthStore {
 			for(String s: a) loadAccount(s);
 		} catch (IOException e) {
 			Log.error("Failed to load accounts", e);
-		} catch (InvalidCredentialsException e) {
-			ice = e;
-			Log.error("Mojang account token expired", e);
 		}
 		Log.debug("loaded accounts: " + list);
 		save();
-		if(ice != null) throw ice;
 	}
 
 	public static void save() {
@@ -71,20 +64,16 @@ public final class AuthStore {
 		Log.debug("saved accounts: " + list);
 	}
 	
-	private static void loadAccount(String x) throws InvalidCredentialsException {
+	private static void loadAccount(String x) {
 		try {
-			//Log.debug("reading account entry: " + x);
 			if(x.length() <= 3) return;
 			String c = decodeAES1(new String(Base64.getDecoder().decode(x), "UTF-8"));
 			String[] sa = split(c, ":|:");
 			String type = sa[0];
-			//Log.debug("decoded descriptor: " + java.util.Arrays.toString(sa));
 			String s = decodeAES2(sa[2]);
-			//Log.debug("decrypted auth data: " + s);
 			Auth a = null;
 			if(type.equals("MOJANG")) {
-				//a = Auth.fromMojangStorage(stringToMap(s));
-				a = Auth.fromMojang(s);
+				return;
 			} else if(type.equals("CRACKED")) {
 				a = Auth.fromUsername(s);
 			} else {
@@ -95,8 +84,6 @@ public final class AuthStore {
 				if(!list.contains(a)) list.add(a);
 				if(sa[1].equals("1")) selected = a;
 			}
-		} catch (InvalidCredentialsException e) {
-			throw e;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -106,19 +93,15 @@ public final class AuthStore {
 		String fs = "";
 		String c = "";
 		try {
-			if(a.isMojang()) {
-				//c = mapToString(a.mojangForStorage());
-				c = a.mojangMailPasswordEncrypted();
-			} else if(a.isCracked()) {
+			if(a.isCracked()) {
 				c = a.getUsername();
 			} else {
 				c = "null";
 			}
-		} catch (Exception e) {
-		}
+		} catch (Exception e) {}
 		String sel = "0";
 		if(a.equals(selected)) sel = "1";
-		fs = "" + a.getType() + ":|:" + sel + ":|:" + encodeAES2(c);
+		fs = "" + a.getType().toString() + ":|:" + sel + ":|:" + encodeAES2(c);
 		return new String(Base64.getEncoder().encode(encodeAES1(fs).getBytes("UTF-8")), "UTF-8");
 	}
 	

@@ -129,16 +129,10 @@ public class MiniModpackPane extends JPanel {
 		Launcher.inst.frame().mainPane().setSelected(this);
 	}
 
-	/**
-	 * Задать объект сборки
-	 */
 	public void setModpack(Modpack mp) {
 		this.modpack = mp;
 	}
 
-	/**
-	 * Получить объект сборки
-	 */
 	public Modpack getModpack() {
 		return modpack;
 	}

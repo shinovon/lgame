@@ -25,6 +25,7 @@ import javax.swing.event.ListSelectionListener;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.auth.AuthStore;
+import ru.lgame.launcher.auth.AuthType;
 import ru.lgame.launcher.ui.ErrorUI;
 import ru.lgame.launcher.ui.locale.Text;
 
@@ -236,14 +237,14 @@ public class AccountsFrm extends JFrame {
 		update();
 	}
 	
-	protected String localizeType(String type) {
-		if(type.equals("MOJANG")) {
+	protected String localizeType(AuthType type) {
+		if(type == AuthType.MOJANG) {
 			return "Mojang";
 		}
-		if(type.equals("MICROSOFT")) {
+		if(type == AuthType.MICROSOFT) {
 			return "Microsoft";
 		}
-		if(type.equals("LGAME")) {
+		if(type == AuthType.LGAME) {
 			return "LGame";
 		}
 		return "По нику";

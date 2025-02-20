@@ -18,8 +18,6 @@ import javax.swing.JOptionPane;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.mojang.authlib.exceptions.InvalidCredentialsException;
-
 import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.auth.AuthStore;
 import ru.lgame.launcher.ui.ErrorUI;
@@ -46,7 +44,7 @@ public class Launcher {
 	
 	public static final String string_version = "v" + version;
 	
-	private static final String LAUNCHER_JSON_URL = "https://nnp.nnchan.ru/lgame/launcher.json";
+	private static final String LAUNCHER_JSON_URL = "https://nnp.nnchan.ru/lgame/launcher.php";
 
 	public static Launcher inst;
 	
@@ -121,11 +119,7 @@ public class Launcher {
 		Config.init();
 		createDirsIfNecessary();
 		Config.saveConfig();
-		try {
-			AuthStore.init();
-		} catch (InvalidCredentialsException e) {
-		//	ErrorUI.showError(Text.get("title.accounts"), Text.get("msg.mojangtokenexpired"));
-		}
+		AuthStore.init();
 		loadingFrame.setText(Text.get("loading.fetchingmodpacks"));
 		try {
 			try {
