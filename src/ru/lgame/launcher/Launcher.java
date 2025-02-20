@@ -39,7 +39,7 @@ import static ru.lgame.launcher.utils.HashUtils.getMD5String;
  */
 public class Launcher {
 	
-	public static final String version = "1.3";
+	public static final String version = "1.3.1";
 	public static final boolean DEBUG = true;
 	
 	public static final String string_version = "v" + version;
