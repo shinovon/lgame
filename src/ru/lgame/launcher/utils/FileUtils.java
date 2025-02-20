@@ -45,5 +45,37 @@ public class FileUtils {
 			}
 		}
 	}
+
+	public static long sizeOf(File file) {
+		if (!file.exists()) {
+			throw new IllegalArgumentException(file + " does not exist");
+		}
+		if (file.isDirectory()) {
+			return sizeOfDirectory0(file);
+		}
+		return file.length();
+	}
+	
+	private static long sizeOfDirectory0(File directory) {
+		final File[] files = directory.listFiles();
+		if (files == null) {
+			return 0L;
+		}
+		long size = 0L;
+		for (final File file : files) {
+			size += sizeOf0(file);
+			if (size < 0L) {
+				break;
+			}
+		}
+		return size;
+	}
+
+	private static long sizeOf0(final File file) {
+		if (file.isDirectory()) {
+			return sizeOfDirectory0(file);
+		}
+		return file.length();
+	}
 }
 

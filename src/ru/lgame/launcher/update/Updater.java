@@ -376,7 +376,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 				Log.warn("Missing asset: " + hash + " (" + key + ")");
 				return false;
 			}
-			long l = org.apache.commons.io.FileUtils.sizeOf(file);
+			long l = FileUtils.sizeOf(file);
 			if(l != object.getLong("size")) {
 				Log.warn("Asset has wrong size: " + hash + " (" + key + ")");
 				return false;
@@ -396,7 +396,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 			return false;
 		}
-		long l = org.apache.commons.io.FileUtils.sizeOf(file);
+		long l = FileUtils.sizeOf(file);
 		if(l != size) {
 			Log.warn("Library has wrong size: " + s + " " + l + " " + size + " " + path);
 			file.delete();
@@ -686,10 +686,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		case 0:
 		{
 			modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
-			boolean client = true;
-			if(!clientInstalled) client = installClient();
-			else if(clientNeedsUpdate) client = updateClient();
-			if(!client) return;
+			if (clientInstalled ? !installClient() : clientNeedsUpdate ? !updateClient() : false)
+				break;
 			modpack.setUpdateInfo(Text.get("state.updatingmodpack"), Text.get("state.updatingmodpack"), -2);
 			install();
 			break;
@@ -711,8 +709,8 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		case 3:
 		{
 			modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
-			if(!clientInstalled) installClient();
-			else if(clientNeedsUpdate) updateClient();
+			if (clientInstalled ? !installClient() : clientNeedsUpdate ? !updateClient() : false)
+				break;
 			modpack.setUpdateInfo(Text.get("state.updatingmodpack"), Text.get("state.updatingmodpack"), -2);
 			update();
 			break;
@@ -1111,7 +1109,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 						String sh = hash.substring(0, 2);
 						String dir = p + "assets" + File.separator + "objects" + File.separator + sh + File.separator + hash;
 						File file = new File(dir);
-						if(!file.exists() || org.apache.commons.io.FileUtils.sizeOf(file) != k.getLong("size")) {
+						if(!file.exists() || FileUtils.sizeOf(file) != k.getLong("size")) {
 							downloader.add("https://resources.download.minecraft.net/" + sh + "/" + hash, dir);
 						}
 					}
@@ -1146,7 +1144,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 								continue;
 							}
 							JSONObject raw = json.getJSONObject("downloads").getJSONObject("raw");
-							if(file.exists() && org.apache.commons.io.FileUtils.sizeOf(file) == raw.getLong("size")) continue;
+							if(file.exists() && FileUtils.sizeOf(file) == raw.getLong("size")) continue;
 							downloader.add(raw.getString("url"), file.getCanonicalPath());
 							//uiInfo(null, "Скачивание Java: " + key + "("+downloadedFiles+"/"+totalFiles+")", percentD((double)downloadedFiles / (double)totalFiles), null);
 							//WebUtils.download(raw.getString("url"), file.getCanonicalPath());
@@ -1209,7 +1207,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 					if(json.getString("type").equals("directory")) {
 						continue;
 					}
-					if(org.apache.commons.io.FileUtils.sizeOf(file) != json.getJSONObject("downloads").getJSONObject("raw").getLong("size")) {
+					if(FileUtils.sizeOf(file) != json.getJSONObject("downloads").getJSONObject("raw").getLong("size")) {
 						Log.info("jre file " + key + " has wrong size");
 						return false;
 					}
