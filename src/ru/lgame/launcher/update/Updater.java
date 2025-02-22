@@ -688,6 +688,10 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 				return;
 			}
 			Log.info("install state: " + modpackState);
+			
+			Log.debug("client installed: " + clientInstalled);
+			Log.debug("client to be updated: " + clientNeedsUpdate);
+			
 			modpack.setUpdateInfo(Text.get("state.updating"), Text.get("stater.updaterinit"), 0);
 			// обнова либо старт сборки
 			boolean ret = !repeated;
@@ -695,7 +699,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			case 0:
 			{
 				modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
-				if (clientInstalled ? !installClient() : clientNeedsUpdate ? !updateClient() : false)
+				if (!clientInstalled ? !installClient() : clientNeedsUpdate ? !updateClient() : false)
 					break;
 				modpack.setUpdateInfo(Text.get("state.updatingmodpack"), Text.get("state.updatingmodpack"), -2);
 				install();
@@ -718,7 +722,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			case 3:
 			{
 				modpack.setUpdateInfo(Text.get("state.updatingclient"), Text.get("state.updatingclient"), 0);
-				if (clientInstalled ? !installClient() : clientNeedsUpdate ? !updateClient() : false)
+				if (!clientInstalled ? !installClient() : clientNeedsUpdate ? !updateClient() : false)
 					break;
 				modpack.setUpdateInfo(Text.get("state.updatingmodpack"), Text.get("state.updatingmodpack"), -2);
 				update();
