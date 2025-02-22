@@ -586,6 +586,11 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 						}
 					}
 				} catch (Exception e) {
+					if(modpackState > 1 || forceUpdate) {
+						updateFatalError("client libraries json", e, Errors.UPDATER_RUN_GET_CLIENT_LIBRARIES);
+						return;
+					}
+					Log.warn("Failed to get client libraries json", e);
 				}
 				try {
 					if(clientJson.getJSONObject("integrity_check").getJSONObject("assets").optBoolean("new_assets")) {
@@ -597,6 +602,11 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 						}
 					}
 				} catch (Exception e) {
+					if(modpackState > 1 || forceUpdate) {
+						updateFatalError("client assets json", e, Errors.UPDATER_RUN_GET_CLIENT_ASSETS);
+						return;
+					}
+					Log.warn("Failed to get client assets json", e);
 				}
 				try {
 					if(clientJson.optBoolean("has_mojang_jre")) {
