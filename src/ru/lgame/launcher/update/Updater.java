@@ -586,7 +586,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 						}
 					}
 				} catch (Exception e) {
-					if(modpackState > 1 || forceUpdate) {
+					if(modpackState == 0 || forceUpdate) {
 						updateFatalError("client libraries json", e, Errors.UPDATER_RUN_GET_CLIENT_LIBRARIES);
 						return;
 					}
@@ -602,19 +602,17 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 						}
 					}
 				} catch (Exception e) {
-					if(modpackState > 1 || forceUpdate) {
+					if(modpackState == 0 || forceUpdate) {
 						updateFatalError("client assets json", e, Errors.UPDATER_RUN_GET_CLIENT_ASSETS);
 						return;
 					}
 					Log.warn("Failed to get client assets json", e);
 				}
-				try {
-					if(clientJson.optBoolean("has_mojang_jre")) {
-						hasMojangJre = true;
-						Log.info("client uses mojang jre");
-						mojang_jre = clientJson.getString("mojang_jre");
-					}
-				} catch (Exception e) {
+				
+				if(clientJson.optBoolean("has_mojang_jre")) {
+					hasMojangJre = true;
+					Log.info("client uses mojang jre");
+					mojang_jre = clientJson.getString("mojang_jre");
 				}
 			} catch (LauncherOfflineException e) {
 				Log.warn("in offline mode!");
