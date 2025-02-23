@@ -1689,7 +1689,9 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		String arch = System.getProperty("os.arch").toLowerCase();
 		String s = "";
 		if(os.startsWith("win")) {
-			if(arch.contains("64")) {
+			if(arch.contains("aarch") || arch.contains("arm")) {
+				s = "windows-arm64";
+			} else if(arch.contains("64")) {
 				s = "windows-x64";
 			} else {
 				s = "windows-x86";
