@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.util.zip.GZIPInputStream;
 
@@ -20,6 +21,17 @@ import ru.lgame.launcher.utils.logging.Log;
  */
 public class HttpUtils {
 	
+	private static final String PROXY_PREFIX = "https://llaun.ch/proxy.php?url=";
+
+	public static double speed;
+	public static boolean useProxy;
+
+	private ProgressListener listener;
+	
+	public int downloaded;
+	public int need;
+	private String file;
+
 	private final Runnable progressUpdRun = new Runnable() {
 		public void run() {
 			if(file == null) return;
@@ -30,14 +42,6 @@ public class HttpUtils {
 			listener.downloadProgress(file, speed, percent, need - downloaded);
 		}
 	};
-
-	private ProgressListener listener;
-	
-	public int downloaded;
-	public int need;
-	private String file;
-
-	public static double speed;
 	
 	public void setListener(ProgressListener p) {
 		listener = p;
@@ -48,7 +52,11 @@ public class HttpUtils {
 		return (double) ((int) (d * pow)) / pow;
 	}
 
-	public final void download(String uri, String path) throws IOException, InterruptedException {
+	public void download(String url, String path) throws IOException, InterruptedException {
+		_download(url, path, 0);
+	}
+
+	private void _download(String url, String path, int attempt) throws IOException, InterruptedException {
 		File f = new File(path);
 		this.file = f.getName();
 		File d = f.getParentFile();
@@ -74,7 +82,13 @@ public class HttpUtils {
 			};
 		}
 		try {
-			HttpURLConnection con = getHttpConnection(uri);
+			String url2 = url;
+			boolean proxy = false;
+			if (useProxy && (url.contains("mojang.com") || url.contains("minecraft.net"))) {
+				url2 = PROXY_PREFIX + URLEncoder.encode(url, "UTF-8");
+				proxy = true;
+			}
+			HttpURLConnection con = getHttpConnection(url2);
 			//con.setRequestProperty("Accept-Encoding", "gzip");
 			con.setRequestMethod("GET");
 			con.setConnectTimeout(10000);
@@ -89,7 +103,7 @@ public class HttpUtils {
 			byte buffer[] = new byte[512 * 1024];
 			int read;
 			need = con.getContentLength();
-			Log.info("Downloading: \"" + uri + "\" to \"" + path + "\", size: " + (need / 1024) + "k");
+			Log.info("Downloading: \"" + url + "\" to \"" + path + "\", size: " + (need / 1024) + "k" + (proxy ? " proxied" : ""));
 			if(need == -1) Log.warn("Content-size unknown");
 			int i = 0;
 			if(st != null) st.start();
@@ -133,6 +147,12 @@ public class HttpUtils {
 			fout.close();
 			if(listener != null) listener.doneDownload(f.getName());
 		} catch (IOException e) {
+			if (!useProxy && attempt == 0 && (url.contains("mojang.com") || url.contains("minecraft.net"))) {
+				Log.warn("Using proxy", e);
+				useProxy = true;
+				_download(url, path, 1);
+				return;
+			}
 			Launcher.inst.queue(new Runnable() {
 				public void run() {
 					try {
@@ -141,7 +161,7 @@ public class HttpUtils {
 					}
 				}
 			});
-			throw new IOException(uri, e);
+			throw new IOException(url, e);
 		}
 		file = null;
 		downloaded = 0;
@@ -224,8 +244,15 @@ public class HttpUtils {
 
 	public static byte[] getBytes(String url) throws IOException {
 		Log.debug("GET " + url);
+		return _getBytes(url, 0);
+	}
+
+	private static byte[] _getBytes(String url, int attempt) throws IOException {
 		InputStream is = null;
 		try {
+			if (useProxy && (url.contains("mojang.com") || url.contains("minecraft.net"))) {
+				url = PROXY_PREFIX + URLEncoder.encode(url, "UTF-8");
+			}
 			HttpURLConnection con = getHttpConnection(url);
 			con.setRequestMethod("GET");
 //			con.setRequestProperty("Cache-Control", "no-cache");
@@ -259,6 +286,11 @@ public class HttpUtils {
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (IOException e) {
+			if (!useProxy && attempt == 0 && (url.contains("mojang.com") || url.contains("minecraft.net"))) {
+				Log.warn("Using proxy", e);
+				useProxy = true;
+				return _getBytes(PROXY_PREFIX + URLEncoder.encode(url, "UTF-8"), 1);
+			}
 			throw new IOException(url, e);
 		} finally {
 			if(is != null) is.close();
