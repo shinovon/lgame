@@ -277,6 +277,12 @@ public class LauncherPane extends JPanel {
 						Auth a = Launcher.inst.currentAuth();
 						String uuid = null;
 						String username = a.getUsername();
+						if (a.isEly()) {
+							skinImageLabel.setIcon(null);
+							skinName = username;
+							skinState = true;
+							return;
+						}
 						if(a.isMojang()) uuid = a.getUUID();
 						if(uuid == null) {
 							uuid = AuthStore.getUUID(username);

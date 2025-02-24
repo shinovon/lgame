@@ -93,9 +93,8 @@ public final class Auth {
 	private boolean validateEly() throws IOException {
 		JSONObject params = new JSONObject();
 		params.put("accessToken", accessToken);
-		
-		return !new JSONObject(HttpUtils.postUtf("https://authserver.ely.by/auth/validate", params.toString(), "application/json"))
-				.has("error");
+		String s = HttpUtils.postUtf("https://authserver.ely.by/auth/validate", params.toString(), "application/json");
+		return s.isEmpty() || !new JSONObject(s).has("error");
 	}
 
 	private boolean refreshEly() throws IOException {
