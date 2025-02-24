@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.utils.FileUtils;
+import ru.lgame.launcher.utils.HttpUtils;
 import ru.lgame.launcher.utils.logging.Log;
 
 /**
@@ -75,7 +76,12 @@ public final class AuthStore {
 			if(type.equals("MOJANG")) {
 				return;
 			} else if(type.equals("CRACKED")) {
-				a = Auth.fromUsername(s);
+				if (s.contains(";")) {
+					String[] split = s.split(";");
+					a = Auth.get(split[0], split[1]);
+				} else {
+					a = Auth.get(s);
+				}
 			} else {
 				Log.debug(s);
 			}
@@ -95,6 +101,10 @@ public final class AuthStore {
 		try {
 			if(a.isCracked()) {
 				c = a.getUsername();
+				String uuid = a.getMojangUUID();
+				if (uuid != null) {
+					c += ";" + uuid;
+				}
 			} else {
 				c = "null";
 			}
@@ -168,10 +178,30 @@ public final class AuthStore {
 		if(selected == a) selected = null;
 		save();
 	}
+	
+	public static void addAndSelect(Auth a) {
+		if(!list.contains(a)) list.add(a);
+		selected = a;
+		save();
+	}
 
 	public static void setSelected(Auth a) {
 		if(list.contains(a)) selected = a;
 		save();
+	}
+	
+	public static String getUUID(String username) throws IOException {
+		String uuid = Launcher.inst.getValueFromCache(username.toLowerCase() + "_uuid");
+		if (uuid == null) {
+			String s = HttpUtils.get("https://api.mojang.com/users/profiles/minecraft/" + username + "?at=" + (System.currentTimeMillis() / 1000L));
+			if(s == null || s == "" || s.length() < 2 || s.charAt(0) != '{') {
+				return null;
+			}
+			JSONObject profile = new JSONObject(s);
+			uuid = profile.getString("id").replace("-", "");
+			Launcher.inst.saveValueToCache(username.toLowerCase() + "_uuid", uuid);
+		}
+		return uuid;
 	}
 
 	private static String[] split(String str, String d) {

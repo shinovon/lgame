@@ -142,14 +142,13 @@ public class AccountsFrm extends JFrame {
 				//comboBox.setEnabled(false);
 				confirmBtn.setEnabled(false);
 				try {
-					Auth a = null;
-					//if(comboBox.getSelectedIndex() == 0) {
-					a = Auth.fromUsername(usernameField.getText());
-					//} else {
-					//	a = Auth.fromMojang(usernameField.getText(), passwordField.getText());
-					//}
-					AuthStore.add(a);
-					AuthStore.setSelected(a);
+					String name = usernameField.getText();
+					String uuid = null;
+					try {
+						uuid = AuthStore.getUUID(getName());
+					} catch (Exception ignored) {}
+					Auth a = Auth.get(name, uuid);
+					AuthStore.addAndSelect(a);
 				} catch (Throwable e) {
 					ErrorUI.showError(Text.get("title.accounts"), Text.get("err.accountadd"), e);
 				}

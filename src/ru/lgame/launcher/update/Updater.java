@@ -19,6 +19,7 @@ import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Errors;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.auth.Auth;
+import ru.lgame.launcher.auth.AuthStore;
 import ru.lgame.launcher.ui.ErrorUI;
 import ru.lgame.launcher.ui.locale.Text;
 import ru.lgame.launcher.utils.FileUtils;
@@ -385,10 +386,10 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		return true;
 	}
 
-	private boolean checkClientLibrary(String p, JSONObject j) throws Exception {
+	private boolean checkClientLibrary(String p, JSONObject j, boolean forDownload) throws Exception {
 		String s = j.getString("name");
-		String sha1 = j.getString("sha1");
-		long size = j.getLong("size");
+		String sha1 = j.optString("sha1", null);
+		long size = j.optLong("size", -1);
 		String path = p + "libraries" + File.separator + path(j.getString("path"));
 		File file = new File(path);
 		if (!file.exists()) {
@@ -396,19 +397,29 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
 			return false;
 		}
-		long l = FileUtils.sizeOf(file);
-		if(l != size) {
-			Log.warn("Library has wrong size: " + s + " " + l + " " + size + " " + path);
-			file.delete();
-			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
+		if (forDownload && j.optBoolean("alwaysDownload")) {
 			return false;
 		}
-		String hash2 = HashUtils.getFileChecksum(path, "SHA-1");
-		if (!hash2.equalsIgnoreCase(sha1)) {
-			file.delete();
-			//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
-			Log.warn("Library has wrong checksum: " + s + " " + hash2);
-			return false;
+		if (j.optBoolean("dontCheck")) {
+			return true;
+		}
+		if (size != -1) {
+			long l = FileUtils.sizeOf(file);
+			if(l != size) {
+				Log.warn("Library has wrong size: " + s + " " + l + " " + size + " " + path);
+				file.delete();
+				//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
+				return false;
+			}
+		}
+		if (sha1 != null) {
+			String hash2 = HashUtils.getFileChecksum(path, "SHA-1");
+			if (!hash2.equalsIgnoreCase(sha1)) {
+				file.delete();
+				//FileUtils.deleteDirectoryRecursion(Paths.get(p + "libraries" + File.separator));
+				Log.warn("Library has wrong checksum: " + s + " " + hash2);
+				return false;
+			}
 		}
 		return true;
 	}
@@ -428,7 +439,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			if(!new File(p + "libraries" + File.separator).exists()) return false;
 			JSONArray libraries = clientLibrariesJson.getJSONArray("libraries");
 			for (Object o: libraries) {
-				if(!checkClientLibrary(p, (JSONObject) o))
+				if(!checkClientLibrary(p, (JSONObject) o, false))
 					return false;
 			}
 			return true;
@@ -1049,7 +1060,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 						String path = k.getString("path");
 						String url = k.getString("url");
 						String dir = p + "libraries" + File.separator + path(path);
-						if(!checkClientLibrary(p, k)) {
+						if(!checkClientLibrary(p, k, true)) {
 							//modpack.setUpdateInfo(null, Text.get("state.downloading") + ": " + path.substring(path.lastIndexOf("/") + 1) + " (0%)", percentI());
 							downloader.add(url, dir);
 							/*
@@ -1321,6 +1332,16 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 				}
 			}
 			ArrayList<String> appArgs = new ArrayList<>();
+			String uuid = auth.getMojangUUID();
+			if (uuid == null) {
+				try {
+					uuid = AuthStore.getUUID(auth.getUsername());
+				} catch (Exception ignored) {}
+			}
+			if (uuid != null) {
+				appArgs.add("--uuid");
+				appArgs.add(uuid);
+			}
 			if(auth.isCracked()) {
 				appArgs.add("--username");
 				appArgs.add(auth.getUsername());
@@ -1438,7 +1459,10 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 			ArrayList<File> list = new ArrayList<File>();
 			for (Object i: libraries) {
 				JSONObject k = (JSONObject) i;
-				if(k.optBoolean("downloadOnly")) continue;
+				if(k.optBoolean("downloadOnly")) {
+					if (!k.optBoolean("includeEly") || !Config.getBoolean("useEly")) continue;
+				}
+				if (k.optBoolean("excludeEly") && Config.getBoolean("useEly")) continue;
 				list.add(new File(getClientDir() + "libraries" + File.separator + path(k.getString("path"))));
 			}
 			return list.toArray(new File[0]);

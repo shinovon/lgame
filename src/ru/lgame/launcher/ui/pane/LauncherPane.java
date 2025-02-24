@@ -33,6 +33,7 @@ import org.json.JSONObject;
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.auth.Auth;
+import ru.lgame.launcher.auth.AuthStore;
 import ru.lgame.launcher.ui.Fonts;
 import ru.lgame.launcher.ui.frame.LauncherFrm;
 import ru.lgame.launcher.ui.locale.Text;
@@ -258,8 +259,8 @@ public class LauncherPane extends JPanel {
 				return;
 			}
 			if(forceUpdateCheck.isSelected()) 
-				Launcher.inst.runForceUpdate(Auth.fromUsername(usernameField.getText()), selected.getModpack());
-			else Launcher.inst.run(Auth.fromUsername(usernameField.getText()), selected.getModpack());
+				Launcher.inst.runForceUpdate(Auth.get(usernameField.getText()), selected.getModpack());
+			else Launcher.inst.run(Auth.get(usernameField.getText()), selected.getModpack());
 		} else {
 			JOptionPane.showMessageDialog(frm, Text.get("msg.noaccount"), "", JOptionPane.WARNING_MESSAGE);
 		}
@@ -278,21 +279,11 @@ public class LauncherPane extends JPanel {
 						String username = a.getUsername();
 						if(a.isMojang()) uuid = a.getMojangUUID();
 						if(uuid == null) {
-							String cv = Launcher.inst.getValueFromCache(username.toLowerCase() + "_uuid");
-							if(cv == null) {
-								String s = HttpUtils.get("https://api.mojang.com/users/profiles/minecraft/" + username + "?at=" + (System.currentTimeMillis() / 1000L));
-								if(s == null || s == "" || s.length() < 2 || s.charAt(0) != '{') {
-									skinName = username;
-									skinState = true;
-									fail = true;
-									break l;
-								}
-								JSONObject profile = new JSONObject(s);
-								uuid = profile.getString("id").replace("-", "");
-								Launcher.inst.saveValueToCache(username.toLowerCase() + "_uuid", uuid);
-							} else uuid = cv;
+							uuid = AuthStore.getUUID(username);
 						}
 						if(uuid == null) {
+							skinName = username;
+							skinState = true;
 							fail = true;
 							break l;
 						}

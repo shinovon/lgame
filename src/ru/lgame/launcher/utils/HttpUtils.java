@@ -10,9 +10,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.security.MessageDigest;
 import java.util.zip.GZIPInputStream;
 
+import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.utils.logging.Log;
 
@@ -21,7 +21,7 @@ import ru.lgame.launcher.utils.logging.Log;
  */
 public class HttpUtils {
 	
-	private static final String PROXY_PREFIX = "https://llaun.ch/proxy.php?url=";
+	public static final String DEFAULT_PROXY_PREFIX = "https://llaun.ch/proxy.php?url=";
 
 	public static double speed;
 	public static boolean useProxy;
@@ -84,8 +84,8 @@ public class HttpUtils {
 		try {
 			String url2 = url;
 			boolean proxy = false;
-			if (useProxy && (url.contains("mojang.com") || url.contains("minecraft.net"))) {
-				url2 = PROXY_PREFIX + URLEncoder.encode(url, "UTF-8");
+			if (useProxy && (url.contains("mojang.com") || url.contains("minecraft.net") || url.contains("minecraftforge.net"))) {
+				url2 = Config.get("proxyPrefix", DEFAULT_PROXY_PREFIX) + URLEncoder.encode(url, "UTF-8");
 				proxy = true;
 			}
 			HttpURLConnection con = getHttpConnection(url2);
@@ -193,26 +193,7 @@ public class HttpUtils {
 	private static HttpURLConnection getHttpConnection(URL url) throws IOException {
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestProperty("User-Agent", "LGameLauncher/" + Launcher.version);
-		con.setRequestProperty("X-User-UID", getHWID());
 		return con;
-	}
-	
-	public static String getHWID() {
-		try {
-			String s = System.getenv("COMPUTERNAME") + System.getProperty("user.name") + System.getenv("PROCESSOR_IDENTIFIER") + System.getenv("PROCESSOR_LEVEL");
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			md.update(s.getBytes());
-			StringBuffer sb = new StringBuffer();
-			byte b[] = md.digest();
-			for (byte aByteData : b) {
-				String hex = Integer.toHexString(0xff & aByteData);
-				if (hex.length() == 1) sb.append('0');
-				sb.append(hex);
-			}
-			return sb.toString();
-		} catch (Exception e) {
-			return "null";
-		}
 	}
 
 	private static InputStream getHttpInputStream(HttpURLConnection con, boolean err) throws IOException {
@@ -251,7 +232,7 @@ public class HttpUtils {
 		InputStream is = null;
 		try {
 			if (useProxy && (url.contains("mojang.com") || url.contains("minecraft.net"))) {
-				url = PROXY_PREFIX + URLEncoder.encode(url, "UTF-8");
+				url = DEFAULT_PROXY_PREFIX + URLEncoder.encode(url, "UTF-8");
 			}
 			HttpURLConnection con = getHttpConnection(url);
 			con.setRequestMethod("GET");
@@ -286,10 +267,10 @@ public class HttpUtils {
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (IOException e) {
-			if (!useProxy && attempt == 0 && (url.contains("mojang.com") || url.contains("minecraft.net"))) {
+			if (!useProxy && attempt == 0 && (url.contains("mojang.com") || url.contains("minecraftforge.net") || url.contains("minecraft.net"))) {
 				Log.warn("Using proxy", e);
 				useProxy = true;
-				return _getBytes(PROXY_PREFIX + URLEncoder.encode(url, "UTF-8"), 1);
+				return _getBytes(Config.get("proxyPrefix", DEFAULT_PROXY_PREFIX) + URLEncoder.encode(url, "UTF-8"), 1);
 			}
 			throw new IOException(url, e);
 		} finally {

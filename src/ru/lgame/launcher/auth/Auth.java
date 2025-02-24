@@ -11,6 +11,7 @@ public final class Auth {
 	private AuthType type;
 	
 	private String username;
+	private String uuid;
 	
 	private String mail;
 	private String password;
@@ -18,13 +19,18 @@ public final class Auth {
 	private Auth() {
 	}
 
-	private Auth(String username) {
+	private Auth(String username, String uuid) {
 		this.username = username;
+		this.uuid = uuid;
 		this.type = AuthType.USERNAME;
 	}
 
-	public static Auth fromUsername(String username) {
-		return new Auth(username);
+	public static Auth get(String username) {
+		return new Auth(username, null);
+	}
+
+	public static Auth get(String username, String uuid) {
+		return new Auth(username, uuid);
 	}
 
 	public boolean isCracked() {
@@ -48,7 +54,7 @@ public final class Auth {
 	}
 
 	public String getMojangUUID() {
-		return null;
+		return uuid;
 	}
 	
 	public String getNNIDAuthToken() {

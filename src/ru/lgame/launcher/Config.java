@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import ru.lgame.launcher.utils.HttpUtils;
 import ru.lgame.launcher.utils.logging.Log;
 
 /**
@@ -29,6 +30,8 @@ public class Config {
 		set("xms", "512");
 		set("downloadLeftTime", false);
 		set("downloadMaxAttempts", "2");
+		set("useEly", true);
+		set("proxyPrefix", HttpUtils.DEFAULT_PROXY_PREFIX);
 	}
 
 	public synchronized static void loadConfig() {
@@ -73,6 +76,13 @@ public class Config {
 	public static String get(String key) {
 		if(properties.containsKey(key)) return (String) properties.get(key);
 		else return null;
+	}
+
+	public static String get(String key, String def) {
+		if (properties.containsKey(key)) {
+			return (String) properties.get(key);
+		}
+		return def;
 	}
 
 	public static boolean contains(String key) {
