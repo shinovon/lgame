@@ -1332,7 +1332,7 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 				}
 			}
 			ArrayList<String> appArgs = new ArrayList<>();
-			String uuid = auth.getMojangUUID();
+			String uuid = auth.getUUID();
 			if (uuid == null) {
 				try {
 					uuid = AuthStore.getUUID(auth.getUsername());
@@ -1342,25 +1342,16 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 				appArgs.add("--uuid");
 				appArgs.add(uuid);
 			}
-			if(auth.isCracked()) {
-				appArgs.add("--username");
-				appArgs.add(auth.getUsername());
-				appArgs.add("--accessToken");
-				appArgs.add("null");
-				appArgs.add("--userProperties");
-				appArgs.add("{}");
+			appArgs.add("--username");
+			appArgs.add(auth.getUsername());
+			String accessToken = auth.getAccessToken();
+			appArgs.add("--accessToken");
+			appArgs.add(accessToken != null ? accessToken : "null");
+			if (auth.isEly()) {
+				appArgs.add("--userType");
+				appArgs.add("mojang");
 			}
-//			} else if(auth.isMojang()) {
-//				appArgs.add("--username");
-//				appArgs.add(auth.getUsername());
-//				appArgs.add("--uuid");
-//				appArgs.add(auth.getMojangUUID());
-//				appArgs.add("--accessToken");
-//				appArgs.add(auth.getMojangAuthToken());
-//				appArgs.add("--userProperties");
-//				appArgs.add("{}");
-//				//appArgs.add("\"" + auth.getMojangUserProperties().replace("\"", "\\\"") + "\"");
-//			}
+			
 			appArgs.add("--gameDir");
 			appArgs.add(getModpackDir());
 			appArgs.add("--assetsDir");

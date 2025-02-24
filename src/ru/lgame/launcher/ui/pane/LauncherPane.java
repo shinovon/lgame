@@ -277,7 +277,7 @@ public class LauncherPane extends JPanel {
 						Auth a = Launcher.inst.currentAuth();
 						String uuid = null;
 						String username = a.getUsername();
-						if(a.isMojang()) uuid = a.getMojangUUID();
+						if(a.isMojang()) uuid = a.getUUID();
 						if(uuid == null) {
 							uuid = AuthStore.getUUID(username);
 						}

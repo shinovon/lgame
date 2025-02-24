@@ -12,6 +12,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.zip.GZIPInputStream;
 
+import org.json.JSONObject;
+
 import ru.lgame.launcher.Config;
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.utils.logging.Log;
@@ -84,7 +86,8 @@ public class HttpUtils {
 		try {
 			String url2 = url;
 			boolean proxy = false;
-			if (useProxy && (url.contains("mojang.com") || url.contains("minecraft.net") || url.contains("minecraftforge.net"))) {
+			if (useProxy &&
+					(url.contains("mojang.com") || url.contains("minecraft.net") || url.contains("minecraftforge.net"))) {
 				url2 = Config.get("proxyPrefix", DEFAULT_PROXY_PREFIX) + URLEncoder.encode(url, "UTF-8");
 				proxy = true;
 			}
@@ -147,7 +150,8 @@ public class HttpUtils {
 			fout.close();
 			if(listener != null) listener.doneDownload(f.getName());
 		} catch (IOException e) {
-			if (!useProxy && attempt == 0 && (url.contains("mojang.com") || url.contains("minecraft.net"))) {
+			if (!useProxy && attempt == 0 &&
+					(url.contains("mojang.com") || url.contains("minecraft.net") || url.contains("minecraftforge.net"))) {
 				Log.warn("Using proxy", e);
 				useProxy = true;
 				_download(url, path, 1);
@@ -231,7 +235,8 @@ public class HttpUtils {
 	private static byte[] _getBytes(String url, int attempt) throws IOException {
 		InputStream is = null;
 		try {
-			if (useProxy && (url.contains("mojang.com") || url.contains("minecraft.net"))) {
+			if (useProxy &&
+					(url.contains("mojang.com") || url.contains("minecraft.net") || url.contains("minecraftforge.net"))) {
 				url = DEFAULT_PROXY_PREFIX + URLEncoder.encode(url, "UTF-8");
 			}
 			HttpURLConnection con = getHttpConnection(url);
@@ -252,9 +257,7 @@ public class HttpUtils {
 			//Log.debug("response code: " + con.getResponseCode());
 			is = getHttpInputStream(con);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			int i = con.getContentLength();
-			if(i <= 0) i = 128;
-			final byte[] buf = new byte[i];
+			final byte[] buf = new byte[16384];
 			int read;
 			while ((read = is.read(buf)) != -1) {
 				baos.write(buf, 0, read);
@@ -267,7 +270,8 @@ public class HttpUtils {
 		} catch (FileNotFoundException e) {
 			throw e;
 		} catch (IOException e) {
-			if (!useProxy && attempt == 0 && (url.contains("mojang.com") || url.contains("minecraftforge.net") || url.contains("minecraft.net"))) {
+			if (!useProxy && attempt == 0 &&
+					(url.contains("mojang.com") || url.contains("minecraft.net") || url.contains("minecraftforge.net"))) {
 				Log.warn("Using proxy", e);
 				useProxy = true;
 				return _getBytes(Config.get("proxyPrefix", DEFAULT_PROXY_PREFIX) + URLEncoder.encode(url, "UTF-8"), 1);
@@ -298,5 +302,53 @@ public class HttpUtils {
 		} catch (IOException e) {
 			throw new IOException(url, e);
 		}
+	}
+
+	public static byte[] postBytes(String url, String data, String type) throws IOException {
+		Log.debug("POST " + url);
+		Log.debug("POST DATA: " + data);
+		InputStream is = null;
+		try {
+			HttpURLConnection con = getHttpConnection(url);
+			con.setRequestMethod("POST");
+			byte[] b = data.getBytes("UTF-8");
+			con.addRequestProperty("Content-Encoding", "UTF-8");
+			con.addRequestProperty("Content-Length", "" + b.length);
+			con.addRequestProperty("Content-Type", type);
+			con.setDoOutput(true);
+			con.setDoInput(true);
+			con.connect();
+			
+			OutputStream os = con.getOutputStream();
+			os.write(b);
+			os.flush();
+			
+			if(con.getResponseCode() == 404) {
+				con.disconnect();
+				throw new FileNotFoundException(url);
+			}
+			is = getHttpInputStream(con);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			final byte[] buf = new byte[16384];
+			int read;
+			while ((read = is.read(buf)) != -1) {
+				baos.write(buf, 0, read);
+			}
+			is.close();
+			con.disconnect();
+			b = baos.toByteArray();
+			baos.close();
+			return b;
+		} catch (FileNotFoundException e) {
+			throw e;
+		} catch (IOException e) {
+			throw new IOException(url, e);
+		} finally {
+			if(is != null) is.close();
+		}
+	}
+
+	public static String postUtf(String url, String data, String type) throws IOException {
+		 return new String(postBytes(url, data, type), "UTF-8");
 	}
 }

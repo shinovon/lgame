@@ -2,17 +2,22 @@ package ru.lgame.launcher.ui.frame;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URI;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
@@ -22,12 +27,15 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import org.json.JSONObject;
+
 import ru.lgame.launcher.Launcher;
 import ru.lgame.launcher.auth.Auth;
 import ru.lgame.launcher.auth.AuthStore;
 import ru.lgame.launcher.auth.AuthType;
 import ru.lgame.launcher.ui.ErrorUI;
 import ru.lgame.launcher.ui.locale.Text;
+import ru.lgame.launcher.utils.HttpUtils;
 
 import java.awt.Color;
 
@@ -44,6 +52,8 @@ public class AccountsFrm extends JFrame {
 	private JPasswordField passwordField;
 
 	private JList<Auth> list;
+
+	private JButton confirmBtn;
 
 	/**
 	 * Create the frame.
@@ -92,12 +102,12 @@ public class AccountsFrm extends JFrame {
 		usernameField.setPreferredSize(new Dimension(120, 20));
 		usernameField.setColumns(16);
 		
-		//JLabel passwordLabel = new JLabel(Text.get("label.password"));
-		//panel_7.add(passwordLabel);
+		JLabel passwordLabel = new JLabel(Text.get("label.password"));
+		panel_7.add(passwordLabel);
 		
 		passwordField = new JPasswordField();
 		passwordField.setCaretColor(new Color(-1));
-		//panel_7.add(passwordField);
+		panel_7.add(passwordField);
 		passwordField.setPreferredSize(new Dimension(120, 20));
 		passwordField.setMinimumSize(new Dimension(120, 20));
 		passwordField.setMaximumSize(new Dimension(300, Integer.MAX_VALUE));
@@ -112,43 +122,58 @@ public class AccountsFrm extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if(comboBox.getSelectedIndex() == 0) {
 					usernameLabel.setText(Text.get("label.username"));
+					confirmBtn.setText(Text.get("button.account.add"));
 					passwordField.setEnabled(false);
 					usernameField.setEnabled(true);
 				} else {
-					usernameLabel.setText("Email");
+					usernameLabel.setText(Text.get("label.email"));
+					confirmBtn.setText(Text.get("button.account.auth"));
 					passwordField.setEnabled(true);
 					usernameField.setEnabled(true);
 				}
 				update();
 			}
 		});
-		//panel_4.add(comboBox);
+		panel_4.add(comboBox);
 		comboBox.setPreferredSize(new Dimension(134, 20));
-		//comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {Text.get("button.account.cracked"), Text.get("button.account.mojang")}));
+		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {Text.get("button.account.cracked"), Text.get("button.account.ely")}));
 		JPanel panel_5 = new JPanel();
 		accountPanel.add(panel_5, BorderLayout.SOUTH);
 		
-		JButton confirmBtn = new JButton(Text.get("button.account.add"));
+		confirmBtn = new JButton(Text.get("button.account.add"));
 		panel_5.add(confirmBtn);
 		confirmBtn.setPreferredSize(new Dimension(134, 20));
 		passwordField.setEnabled(false);
 		usernameField.setEnabled(false);
 		comboBox.setEnabled(false);
 		confirmBtn.setEnabled(false);
-		confirmBtn.addActionListener(new ActionListener() { // XXX: Mojang login disabled
+		confirmBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				passwordField.setEnabled(false);
 				usernameField.setEnabled(false);
-				//comboBox.setEnabled(false);
+				comboBox.setEnabled(false);
 				confirmBtn.setEnabled(false);
 				try {
-					String name = usernameField.getText();
-					String uuid = null;
-					try {
-						uuid = AuthStore.getUUID(getName());
-					} catch (Exception ignored) {}
-					Auth a = Auth.get(name, uuid);
-					AuthStore.addAndSelect(a);
+					if (comboBox.getSelectedIndex() == 1) {
+						try {
+							AuthStore.addAndSelect(Auth.getEly(usernameField.getText(), passwordField.getText()));
+						} catch (Exception e) {
+							if ("ForbiddenOperationException".equals(e.getMessage())) {
+								String code = JOptionPane.showInputDialog(AccountsFrm.this, "Введите OTP код", "");
+								if (code != null)
+									AuthStore.addAndSelect(Auth.getEly(usernameField.getText(), passwordField.getText() + ":" + code));
+							} else {
+								throw e;
+							}
+						}
+					} else {
+						String name = usernameField.getText();
+						String uuid = null;
+						try {
+							uuid = AuthStore.getUUID(getName());
+						} catch (Exception ignored) {}
+						AuthStore.addAndSelect(Auth.get(name, uuid));
+					}
 				} catch (Throwable e) {
 					ErrorUI.showError(Text.get("title.accounts"), Text.get("err.accountadd"), e);
 				}
@@ -205,16 +230,20 @@ public class AccountsFrm extends JFrame {
 		addBtn.setPreferredSize(new Dimension(48, 23));
 		addBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//if(comboBox.getSelectedIndex() == 0) {
-				usernameLabel.setText(Text.get("label.username"));
-				//passwordField.setEnabled(false);
-				usernameField.setEnabled(true);
-				//} else {
-				//	usernameLabel.setText(Text.get("label.email"));
-				//	passwordField.setEnabled(true);
-				//	usernameField.setEnabled(true);
-				//}
-				//comboBox.setEnabled(true);
+				if(comboBox.getSelectedIndex() == 0) {
+					usernameLabel.setText(Text.get("label.username"));
+					confirmBtn.setText(Text.get("button.account.add"));
+					passwordField.setEnabled(false);
+					usernameField.setEnabled(true);
+					usernameField.setVisible(true);
+				} else {
+					usernameLabel.setText(Text.get("label.email"));
+					confirmBtn.setText(Text.get("button.account.auth"));
+					passwordField.setEnabled(true);
+					usernameField.setEnabled(true);
+					usernameField.setVisible(false);
+				}
+				comboBox.setEnabled(true);
 				confirmBtn.setEnabled(true);
 				update();
 			}
@@ -245,6 +274,9 @@ public class AccountsFrm extends JFrame {
 		}
 		if(type == AuthType.LGAME) {
 			return "LGame";
+		}
+		if(type == AuthType.ELY) {
+			return "Ely.by";
 		}
 		return "По нику";
 	}

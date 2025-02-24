@@ -9,6 +9,8 @@ button.ok=OK
 button.showlogger=Показать логи
 button.account.add=Подтвердить
 button.account.cracked=По нику
+button.account.ely=Ely.by
+button.account.auth=Авторизоваться
 button.showlogger=Показать логи
 button.openlibrarydir=Открыть папку со сборками
 
@@ -24,6 +26,7 @@ label.email=Email
 label.javapathnote=(оставьте пустым для автоматического определения)
 label.localizedmodpack=Перевод
 label.warnbeta=<html>Внимание! Так как лаунчер находится в стадии разработки, он может содержать баги и недоработки. Сообщайте о найденных ошибках <a href="">сюда</a>.
+label.ely=
 
 check.forceinstall=Переустановить
 

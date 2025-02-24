@@ -82,6 +82,8 @@ public final class AuthStore {
 				} else {
 					a = Auth.get(s);
 				}
+			} else if(type.equals("ELY")) {
+				a = Auth.parseEly(s);
 			} else {
 				Log.debug(s);
 			}
@@ -99,15 +101,7 @@ public final class AuthStore {
 		String fs = "";
 		String c = "";
 		try {
-			if(a.isCracked()) {
-				c = a.getUsername();
-				String uuid = a.getMojangUUID();
-				if (uuid != null) {
-					c += ";" + uuid;
-				}
-			} else {
-				c = "null";
-			}
+			c = a.export();
 		} catch (Exception e) {}
 		String sel = "0";
 		if(a.equals(selected)) sel = "1";
