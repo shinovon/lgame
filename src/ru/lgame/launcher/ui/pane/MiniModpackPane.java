@@ -261,8 +261,16 @@ public class MiniModpackPane extends JPanel {
 		if(tw > MAX_WIDTH) tw = MAX_WIDTH;
 		Font of = g.getFont();
 		g.setFont(modpackTitle);
-		g.drawString(modpackName, x, g.getFontMetrics().getHeight() / 2 + 5);
+		int titleY = g.getFontMetrics().getHeight() / 2 + 5;
+		int titleW = g.getFontMetrics().stringWidth(modpackName);
+		g.drawString(modpackName, x, titleY);
 		int ty = g.getFontMetrics().getHeight() + yyy;
+		if (modpack.getType().equals("localized")) {
+			g.setFont(f);
+			g.setColor(INSTALLED_LABEL_COLOR);
+			g.drawString(Text.get("label.localized"), x + titleW + 4, titleY);
+			g.setColor(UIManager.getColor("Label.foreground"));
+		}
 		/*if(category != null) {
 			g.setFont(modpackCategory);
 			int cth = g.getFontMetrics(modpackCategory).getHeight();

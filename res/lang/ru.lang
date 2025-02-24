@@ -26,7 +26,7 @@ label.email=Email
 label.javapathnote=(оставьте пустым для автоматического определения)
 label.localizedmodpack=Перевод
 label.warnbeta=<html>Внимание! Так как лаунчер находится в стадии разработки, он может содержать баги и недоработки. Сообщайте о найденных ошибках <a href="">сюда</a>.
-label.ely=
+label.localized=Перевод
 
 check.forceinstall=Переустановить
 
