@@ -177,6 +177,8 @@ public class AccountsFrm extends JFrame {
 				} catch (Throwable e) {
 					ErrorUI.showError(Text.get("title.accounts"), Text.get("err.accountadd"), e);
 				}
+				usernameField.setText("");
+				passwordField.setText("");
 				update();
 			}
 		});
@@ -230,18 +232,18 @@ public class AccountsFrm extends JFrame {
 		addBtn.setPreferredSize(new Dimension(48, 23));
 		addBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				usernameField.setText("");
+				passwordField.setText("");
 				if(comboBox.getSelectedIndex() == 0) {
 					usernameLabel.setText(Text.get("label.username"));
 					confirmBtn.setText(Text.get("button.account.add"));
 					passwordField.setEnabled(false);
 					usernameField.setEnabled(true);
-					usernameField.setVisible(true);
 				} else {
 					usernameLabel.setText(Text.get("label.email"));
 					confirmBtn.setText(Text.get("button.account.auth"));
 					passwordField.setEnabled(true);
 					usernameField.setEnabled(true);
-					usernameField.setVisible(false);
 				}
 				comboBox.setEnabled(true);
 				confirmBtn.setEnabled(true);

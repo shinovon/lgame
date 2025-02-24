@@ -1631,7 +1631,13 @@ public final class Updater implements Runnable, ZipUtils.ProgressListener, HttpU
 		cmd.add(constructClassPath(classpathList));
 		cmd.add(mainClass);
 		cmd.addAll(appArgs);
-		Log.info(cmd.toString());
+		
+		String s = cmd.toString();
+		if (auth.getAccessToken() != null) {
+			s.replace(auth.getAccessToken(), "HIDDEN");
+		}
+		Log.info(s);
+		
 		return startProcess(dir, cmd);
 	}
 

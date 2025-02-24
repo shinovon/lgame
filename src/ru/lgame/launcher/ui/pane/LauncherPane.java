@@ -299,6 +299,7 @@ public class LauncherPane extends JPanel {
 							skinImageLabel.setIcon(new ImageIcon(ci));
 							skinName = username;
 							skinState = true;
+							return;
 						}
 						try {
 							byte[] b = HttpUtils.getBytes(url);
