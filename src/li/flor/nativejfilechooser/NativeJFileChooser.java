@@ -68,9 +68,9 @@ public class NativeJFileChooser extends JFileChooser {
 	
 	public static final boolean FX_AVAILABLE;
     private List<File> currentFiles;
-    private FileChooser fileChooser;
+    private Object fileChooser;
     private File currentFile;
-    private DirectoryChooser directoryChooser;
+    private Object directoryChooser;
 
     static {
         boolean isFx;
@@ -132,12 +132,12 @@ public class NativeJFileChooser extends JFileChooser {
                     }
 
                     if (isDirectorySelectionEnabled()) {
-                        currentFile = directoryChooser.showDialog(null);
+                        currentFile = ((DirectoryChooser) directoryChooser).showDialog(null);
                     } else {
                         if (isMultiSelectionEnabled()) {
-                            currentFiles = fileChooser.showOpenMultipleDialog(null);
+                            currentFiles = ((FileChooser) fileChooser).showOpenMultipleDialog(null);
                         } else {
-                            currentFile = fileChooser.showOpenDialog(null);
+                            currentFile = ((FileChooser) fileChooser).showOpenDialog(null);
                         }
                     }
                     latch.countDown();
@@ -154,12 +154,12 @@ public class NativeJFileChooser extends JFileChooser {
 	                }
 	
 	                if (isDirectorySelectionEnabled()) {
-	                    currentFile = directoryChooser.showDialog(null);
+	                    currentFile = ((DirectoryChooser) directoryChooser).showDialog(null);
 	                } else {
 	                    if (isMultiSelectionEnabled()) {
-	                        currentFiles = fileChooser.showOpenMultipleDialog(null);
+	                        currentFiles = ((FileChooser) fileChooser).showOpenMultipleDialog(null);
 	                    } else {
-	                        currentFile = fileChooser.showOpenDialog(null);
+	                        currentFile = ((FileChooser) fileChooser).showOpenDialog(null);
 	                    }
 	                }
 	                latch.countDown();
@@ -210,9 +210,9 @@ public class NativeJFileChooser extends JFileChooser {
                 }
 
                 if (isDirectorySelectionEnabled()) {
-                    currentFile = directoryChooser.showDialog(null);
+                    currentFile = ((DirectoryChooser) directoryChooser).showDialog(null);
                 } else {
-                    currentFile = fileChooser.showSaveDialog(null);
+                    currentFile = ((FileChooser) fileChooser).showSaveDialog(null);
                 }
                 latch.countDown();
             }
@@ -285,17 +285,17 @@ public class NativeJFileChooser extends JFileChooser {
         currentFile = file;
         if (file != null) {
             if (file.isDirectory()) {
-                fileChooser.setInitialDirectory(file.getAbsoluteFile());
+                ((FileChooser) fileChooser).setInitialDirectory(file.getAbsoluteFile());
 
                 if (directoryChooser != null) {
-                    directoryChooser.setInitialDirectory(file.getAbsoluteFile());
+                    ((DirectoryChooser) directoryChooser).setInitialDirectory(file.getAbsoluteFile());
                 }
             } else if (file.isFile()) {
-                fileChooser.setInitialDirectory(file.getParentFile());
-                fileChooser.setInitialFileName(file.getName());
+                ((FileChooser) fileChooser).setInitialDirectory(file.getParentFile());
+                ((FileChooser) fileChooser).setInitialFileName(file.getName());
 
                 if (directoryChooser != null) {
-                    directoryChooser.setInitialDirectory(file.getParentFile());
+                    ((DirectoryChooser) directoryChooser).setInitialDirectory(file.getParentFile());
                 }
             }
 
@@ -324,9 +324,9 @@ public class NativeJFileChooser extends JFileChooser {
             super.setDialogTitle(dialogTitle);
             return;
         }
-        fileChooser.setTitle(dialogTitle);
+        ((FileChooser) fileChooser).setTitle(dialogTitle);
         if (directoryChooser != null) {
-            directoryChooser.setTitle(dialogTitle);
+            ((DirectoryChooser) directoryChooser).setTitle(dialogTitle);
         }
     }
 
@@ -335,7 +335,7 @@ public class NativeJFileChooser extends JFileChooser {
         if (!FX_AVAILABLE) {
             return super.getDialogTitle();
         }
-        return fileChooser.getTitle();
+        return ((FileChooser) fileChooser).getTitle();
     }
 
     @Override
@@ -344,11 +344,11 @@ public class NativeJFileChooser extends JFileChooser {
             super.changeToParentDirectory();
             return;
         }
-        File parentDir = fileChooser.getInitialDirectory().getParentFile();
+        File parentDir = ((FileChooser) fileChooser).getInitialDirectory().getParentFile();
         if (parentDir.isDirectory()) {
-            fileChooser.setInitialDirectory(parentDir);
+            ((FileChooser) fileChooser).setInitialDirectory(parentDir);
             if (directoryChooser != null) {
-                directoryChooser.setInitialDirectory(parentDir);
+                ((DirectoryChooser) directoryChooser).setInitialDirectory(parentDir);
             }
         }
     }
@@ -366,7 +366,7 @@ public class NativeJFileChooser extends JFileChooser {
             for (String extension : f.getExtensions()) {
                 ext.add(extension.replaceAll("^\\*?\\.?(.*)$", "*.$1"));
             }
-            fileChooser.getExtensionFilters()
+            ((FileChooser) fileChooser).getExtensionFilters()
                     .add(new FileChooser.ExtensionFilter(f.getDescription(), ext));
         }
     }
@@ -382,11 +382,11 @@ public class NativeJFileChooser extends JFileChooser {
             return;
         }
         if (bool) {
-            fileChooser.getExtensionFilters()
+            ((FileChooser) fileChooser).getExtensionFilters()
                     .add(new FileChooser.ExtensionFilter("All files", "*.*"));
         } else {
             for (Iterator<FileChooser.ExtensionFilter> it
-                    = fileChooser.getExtensionFilters().iterator(); it.hasNext();) {
+                    = ((FileChooser) fileChooser).getExtensionFilters().iterator(); it.hasNext();) {
                 FileChooser.ExtensionFilter filter = it.next();
                 if (filter.getExtensions().size() == 1
                         && filter.getExtensions().contains("*.*")) {
