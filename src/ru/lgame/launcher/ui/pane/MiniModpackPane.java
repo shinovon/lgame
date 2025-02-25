@@ -132,7 +132,7 @@ public class MiniModpackPane extends JPanel {
 
 	protected void selected() {
 		selected = true;
-		setBorder(new MatteBorder(1, 1, 1, 1, Color.WHITE));
+		setBorder(new MatteBorder(1, 1, 1, 1, Config.getBoolean("legacyLook") ? PROGRESS_BAR_FG_LEGACY_COLOR : Color.WHITE));
 		Launcher.inst.frame().mainPane().setSelected(this);
 	}
 
@@ -218,14 +218,10 @@ public class MiniModpackPane extends JPanel {
 	
 	public void updateContents() {
 		if(selected) {
-			setBorder(new MatteBorder(1, 1, 1, 1, Color.WHITE));
+			setBorder(new MatteBorder(1, 1, 1, 1, Config.getBoolean("legacyLook") ? PROGRESS_BAR_FG_LEGACY_COLOR : Color.WHITE));
 		} else {
 			setBorder(new MatteBorder(0, 0, 1, 0, Color.GRAY));
 		}
-		//removeAll();
-		//add(imageLabel);
-		//add(new JLabel(sborkaName));
-		//add(new JLabel(desc));
 		setPreferredSize(new Dimension(200, ITEM_HEIGHT));
 		repaint();
 	}
